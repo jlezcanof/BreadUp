@@ -16,8 +16,8 @@ final class BreadCalculatorVM {
     var time: Int = 0
     var temperature: Int = 0
 
+    // TODO pendiente de calcular
     func calculate() {
-        print("vm.calculate")
         let hydration = Double(water) / Double(flourQuantity)
 
         let flourFactor: Double = switch flourType {

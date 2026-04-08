@@ -55,12 +55,12 @@ struct ContentView: View {
                             step:5,
                             onEditingChanged: { editing in
     //                            isEditing = editing
-                                if editing {
-                                    print("Empieza a mover el slider")
-                                } else {
-                                    print("Termina de mover el slider")
-                                    // Aquí haces algo pesado: guardar, enviar, etc.
-                                }
+//                                if editing {
+//                                    print("Empieza a mover el slider")
+//                                } else {
+//                                    print("Termina de mover el slider")
+//                                    // Aquí haces algo pesado: guardar, enviar, etc.
+//                                }
                             }
                         )
                         HStack {
@@ -94,14 +94,9 @@ struct ContentView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
-
-                    
                     Section {
                         Button {
                             vm.calculate()
-//                            withAnimation {
-//                                proxy.scrollTo(resultID, anchor: .bottom)
-//                            }
                         } label: {
                             Text("Calcular")
                                 .frame(maxWidth: .infinity)
