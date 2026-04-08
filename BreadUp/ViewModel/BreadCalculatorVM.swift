@@ -51,12 +51,12 @@ final class BreadCalculatorVM {
     }
     
     func save(context: ModelContext) {
-        let ingredients = BreadUpIngredients(water: water,
+        let ingredients = BreadUpIngredients(id: UUID(),water: water,
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
                                              yeast: yeast)
         
-        let result = BreadUpCalculate(time: time,
+        let result = BreadUpCalculate(id: UUID(), time: time,
                                       temperature: temperature)
         
         ingredients.calculateBread = result

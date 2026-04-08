@@ -30,6 +30,7 @@ enum BreadUpSchemaV1: VersionedSchema {
     
     @Model
     final class Ingredients {
+        @Attribute(.unique) var id: UUID
         var water: Int
         var flourType: TypeFlour
         var flourQuantity: Int
@@ -39,11 +40,13 @@ enum BreadUpSchemaV1: VersionedSchema {
         var calculateBread: CalculateBread?
 
         init(
+            id: UUID,
             water: Int,
             flourType: TypeFlour,
             flourQuantity: Int,
             yeast: Int
         ) {
+            self.id = id
             self.water = water
             self.flourType = flourType
             self.flourQuantity = flourQuantity
@@ -53,12 +56,14 @@ enum BreadUpSchemaV1: VersionedSchema {
 
     @Model
     final class CalculateBread {
+        @Attribute(.unique) var id: UUID
         var time: Int
         var temperature: Int
 
         var ingredients: Ingredients?
 
-        init(time: Int, temperature: Int) {
+        init(id: UUID, time: Int, temperature: Int) {
+            self.id = id
             self.time = time
             self.temperature = temperature
         }

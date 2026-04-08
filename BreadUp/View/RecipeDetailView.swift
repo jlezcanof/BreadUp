@@ -1,14 +1,14 @@
 //
-//  ContentView.swift
+//  RecipeDetailView.swift
 //  BreadUp
 //
-//  Created by Jose Manuel Lezcano on 25/3/26.
+//  Created by Jose Manuel Lezcano Fresno on 8/4/26.
 //
 
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct RecipeDetailView: View {
     
     @Environment(\.modelContext) private var modelContext
     @State private var vm = BreadCalculatorVM()
@@ -141,5 +141,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    RecipeDetailView()
 }
