@@ -17,6 +17,7 @@ final class BreadCalculatorVM {
     var temperature: Int = 0
 
     func calculate() {
+        print("vm.calculate")
         let hydration = Double(water) / Double(flourQuantity)
 
         let flourFactor: Double = switch flourType {
@@ -30,6 +31,7 @@ final class BreadCalculatorVM {
         let baseTime = 60.0 - (Double(yeast) * 0.8)
         let adjustedTime = baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
         time = max(25, Int(adjustedTime.rounded()))
+        print("time is \(time)")
 
         let baseTemp: Double = switch flourType {
         case .wheat:      200

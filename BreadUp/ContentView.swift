@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel = BreadCalculatorVM()
+    @State private var vm = BreadCalculatorVM()
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Agua") {
                     VStack(alignment: .leading) {
-                        Text("\(viewModel.water) ml")
+                        Text("\(vm.water) ml")
                             .font(.headline)
                         Slider(
                             value: Binding(
-                                get: { Double(viewModel.water) },
-                                set: { viewModel.water = Int($0) }
+                                get: { Double(vm.water) },
+                                set: { vm.water = Int($0) }
                             ),
                             in: 125...500,
                             step: 25
@@ -36,19 +36,19 @@ struct ContentView: View {
                 }
 
                 Section("Harina") {
-                    Picker("Tipo de harina", selection: $viewModel.flourType) {
+                    Picker("Tipo de harina", selection: $vm.flourType) {
                         ForEach(FlourType.allCases) { type in
                             Text(type.rawValue).tag(type)
                         }
                     }
 
                     VStack(alignment: .leading) {
-                        Text("\(viewModel.flourQuantity) ml")
+                        Text("\(vm.flourQuantity) ml")
                             .font(.headline)
                         Slider(
                             value: Binding(
-                                get: { Double(viewModel.flourQuantity) },
-                                set: { viewModel.flourQuantity = Int($0) }
+                                get: { Double(vm.flourQuantity) },
+                                set: { vm.flourQuantity = Int($0) }
                             ),
                             in: 125...400,
                             step: 25
@@ -64,17 +64,40 @@ struct ContentView: View {
                 }
 
                 Section("Levadura") {
-                    Stepper(
-                        "\(viewModel.yeast) gramos",
-                        value: $viewModel.yeast,
+                    Text("\(vm.yeast) gramos")
+                        .font(.headline)
+                    
+                    
+                    Slider(
+                        value: Binding(
+                            get: { Double(vm.yeast) },
+                            set: { vm.yeast = Int($0) }
+                        ),
                         in: 5...50,
-                        step: 5
+                        step:5,
+                        onEditingChanged: { editing in
+//                            isEditing = editing
+                            if editing {
+                                print("Empieza a mover el slider")
+                            } else {
+                                print("Termina de mover el slider")
+                                // Aquí haces algo pesado: guardar, enviar, etc.
+                            }
+                        }
                     )
+                    HStack {
+                        Text("5 gr")
+                        Spacer()
+                        Text("50 gr")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                           
                 }
 
                 Section {
                     Button {
-                        viewModel.calculate()
+                        vm.calculate()
                     } label: {
                         Text("Calcular")
                             .frame(maxWidth: .infinity)
@@ -82,10 +105,10 @@ struct ContentView: View {
                     }
                 }
 
-                if viewModel.time > 0 {
+                if vm.time > 0 {
                     Section("Resultado") {
-                        LabeledContent("Tiempo", value: "\(viewModel.time) minutos")
-                        LabeledContent("Temperatura", value: "\(viewModel.temperature) °C")
+                        LabeledContent("Tiempo", value: "\(vm.time) minutos")
+                        LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                     }
                 }
             }
