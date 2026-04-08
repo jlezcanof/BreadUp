@@ -5,7 +5,7 @@
 
 import Foundation
 
-@MainActor
+//@MainActor
 @Observable
 final class BreadCalculatorVM {
     var water: Int = 250
@@ -43,5 +43,10 @@ final class BreadCalculatorVM {
 
         let tempAdjustment = (hydration - 0.6) * 15
         temperature = Int((baseTemp - tempAdjustment).rounded())
+    }
+    
+    func resetResult() {
+        time = 0
+        temperature = 0
     }
 }
