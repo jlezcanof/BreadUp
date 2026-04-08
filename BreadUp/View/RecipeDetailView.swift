@@ -11,8 +11,11 @@ import SwiftData
 struct RecipeDetailView: View {
     
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
     @State private var vm = BreadCalculatorVM()
     @State private var resultID = "resultado"
+    @State private var showSaveAlert = false
 
     var body: some View {
         NavigationStack {
@@ -112,7 +115,8 @@ struct RecipeDetailView: View {
                             LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                             
                             Button {
-                                        vm.save(context: modelContext)
+                                // vm.save(context: modelContext)
+                                showSaveAlert = true
                                         } label: {
                                             HStack {
                                                 Spacer()
@@ -133,6 +137,13 @@ struct RecipeDetailView: View {
                             proxy.scrollTo(resultID, anchor: .bottom)
                         }
                     }
+                }
+                .alert("Guardar receta", isPresented: $showSaveAlert) {
+                    Button("No", role: .cancel) { }
+                       Button("Sí") {
+                           vm.save(context: modelContext)
+                           dismiss()
+                       }
                 }
                 .navigationTitle("BreadUp")
             }
