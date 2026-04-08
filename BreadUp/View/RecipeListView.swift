@@ -18,8 +18,8 @@ struct RecipeListView: View {
         List {
             ForEach(recipes) { recipe in
                 VStack(alignment: .leading, spacing: 6) {
- //                   Text(recipe.flourType.displayName)
-//                        .font(.headline)
+                    Text(recipe.flourType.displayName)
+                        .font(.headline)
                     HStack {
                         Label("\(recipe.water) ml", systemImage: "drop.fill")
                         Spacer()

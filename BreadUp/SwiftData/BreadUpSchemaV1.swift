@@ -70,3 +70,16 @@ enum BreadUpSchemaV1: VersionedSchema {
     }
     
 }
+
+extension BreadUpSchemaV1.TypeFlour {
+    
+    var displayName: String {
+        switch self {
+        case .wheat:     "Harina de trigo"
+        case .wholewheat: "Harina de trigo integral"
+        case .rye:       "Harina de Centeno"
+        case .spelt:     "Harina de espelta"
+        case .corn:      "Harina de maíz"
+        }
+    }
+}
