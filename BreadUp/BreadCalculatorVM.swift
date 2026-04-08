@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import SwiftData
 
 //@MainActor
 @Observable
@@ -48,5 +49,19 @@ final class BreadCalculatorVM {
     func resetResult() {
         time = 0
         temperature = 0
+    }
+    
+    func save(context: ModelContext) {
+        let ingredients = BreadUpIngredients(water: water,
+                                             flourType: flourType.toSchemaType,
+                                             flourQuantity: flourQuantity,
+                                             yeast: yeast)
+        
+        let result = BreadUpCalculate(time: time,
+                                      temperature: temperature)
+        
+        ingredients.calculateBread = result
+        
+        context.insert(ingredients)
     }
 }

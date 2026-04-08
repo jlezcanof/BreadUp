@@ -21,4 +21,5 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
 }
 
 
-typealias BreadUPIngredients         = BreadUpSchemaV1.Ingredients
+typealias BreadUpIngredients         = BreadUpSchemaV1.Ingredients
+typealias BreadUpCalculate           = BreadUpSchemaV1.CalculateBread

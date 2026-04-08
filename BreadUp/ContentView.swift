@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    
+    @Environment(\.modelContext) private var modelContext
     @State private var vm = BreadCalculatorVM()
     @State private var resultID = "resultado"
 
@@ -107,6 +110,15 @@ struct ContentView: View {
                         Section("Resultado") {
                             LabeledContent("Tiempo", value: "\(vm.time) minutos")
                             LabeledContent("Temperatura", value: "\(vm.temperature) °C")
+                            
+                            Button {
+                                        vm.save(context: modelContext)
+                                        } label: {
+                                            HStack {
+                                                Spacer()
+                                                Label("Guardar receta", systemImage: "cooktop.fill")
+                                            }
+                                        }
                         }
                         .id(resultID)
                     }
