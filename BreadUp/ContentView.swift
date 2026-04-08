@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  BreadUp
 //
-//  Created by Yomismista on 25/3/26.
+//  Created by Jose Manuel Lezcano on 25/3/26.
 //
 
 import SwiftUI

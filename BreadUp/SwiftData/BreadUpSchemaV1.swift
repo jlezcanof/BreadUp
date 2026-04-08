@@ -1,0 +1,102 @@
+//
+//  BreadUpSchemaV1.swift
+//  BreadUp
+//
+//  Created by Jose Manuel Lezcano on 8/4/26.
+//
+
+import Foundation
+import SwiftData
+
+enum BreadUpSchemaV1: VersionedSchema {
+    static var versionIdentifier: Schema.Version {
+        Schema.Version(1, 0, 0)
+    }
+
+    static var models: [any PersistentModel.Type] {
+        [Ingredients.self, CalculateBread.self]
+    }
+    
+    //enum FlourType: String, CaseIterable, Identifiable {
+    //    case wheat = "Harina de trigo"
+    //    case wholeWheat = "Harina de trigo integral"
+    //    case rye = "Harina de Centeno"
+    //    case spelt = "Harina de espelta"
+    //    case corn = "Harina de maíz"
+    //
+    //    var id: Self { self }
+    //}
+
+    @Model
+    final class Ingredients {
+        var water: Int
+        var flourType: String//FlourType
+        var flourQuantity: Int
+        var yeast: Int
+
+        @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
+        var calculateBread: CalculateBread?
+
+        init(
+            water: Int,
+            flourType: String,//FlourType,
+            flourQuantity: Int,
+            yeast: Int
+        ) {
+            self.water = water
+            self.flourType = flourType
+            self.flourQuantity = flourQuantity
+            self.yeast = yeast
+        }
+    }
+
+    @Model
+    final class CalculateBread {
+        var time: Int
+        var temperature: Int
+
+        var ingredients: Ingredients?
+
+        init(time: Int, temperature: Int) {
+            self.time = time
+            self.temperature = temperature
+        }
+    }
+    
+//    @Model
+//    final class Ingredients {
+//        var water: Int
+//        var flourType: FlourType
+//        var flourQuantity: Int
+//        var yeast: Int
+//
+//        @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
+//        var calculateBread: CalculateBread?
+//
+//        init(
+//            water: Int,
+//            flourType: FlourType,
+//            flourQuantity: Int,
+//            yeast: Int
+//        ) {
+//            self.water = water
+//            self.flourType = flourType
+//            self.flourQuantity = flourQuantity
+//            self.yeast = yeast
+//        }
+//    }
+//
+//    @Model
+//    final class CalculateBread {
+//        var time: Int
+//        var temperature: Int
+//
+//        var ingredients: Ingredients?
+//
+//        init(time: Int, temperature: Int) {
+//            self.time = time
+//            self.temperature = temperature
+//        }
+//    }
+
+}
