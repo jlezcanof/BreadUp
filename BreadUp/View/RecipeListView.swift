@@ -17,30 +17,32 @@ struct RecipeListView: View {
     var body: some View {
         List {
             ForEach(recipes) { recipe in
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(recipe.flourType.displayName)
-                        .font(.headline)
-                    HStack {
-                        Label("\(recipe.water) ml", systemImage: "drop.fill")
-                        Spacer()
-                        Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
-                        Spacer()
-                        Label("\(recipe.yeast) g", systemImage: "microbe.fill")
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                    if let result = recipe.calculateBread {
+                NavigationLink(destination: RecipeSavedDetailView(recipe: recipe)) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(recipe.flourType.displayName)
+                            .font(.headline)
                         HStack {
-                            Label("\(result.time) min", systemImage: "clock.fill")
+                            Label("\(recipe.water) ml", systemImage: "drop.fill")
                             Spacer()
-                            Label("\(result.temperature) °C", systemImage: "thermometer.medium")
+                            Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
+                            Spacer()
+                            Label("\(recipe.yeast) g", systemImage: "microbe.fill")
                         }
                         .font(.subheadline)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.secondary)
+
+                        if let result = recipe.calculateBread {
+                            HStack {
+                                Label("\(result.time) min", systemImage: "clock.fill")
+                                Spacer()
+                                Label("\(result.temperature) °C", systemImage: "thermometer.medium")
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(.orange)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
             }
             .onDelete(perform: deleteRecipes)
         }
