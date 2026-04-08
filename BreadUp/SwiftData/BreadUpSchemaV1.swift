@@ -17,20 +17,21 @@ enum BreadUpSchemaV1: VersionedSchema {
         [Ingredients.self, CalculateBread.self]
     }
     
-    //enum FlourType: String, CaseIterable, Identifiable {
-    //    case wheat = "Harina de trigo"
-    //    case wholeWheat = "Harina de trigo integral"
-    //    case rye = "Harina de Centeno"
-    //    case spelt = "Harina de espelta"
-    //    case corn = "Harina de maíz"
-    //
-    //    var id: Self { self }
-    //}
-
+     enum TypeFlour: String, Identifiable, Codable, CaseIterable {
+         
+        case wheat
+        case wholewheat
+        case rye
+        case spelt
+        case corn
+         
+         var id: Self {self}
+    }
+    
     @Model
     final class Ingredients {
         var water: Int
-        var flourType: String//FlourType
+        var flourType: TypeFlour
         var flourQuantity: Int
         var yeast: Int
 
@@ -39,7 +40,7 @@ enum BreadUpSchemaV1: VersionedSchema {
 
         init(
             water: Int,
-            flourType: String,//FlourType,
+            flourType: TypeFlour,
             flourQuantity: Int,
             yeast: Int
         ) {
@@ -63,40 +64,4 @@ enum BreadUpSchemaV1: VersionedSchema {
         }
     }
     
-//    @Model
-//    final class Ingredients {
-//        var water: Int
-//        var flourType: FlourType
-//        var flourQuantity: Int
-//        var yeast: Int
-//
-//        @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
-//        var calculateBread: CalculateBread?
-//
-//        init(
-//            water: Int,
-//            flourType: FlourType,
-//            flourQuantity: Int,
-//            yeast: Int
-//        ) {
-//            self.water = water
-//            self.flourType = flourType
-//            self.flourQuantity = flourQuantity
-//            self.yeast = yeast
-//        }
-//    }
-//
-//    @Model
-//    final class CalculateBread {
-//        var time: Int
-//        var temperature: Int
-//
-//        var ingredients: Ingredients?
-//
-//        init(time: Int, temperature: Int) {
-//            self.time = time
-//            self.temperature = temperature
-//        }
-//    }
-
 }
