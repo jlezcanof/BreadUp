@@ -15,27 +15,6 @@ struct ContentView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 Form {
-                    Section("Agua") {
-                        VStack(alignment: .leading) {
-                            Text("\(vm.water) ml")
-                                .font(.headline)
-                            Slider(
-                                value: Binding(
-                                    get: { Double(vm.water) },
-                                    set: { vm.water = Int($0) }
-                                ),
-                                in: 125...500,
-                                step: 25
-                            )
-                            HStack {
-                                Text("125 ml")
-                                Spacer()
-                                Text("500 ml")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    }
 
                     Section("Harina") {
                         Picker("Tipo de harina", selection: $vm.flourType) {
@@ -43,7 +22,6 @@ struct ContentView: View {
                                 Text(type.rawValue).tag(type)
                             }
                         }
-
                         VStack(alignment: .leading) {
                             Text("\(vm.flourQuantity) ml")
                                 .font(.headline)
@@ -94,13 +72,36 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                                
                     }
+                    
+                    Section("Agua") {
+                        VStack(alignment: .leading) {
+                            Text("\(vm.water) ml")
+                                .font(.headline)
+                            Slider(
+                                value: Binding(
+                                    get: { Double(vm.water) },
+                                    set: { vm.water = Int($0) }
+                                ),
+                                in: 125...500,
+                                step: 25
+                            )
+                            HStack {
+                                Text("125 ml")
+                                Spacer()
+                                Text("500 ml")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
 
+                    
                     Section {
                         Button {
                             vm.calculate()
-                            withAnimation {
-                                proxy.scrollTo(resultID, anchor: .bottom)
-                            }
+//                            withAnimation {
+//                                proxy.scrollTo(resultID, anchor: .bottom)
+//                            }
                         } label: {
                             Text("Calcular")
                                 .frame(maxWidth: .infinity)
@@ -119,6 +120,13 @@ struct ContentView: View {
                 .onChange(of: vm.flourType) {vm.resetResult()}
                 .onChange(of: vm.flourQuantity) {vm.resetResult()}
                 .onChange(of: vm.yeast) {vm.resetResult()}
+                .onChange(of: vm.time) {
+                    if vm.time > 0 {
+                        withAnimation {
+                            proxy.scrollTo(resultID, anchor: .bottom)
+                        }
+                    }
+                }
                 .navigationTitle("BreadUp")
             }
         }
