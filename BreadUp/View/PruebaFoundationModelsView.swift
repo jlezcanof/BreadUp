@@ -26,15 +26,14 @@ struct PruebaFoundationModels: View {
                 Task {
                     do {
                           try await vm.obtenerRespuestaLLM()
+                                                
+                        let prompt = "Genera una receta de pan en tan solo 5 líneas con estas cantidades en los ingredientes"
                         
+                        let stream = session2.streamResponse(to: prompt, generating: Pan.self)
                         
-//                          let prompt = "Genera una receta de pan en tan solo 5 líneas con estas cantidades en los ingredientes"
-//                        
-//                        let stream = session2.streamResponse(to: prompt, generating: Pan.self)
-//                        
-//                        for try await partial in stream {
-//                            self.onePan = partial
-//                        }
+                        for try await partial in stream {
+                            // self.onePan = partial
+                        }
 
 ////                        print(response.content)
 ////                        print(response.rawContent)
