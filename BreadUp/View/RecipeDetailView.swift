@@ -142,6 +142,7 @@ struct RecipeDetailView: View {
                     Button("No", role: .cancel) { }
                        Button("Sí") {
                            vm.save(context: modelContext)
+                           vm.prueba()
                            dismiss()
                        }
                 }

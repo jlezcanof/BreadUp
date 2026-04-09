@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		9E1BCFD62F87A9B0003A4812 /* FMFPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = FMFPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9E27310D2F7446EA0008A3B9 /* BreadUp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreadUp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +33,7 @@
 		9E2731042F7446EA0008A3B9 = {
 			isa = PBXGroup;
 			children = (
+				9E1BCFD62F87A9B0003A4812 /* FMFPlayground.playground */,
 				9E27310F2F7446EA0008A3B9 /* BreadUp */,
 				9E27310E2F7446EA0008A3B9 /* Products */,
 			);
@@ -270,6 +272,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-no_warn_duplicate_libraries";
 				PRODUCT_BUNDLE_IDENTIFIER = com.josemanuel.lezcano.BreadUp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -309,6 +312,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-no_warn_duplicate_libraries";
 				PRODUCT_BUNDLE_IDENTIFIER = com.josemanuel.lezcano.BreadUp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

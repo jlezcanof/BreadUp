@@ -63,4 +63,14 @@ final class BreadCalculatorVM {
         
         context.insert(ingredients)
     }
+    
+    
+    func prueba() {
+        let value: String?? = .some(nil)
+        
+        print( value == nil)//false
+//        print (value?.self == nil)
+        print(value.self == nil)//
+        
+    }
 }

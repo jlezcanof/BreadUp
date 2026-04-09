@@ -22,9 +22,14 @@ struct BreadUpApp: App {
     }
     
     var body: some Scene {
+        
+//        WindowGroup {
+//            ContentView()
+//        }
+//        .modelContainer(container)
+        
         WindowGroup {
-            ContentView()
+            PruebaFoundationModels()
         }
-        .modelContainer(container)
     }
 }
