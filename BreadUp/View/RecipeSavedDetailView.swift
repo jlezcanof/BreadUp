@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RecipeSavedDetailView: View {
+    
     let recipe: BreadUpIngredients
 
     var body: some View {

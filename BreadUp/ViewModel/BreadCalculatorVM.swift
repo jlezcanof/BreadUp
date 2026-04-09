@@ -5,10 +5,11 @@
 
 import Foundation
 import SwiftData
+import FoundationModels
 
-//@MainActor
 @Observable
 final class BreadCalculatorVM {
+    
     var water: Int = 250
     var flourType: FlourType = .wheat
     var flourQuantity: Int = 250
@@ -16,6 +17,19 @@ final class BreadCalculatorVM {
 
     var time: Int = 0
     var temperature: Int = 0
+    let prompt = """
+    Generate a list of suggested search terms for an app about visiting famous landmarks
+    """
+    
+    //"Cuál es la mejor manera de hacer una receta de pan"
+    let session: LanguageModelSession// = LanguageModelSession()
+ 
+    var resultado = "" // Pulsa para probar
+    
+    init() {
+        self.session = LanguageModelSession()
+    }
+
 
     // TODO pendiente de calcular
     func calculate() {
@@ -71,6 +85,17 @@ final class BreadCalculatorVM {
         print( value == nil)//false
 //        print (value?.self == nil)
         print(value.self == nil)//
-        
     }
+    
+    func obtenerRespuestaLLM() async throws {
+        let response = try await session.respond(
+            to: self.prompt,
+            generating: SearchSuggestions.self
+        )
+        resultado = "\(response.rawContent)".replacingOccurrences(of: "\\n", with: "\n")
+        //  print(response.content)
+        //  print(response.rawContent)
+    }
+    
+    
 }

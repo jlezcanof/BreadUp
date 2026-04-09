@@ -9,27 +9,44 @@ import SwiftUI
 import FoundationModels
 
 struct PruebaFoundationModels: View {
-    @State private var resultado = "Pulsa para probar"
+    
+    let session2: LanguageModelSession
+    
+    @State private var vm = BreadCalculatorVM()
+    
+    @State
+    private var onePan: Pan.PartiallyGenerated?
+    
+    //@State private var resultado = "" // Pulsa para probar
 
     var body: some View {
         VStack(spacing: 20) {
             Button("Probar FoundationModels") {
+                
                 Task {
                     do {
-                        let session = LanguageModelSession()
-                        let response = try await session.respond(
-                            to: "Cuál es la mejor manera de hacer una receta de pan"
-                        )
-                        resultado = "\(response.rawContent)".replacingOccurrences(of: "\\n", with: "\n")
-//                        print(response.content)
-//                        print(response.rawContent)
+                          try await vm.obtenerRespuestaLLM()
+                        
+                        
+//                          let prompt = "Genera una receta de pan en tan solo 5 líneas con estas cantidades en los ingredientes"
+//                        
+//                        let stream = session2.streamResponse(to: prompt, generating: Pan.self)
+//                        
+//                        for try await partial in stream {
+//                            self.onePan = partial
+//                        }
+
+////                        print(response.content)
+////                        print(response.rawContent)
                     } catch {
-                        resultado = "Error: \(error.localizedDescription)"
+                        print("Error: \(error.localizedDescription)")
+                        // resultado = "Error: \(error.localizedDescription)"
                     }
+                    
                 }
             }
             ScrollView {
-                if let messageMD = try? AttributedString(markdown: resultado, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
+                if let messageMD = try? AttributedString(markdown: vm.resultado, options: options) {
                     Text(messageMD)
                         .padding()
                         .textSelection(.enabled)
@@ -41,10 +58,11 @@ struct PruebaFoundationModels: View {
         }
     }
     
-    private static let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+    private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .full)
+    //      .inlineOnlyPreservingWhitespace
 
 }
 
 #Preview {
-    PruebaFoundationModels()
+    PruebaFoundationModels(session2: LanguageModelSession())
 }

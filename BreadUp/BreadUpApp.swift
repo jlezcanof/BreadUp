@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import FoundationModels
 
 @main
 struct BreadUpApp: App {
@@ -29,7 +30,7 @@ struct BreadUpApp: App {
 //        .modelContainer(container)
         
         WindowGroup {
-            PruebaFoundationModels()
+            PruebaFoundationModels(session2: LanguageModelSession())
         }
     }
 }
