@@ -106,22 +106,27 @@ struct RecipeDetailView: View {
                             //vm.calculate()
                             vm.calculateRecipe()
                         } label: {
-                            Text("Calcular")
+                            Label("Generar receta", systemImage: "apple.intelligence")
                                 .frame(maxWidth: .infinity)
                                 .font(.headline)
+//                            Text("Generar receta")
+//                                .frame(maxWidth: .infinity)
+//                                .font(.headline)
                         }
                     }
-                    if vm.time > 0 {
+                    if let recipe = vm.recipe {
                         Section("Resultado") {
-                            LabeledContent("Tiempo", value: "\(vm.time) minutos")
-                            LabeledContent("Temperatura", value: "\(vm.temperature) °C")
-                            
+//                            LabeledContent("Tiempo", value: "\(vm.time) minutos")
+//                            LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                             ScrollView {
-                                if let messageMD = try? AttributedString(markdown: vm.recipe, options: options) {
+                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
                                     Text(messageMD)
                                         .padding()
                                         .textSelection(.enabled)
                                         .frame(maxWidth: .infinity, alignment: .leading)
+//                                        .frame(height: 200)
+                                        .background(Color(.secondarySystemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
                             
@@ -163,7 +168,7 @@ struct RecipeDetailView: View {
         }
     }
     
-    private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .full)
+    private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
     //      .inlineOnlyPreservingWhitespace
 }
 

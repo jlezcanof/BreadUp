@@ -4,15 +4,7 @@
 //
 //  Created by Yomismista on 9/4/26.
 //
-
 import FoundationModels
-
-
-
-@Generable()
-struct Pan {
-    var consejos: String
-}
 
 struct GetBreadRecipeTool: Tool {
         
@@ -25,9 +17,7 @@ struct GetBreadRecipeTool: Tool {
     let description = "Calculates the preparation method for the recipe bread with the given ingredients"
     
     let includesSchemaInInstructions = false
-    
-//    let parameters: GenerationSchema
-    
+        
     @Generable
     struct BreadArguments {
         // Aqui vamos a poner todos los ingredientes y su cantidad

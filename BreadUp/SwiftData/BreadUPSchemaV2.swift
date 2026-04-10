@@ -15,4 +15,8 @@ enum BreadUpSchemaV2: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         []
     }
+    
+    // TODO a los ingredientes le vamos a añadir la sal..
+    
+    //y en la receta sólo vamos a guardar el tiempo de cocción y temperatura...y la fecha que se han guardado..
 }

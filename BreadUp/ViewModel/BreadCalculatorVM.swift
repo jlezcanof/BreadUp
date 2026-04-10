@@ -24,7 +24,7 @@ final class BreadCalculatorVM {
     //"Cuál es la mejor manera de hacer una receta de pan"
     //let session: LanguageModelSession// = LanguageModelSession()
  
-    var recipe = "" // Pulsa para probar
+    var recipe : String?//= "" // Pulsa para probar
     
     init() {
 //        self.session = LanguageModelSession(tools: [GetBreadRecipeTool()], instructions: "hola.")
@@ -94,21 +94,20 @@ final class BreadCalculatorVM {
     }
     
     private func generateRecipeBread() async throws {
-        let session = LanguageModelSession(//model: SystemLanguageModel(useCase: .contentTagging),
+        let session = LanguageModelSession(
             tools:  [GetBreadRecipeTool()], instructions: """
             Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
             """)
       
         let prompt = """
-            Dime en 5 líneas cómo hacer un pan con estos ingredientes:
+            Me vas a dar una receta para hacer un pan con los ingredientes y cantidades indicadas. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo:
             - Agua: \(water) ml
             - Harina: \(flourType.rawValue), \(flourQuantity) ml
             - Levadura: \(yeast) g
         """
         
-        let response = try await session.respond(to: prompt)// "Dime en cinco líneas la menor manera de hacer un pan con estos ingredientes"
+        let response = try await session.respond(to: prompt)
         self.recipe = response.content
-//        print(response.content)
         
         print(session.transcript)
         
