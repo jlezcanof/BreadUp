@@ -22,12 +22,12 @@ final class BreadCalculatorVM {
     """
     
     //"Cuál es la mejor manera de hacer una receta de pan"
-    let session: LanguageModelSession// = LanguageModelSession()
+    //let session: LanguageModelSession// = LanguageModelSession()
  
-    var resultado = "" // Pulsa para probar
+    var recipe = "" // Pulsa para probar
     
     init() {
-        self.session = LanguageModelSession()
+//        self.session = LanguageModelSession(tools: [GetBreadRecipeTool()], instructions: "hola.")
     }
 
 
@@ -86,15 +86,34 @@ final class BreadCalculatorVM {
 //        print (value?.self == nil)
         print(value.self == nil)//
     }
+        
+    func calculateRecipe() {
+        Task {
+            try? await self.generateRecipeBread()
+        }
+    }
     
-    func obtenerRespuestaLLM() async throws {
-        let response = try await session.respond(
-            to: self.prompt,
-            generating: SearchSuggestions.self
-        )
-        resultado = "\(response.rawContent)".replacingOccurrences(of: "\\n", with: "\n")
-        //  print(response.content)
-        //  print(response.rawContent)
+    private func generateRecipeBread() async throws {
+        let session = LanguageModelSession(//model: SystemLanguageModel(useCase: .contentTagging),
+            tools:  [GetBreadRecipeTool()], instructions: """
+            Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
+            """)
+      
+        let prompt = """
+            Dime en 5 líneas cómo hacer un pan con estos ingredientes:
+            - Agua: \(water) ml
+            - Harina: \(flourType.rawValue), \(flourQuantity) ml
+            - Levadura: \(yeast) g
+        """
+        
+        let response = try await session.respond(to: prompt)// "Dime en cinco líneas la menor manera de hacer un pan con estos ingredientes"
+        self.recipe = response.content
+//        print(response.content)
+        
+        print(session.transcript)
+        
+        time = 1
+        
     }
     
     

@@ -23,14 +23,12 @@ struct BreadUpApp: App {
     }
     
     var body: some Scene {
-        
-//        WindowGroup {
-//            ContentView()
-//        }
-//        .modelContainer(container)
-        
         WindowGroup {
-            PruebaFoundationModels(session2: LanguageModelSession())
+            ContentView()
         }
+        .modelContainer(container)
+//        WindowGroup {
+//            PruebaFoundationModels(session2: LanguageModelSession())
+//        }
     }
 }

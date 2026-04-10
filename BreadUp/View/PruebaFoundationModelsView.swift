@@ -8,7 +8,11 @@
 import SwiftUI
 import FoundationModels
 
+@available(*, deprecated, renamed: "RecipeDetailview")
 struct PruebaFoundationModels: View {
+    
+    // nos indiciará si está disponible o no
+    private let model = SystemLanguageModel.default
     
     let session2: LanguageModelSession
     
@@ -17,16 +21,23 @@ struct PruebaFoundationModels: View {
     @State
     private var onePan: Pan.PartiallyGenerated?
     
-    //@State private var resultado = "" // Pulsa para probar
-
     var body: some View {
         VStack(spacing: 20) {
+            
+            switch model.availability {
+            case .available:
+                Text("Model is available").foregroundStyle(.green)
+            case .unavailable(let reason):
+                Text("Model is unavailable").foregroundStyle(Color.red)
+                //Text("Reason: \(reason)")// warning appendInterpolation()
+            }
+            
             Button("Probar FoundationModels") {
                 
                 Task {
                     do {
-                          try await vm.obtenerRespuestaLLM()
-                                                
+//                        try await vm.obtenerRespuestaLLM()
+                        vm.calculateRecipe()
                         let prompt = "Genera una receta de pan en tan solo 5 líneas con estas cantidades en los ingredientes"
                         
                         let stream = session2.streamResponse(to: prompt, generating: Pan.self)
@@ -37,15 +48,15 @@ struct PruebaFoundationModels: View {
 
 ////                        print(response.content)
 ////                        print(response.rawContent)
+                          vm.calculateRecipe()
                     } catch {
                         print("Error: \(error.localizedDescription)")
-                        // resultado = "Error: \(error.localizedDescription)"
                     }
                     
                 }
             }
             ScrollView {
-                if let messageMD = try? AttributedString(markdown: vm.resultado, options: options) {
+                if let messageMD = try? AttributedString(markdown: vm.recipe, options: options) {
                     Text(messageMD)
                         .padding()
                         .textSelection(.enabled)

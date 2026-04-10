@@ -14,6 +14,7 @@ struct RecipeDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var vm = BreadCalculatorVM()
+    
     @State private var resultID = "resultado"
     @State private var showSaveAlert = false
 
@@ -102,7 +103,8 @@ struct RecipeDetailView: View {
                     }
                     Section {
                         Button {
-                            vm.calculate()
+                            //vm.calculate()
+                            vm.calculateRecipe()
                         } label: {
                             Text("Calcular")
                                 .frame(maxWidth: .infinity)
@@ -114,15 +116,25 @@ struct RecipeDetailView: View {
                             LabeledContent("Tiempo", value: "\(vm.time) minutos")
                             LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                             
+                            ScrollView {
+                                if let messageMD = try? AttributedString(markdown: vm.recipe, options: options) {
+                                    Text(messageMD)
+                                        .padding()
+                                        .textSelection(.enabled)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                            
                             Button {
-                                // vm.save(context: modelContext)
+                                // TODO decidir que guardar aqui
+                                vm.save(context: modelContext)
                                 showSaveAlert = true
-                                        } label: {
-                                            HStack {
-                                                Spacer()
-                                                Label("Guardar receta", systemImage: "cooktop.fill")
-                                            }
-                                        }
+                            } label: {
+                                    HStack {
+                                        Spacer()
+                                        Label("Guardar receta", systemImage: "cooktop.fill")
+                                }
+                            }
                         }
                         .id(resultID)
                     }
@@ -150,6 +162,9 @@ struct RecipeDetailView: View {
             }
         }
     }
+    
+    private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .full)
+    //      .inlineOnlyPreservingWhitespace
 }
 
 #Preview {

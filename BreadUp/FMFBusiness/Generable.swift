@@ -7,12 +7,6 @@
 
 import FoundationModels
 
-@Generable()
-struct SearchSuggestions {
-    
-    @Guide(description: "A list of suggested search terms", .count(1))//Una receta de como hacer pan
-    var searchTerms: [String]  
-}
 
 
 @Generable()
@@ -20,47 +14,71 @@ struct Pan {
     var consejos: String
 }
 
-
-struct GetBreadRecipeTool : Tool {
-    
+struct GetBreadRecipeTool: Tool {
+        
     typealias Output = ToolOutput
     
     typealias Arguments = BreadArguments
     
-    @Generable
-    struct BreadArguments {
-        
-        @Guide(description: "The number of bread recipes to fetch")
-        var recipe: String
-        
-        // Aqui vamos a poner todos los ingredientes y su cantidad
-    }
+    let name = "calculate_break"
     
-    let name = "getBreadRecipeTool"
+    let description = "Calculates the preparation method for the recipe bread with the given ingredients"
     
-    let description = "Obtener la mejor receta para hacer pan"
+    let includesSchemaInInstructions = false
     
 //    let parameters: GenerationSchema
     
-    func call(arguments: Arguments) async throws -> ToolOutput? {
+    @Generable
+    struct BreadArguments {
+        // Aqui vamos a poner todos los ingredientes y su cantidad
+
+        @Guide(description: "The quantity of water")
+        var water: Int
         
-//        let content = GeneratedContent(properties: ["pepe" : arguments.recipe])
-//
-////        let content = GeneratedContent(properties: ["temperature": temperature])
-////        let ouput = ToolOutput(content)
-//        
-//        let output = ToolOutput()
-//        return output
+        @Guide(description: "Type of flour")
+        var flourType: String
         
-        return nil
+        @Guide(description: "The quantity of flour")
+        var flourQuantity: Int
+        
+        @Guide(description: "The quantity of yeast")
+        var yeast: Int
+        
+//        @Guide(description: "The number of bread recipes to fetch")
+        var time: Int
+        
+//        @Guide(description: "The number of bread recipes to fetch")
+        var temperature: Int
     }
+    
+    func call(arguments: BreadArguments) async throws -> ToolOutput {
+        
+        let output = ToolOutput(water: arguments.water,
+                                flourType: arguments.flourType,
+                                flourQuantity: arguments.flourQuantity,
+                                yeast: arguments.yeast)
+        
+        return output
+    }
+    
 }
 
-//@MainActor
-struct ToolOutput : PromptRepresentable, Sendable {
+struct ToolOutput : PromptRepresentable {
     
-    let promptRepresentation: Prompt
+    var water: Int
     
+    var flourType: String
     
+    var flourQuantity: Int
+    
+    var yeast: Int
+        
+    // Aqui podremos el prompt de usuario indicando la cantidad de los ingredientes y que queremos hacer pan
+    nonisolated var promptRepresentation: Prompt {
+        """
+            Bread result:
+            - Preparation method for making break: \(water)
+        """
+    }
     
 }
