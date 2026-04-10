@@ -37,7 +37,7 @@ final class BreadCalculatorVM {
 
         let flourFactor: Double = switch flourType {
         case .wheat:      1.0
-        case .wholeWheat:  1.15
+        case .wholewheat:  1.15
         case .rye:         1.2
         case .spelt:       1.1
         case .corn:        1.25
@@ -49,7 +49,7 @@ final class BreadCalculatorVM {
 
         let baseTemp: Double = switch flourType {
         case .wheat:      200
-        case .wholeWheat:  190
+        case .wholewheat:  190
         case .rye:         195
         case .spelt:       185
         case .corn:        210
@@ -66,7 +66,7 @@ final class BreadCalculatorVM {
     
     func save(context: ModelContext) {
         let ingredients = BreadUpIngredients(id: UUID(),water: water,
-                                             flourType: flourType.toSchemaType,
+                                             flourType: flourType.toSchemaType, // flourType.toSchemaType
                                              flourQuantity: flourQuantity,
                                              yeast: yeast)
         

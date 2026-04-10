@@ -33,7 +33,7 @@ enum BreadUpSchemaV1: VersionedSchema {
     final class Ingredients {
         @Attribute(.unique) var id: UUID
         var water: Int
-        var flourType: TypeFlour
+        var flourType: FlourType//TypeFlour
         var flourQuantity: Int
         var yeast: Int
 
@@ -43,7 +43,7 @@ enum BreadUpSchemaV1: VersionedSchema {
         init(
             id: UUID,
             water: Int,
-            flourType: TypeFlour,
+            flourType: FlourType,//TypeFlour
             flourQuantity: Int,
             yeast: Int
         ) {
@@ -72,18 +72,18 @@ enum BreadUpSchemaV1: VersionedSchema {
     
 }
 
-extension BreadUpSchemaV1.TypeFlour {
-    
-    var displayName: String {
-        switch self {
-        case .wheat:     "Harina de trigo"
-        case .wholewheat: "Harina de trigo integral"
-        case .rye:       "Harina de Centeno"
-        case .spelt:     "Harina de espelta"
-        case .corn:      "Harina de maíz"
-        }
-    }
-}
+//extension BreadUpSchemaV1.TypeFlour {
+//    
+//    var displayName: String {
+//        switch self {
+//        case .wheat:     "Harina de trigo"
+//        case .wholewheat: "Harina de trigo integral"
+//        case .rye:       "Harina de Centeno"
+//        case .spelt:     "Harina de espelta"
+//        case .corn:      "Harina de maíz"
+//        }
+//    }
+//}
 
 extension BreadUpSchemaV1.Ingredients  {
     @MainActor static let example = BreadUpIngredients(id: UUID(),

@@ -20,6 +20,52 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
     }
 }
 
-
 typealias BreadUpIngredients         = BreadUpSchemaV1.Ingredients
 typealias BreadUpCalculate           = BreadUpSchemaV1.CalculateBread
+
+
+enum TypeFlour: String, Identifiable, Codable, CaseIterable {
+    
+   case wheat
+   case wholewheat
+   case rye
+   case spelt
+   case corn
+    
+    var id: Self {self}
+}
+
+enum FlourType: String, CaseIterable, Identifiable, Codable {
+    case wheat = "Harina de trigo"
+    case wholewheat = "Harina de trigo integral"
+    case rye = "Harina de Centeno"
+    case spelt = "Harina de espelta"
+    case corn = "Harina de maíz"
+
+    var id: Self { self }
+}
+
+extension FlourType { // BreadUpSchemaV1.TypeFlour
+    
+    var displayName: String {
+        switch self {
+        case .wheat:     "Harina de trigo"
+        case .wholewheat: "Harina de trigo integral"
+        case .rye:       "Harina de Centeno"
+        case .spelt:     "Harina de espelta"
+        case .corn:      "Harina de maíz"
+        }
+    }
+}
+
+extension FlourType {
+    var toSchemaType: FlourType { // BreadUpSchemaV1.TypeFlour
+        switch self {
+        case .wheat:      .wheat
+        case .wholewheat: .wholewheat
+        case .rye:        .rye
+        case .spelt:      .spelt
+        case .corn:       .corn
+        }
+    }
+}

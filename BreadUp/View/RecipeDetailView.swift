@@ -103,7 +103,6 @@ struct RecipeDetailView: View {
                     }
                     Section {
                         Button {
-                            //vm.calculate()
                             vm.calculateRecipe()
                         } label: {
                             Label("Generar receta", systemImage: "apple.intelligence")
@@ -131,7 +130,6 @@ struct RecipeDetailView: View {
                             }
                             Button {
                                 // TODO decidir que guardar aqui
-                                vm.save(context: modelContext)
                                 showSaveAlert = true
                             } label: {
                                     HStack {
@@ -158,7 +156,6 @@ struct RecipeDetailView: View {
                     Button("No", role: .cancel) { }
                        Button("Sí") {
                            vm.save(context: modelContext)
-                           vm.prueba()
                            dismiss()
                        }
                 }
