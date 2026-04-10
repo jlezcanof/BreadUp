@@ -45,7 +45,7 @@ enum FlourType: String, CaseIterable, Identifiable, Codable {
     var id: Self { self }
 }
 
-extension FlourType { // BreadUpSchemaV1.TypeFlour
+extension FlourType {
     
     var displayName: String {
         switch self {
@@ -59,7 +59,7 @@ extension FlourType { // BreadUpSchemaV1.TypeFlour
 }
 
 extension FlourType {
-    var toSchemaType: FlourType { // BreadUpSchemaV1.TypeFlour
+    var toSchemaType: FlourType { 
         switch self {
         case .wheat:      .wheat
         case .wholewheat: .wholewheat
@@ -68,4 +68,13 @@ extension FlourType {
         case .corn:       .corn
         }
     }
+}
+
+// BreadUpIngredients
+extension BreadUpSchemaV1.Ingredients  {
+    @MainActor static let example = BreadUpIngredients(id: UUID(),
+                                            water: 250,
+                                            flourType: .corn,
+                                            flourQuantity: 300,
+                                            yeast: 150)
 }

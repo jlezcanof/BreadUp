@@ -18,22 +18,11 @@ enum BreadUpSchemaV1: VersionedSchema {
         [Ingredients.self, CalculateBread.self]
     }
     
-     enum TypeFlour: String, Identifiable, Codable, CaseIterable {
-         
-        case wheat
-        case wholewheat
-        case rye
-        case spelt
-        case corn
-         
-         var id: Self {self}
-    }
-    
     @Model
     final class Ingredients {
         @Attribute(.unique) var id: UUID
         var water: Int
-        var flourType: FlourType//TypeFlour
+        var flourType: FlourType
         var flourQuantity: Int
         var yeast: Int
 
@@ -43,7 +32,7 @@ enum BreadUpSchemaV1: VersionedSchema {
         init(
             id: UUID,
             water: Int,
-            flourType: FlourType,//TypeFlour
+            flourType: FlourType,
             flourQuantity: Int,
             yeast: Int
         ) {
@@ -72,23 +61,10 @@ enum BreadUpSchemaV1: VersionedSchema {
     
 }
 
-//extension BreadUpSchemaV1.TypeFlour {
-//    
-//    var displayName: String {
-//        switch self {
-//        case .wheat:     "Harina de trigo"
-//        case .wholewheat: "Harina de trigo integral"
-//        case .rye:       "Harina de Centeno"
-//        case .spelt:     "Harina de espelta"
-//        case .corn:      "Harina de maíz"
-//        }
-//    }
+//extension BreadUpSchemaV1.Ingredients  {
+//    @MainActor static let example = BreadUpIngredients(id: UUID(),
+//                                            water: 250,
+//                                            flourType: .corn,
+//                                            flourQuantity: 300,
+//                                            yeast: 150)
 //}
-
-extension BreadUpSchemaV1.Ingredients  {
-    @MainActor static let example = BreadUpIngredients(id: UUID(),
-                                            water: 250,
-                                            flourType: .corn,
-                                            flourQuantity: 300,
-                                            yeast: 150)
-}
