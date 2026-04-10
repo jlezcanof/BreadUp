@@ -101,6 +101,14 @@ struct RecipeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
+                    Section("Fecha") {
+                        DatePicker(
+                                "Fecha de elaboración",
+                                selection: $vm.selectedDate,
+                                displayedComponents: [.date]
+                            )
+//                        DatePicker(selection: <#T##Binding<Date>#>, in: <#T##ClosedRange<Date>#>, label: <#T##() -> Label#>)
+                    }
                     Section {
                         Button {
                             vm.calculateRecipe()

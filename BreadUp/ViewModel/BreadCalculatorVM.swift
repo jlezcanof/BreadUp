@@ -17,6 +17,7 @@ final class BreadCalculatorVM {
 
     var time: Int = 0
     var temperature: Int = 0
+    var selectedDate: Date = Date()
     let prompt = """
     Generate a list of suggested search terms for an app about visiting famous landmarks
     """
@@ -24,7 +25,7 @@ final class BreadCalculatorVM {
     //"Cuál es la mejor manera de hacer una receta de pan"
     //let session: LanguageModelSession// = LanguageModelSession()
  
-    var recipe : String?//= "" // Pulsa para probar
+    var recipe : String?
     
     init() {
 //        self.session = LanguageModelSession(tools: [GetBreadRecipeTool()], instructions: "hola.")
@@ -66,7 +67,7 @@ final class BreadCalculatorVM {
     
     func save(context: ModelContext) {
         let ingredients = BreadUpIngredients(id: UUID(),water: water,
-                                             flourType: flourType.toSchemaType, // flourType.toSchemaType
+                                             flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
                                              yeast: yeast)
         
@@ -76,15 +77,6 @@ final class BreadCalculatorVM {
         ingredients.calculateBread = result
         
         context.insert(ingredients)
-    }
-    
-    
-    func prueba() {
-        let value: String?? = .some(nil)
-        
-        print( value == nil)//false
-//        print (value?.self == nil)
-        print(value.self == nil)//
     }
         
     func calculateRecipe() {

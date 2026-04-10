@@ -10,12 +10,12 @@ import SwiftData
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [BreadUpSchemaV1.self]
+        [BreadUpSchemaV1.self, BreadUpSchemaV2.self]
     }
 
     static var stages: [MigrationStage] {
         [
-//            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
+            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
         ]
     }
 }
