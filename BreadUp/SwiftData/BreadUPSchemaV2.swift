@@ -22,7 +22,7 @@ enum BreadUpSchemaV2: VersionedSchema {
         var water: Int
         var flourType: FlourType
         var flourQuantity: Int
-        var saltQuantity: Int
+//        var saltQuantity: Int
         var yeast: Int
         var created: Date
 
@@ -34,7 +34,7 @@ enum BreadUpSchemaV2: VersionedSchema {
             water: Int,
             flourType: FlourType,
             flourQuantity: Int,
-            saltQuantity: Int,
+//            saltQuantity: Int,
             yeast: Int,
             createdAt: Date
         ) {
@@ -42,7 +42,7 @@ enum BreadUpSchemaV2: VersionedSchema {
             self.water         = water
             self.flourType     = flourType
             self.flourQuantity = flourQuantity
-            self.saltQuantity  = saltQuantity
+//            self.saltQuantity  = saltQuantity
             self.yeast         = yeast
             self.created       = createdAt
         }

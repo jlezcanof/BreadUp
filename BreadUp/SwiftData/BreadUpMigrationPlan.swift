@@ -15,11 +15,12 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
 
     static var stages: [MigrationStage] {
         [
-            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
+//            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
         ]
     }
 }
 
+// pending migrate to v2
 typealias BreadUpIngredients         = BreadUpSchemaV1.Ingredients
 typealias BreadUpCalculate           = BreadUpSchemaV1.CalculateBread
 
@@ -77,4 +78,14 @@ extension BreadUpSchemaV1.Ingredients  {
                                             flourType: .corn,
                                             flourQuantity: 300,
                                             yeast: 150)
+}
+
+extension BreadUpSchemaV2.Ingredients  {
+    @MainActor static let example2 = BreadUpSchemaV2.Ingredients(id: UUID(),
+                                            water: 250,
+                                            flourType: .corn,
+                                            flourQuantity: 300,
+//                                            saltQuantity: 5,
+                                            yeast: 150,
+                                            createdAt: Date())
 }

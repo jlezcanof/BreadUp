@@ -17,7 +17,8 @@ struct RecipeDetailView: View {
     
     @State private var resultID = "resultado"
     @State private var showSaveAlert = false
-
+    @State private var showDatePicker = false
+    
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
@@ -77,7 +78,6 @@ struct RecipeDetailView: View {
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                               
                     }
                     
                     Section("Agua") {
@@ -101,14 +101,37 @@ struct RecipeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
+                    
                     Section("Fecha") {
-                        DatePicker(
+                        Button {
+                            withAnimation {
+                                showDatePicker.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Text("Fecha de elaboración")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Text(vm.selectedDate, format: .dateTime.day().month().year())
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        if showDatePicker {
+                            DatePicker(
                                 "Fecha de elaboración",
                                 selection: $vm.selectedDate,
                                 displayedComponents: [.date]
                             )
-//                        DatePicker(selection: <#T##Binding<Date>#>, in: <#T##ClosedRange<Date>#>, label: <#T##() -> Label#>)
+                            .datePickerStyle(.graphical)
+                            .onChange(of: vm.selectedDate) {
+                                withAnimation {
+                                    showDatePicker = false
+                                }
+                            }
+                        }
                     }
+                    
                     Section {
                         Button {
                             vm.calculateRecipe()
