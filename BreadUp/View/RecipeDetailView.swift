@@ -118,8 +118,8 @@ struct RecipeDetailView: View {
                         Section("Resultado") {
 //                            LabeledContent("Tiempo", value: "\(vm.time) minutos")
 //                            LabeledContent("Temperatura", value: "\(vm.temperature) °C")
+                            if let messageMD = try? AttributedString(markdown: recipe, options: options) {
                             ScrollView {
-                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
                                     Text(messageMD)
                                         .padding()
                                         .textSelection(.enabled)
@@ -129,7 +129,6 @@ struct RecipeDetailView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
-                            
                             Button {
                                 // TODO decidir que guardar aqui
                                 vm.save(context: modelContext)
