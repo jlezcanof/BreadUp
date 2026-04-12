@@ -69,10 +69,10 @@ final class BreadCalculatorVM {
         let ingredients = BreadUpIngredients(id: UUID(),water: water,
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
-                                             yeast: yeast)
+                                             yeast: yeast,
+                                             createdAt: Date() )
         
-        let result = BreadUpCalculate(id: UUID(), time: time,
-                                      temperature: temperature)
+        let result = BreadUpCalculate(id: UUID(), recipe: recipe ?? "")
         
         ingredients.calculateBread = result
         

@@ -33,9 +33,10 @@ struct RecipeListView: View {
 
                         if let result = recipe.calculateBread {
                             HStack {
-                                Label("\(result.time) min", systemImage: "clock.fill")
+                                //Label("\(result.time) min", systemImage: "clock.fill")
                                 Spacer()
-                                Label("\(result.temperature) °C", systemImage: "thermometer.medium")
+                                //Label("\(result.temperature) °C", systemImage: "thermometer.medium")
+                                Label("\(result.recipe)", systemImage: "cooktop.fill")
                             }
                             .font(.subheadline)
                             .foregroundStyle(.orange)
