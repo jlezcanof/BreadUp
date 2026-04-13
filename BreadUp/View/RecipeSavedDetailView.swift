@@ -25,8 +25,17 @@ struct RecipeSavedDetailView: View {
             Section("Agua") {
                 LabeledContent("Cantidad", value: "\(recipe.water) ml")
             }
+            
+            if let created = recipe.created {
+                Section("Fecha de elaboración") {
+                    HStack {
+                            Text(created, format: .dateTime.day().month().year())
+                                .foregroundStyle(.secondary)
+                    }
+                }
+            }
             if let result = recipe.calculateBread, let recipe = result.recipe {
-                Section("Receta") {// Resultado
+                Section("Receta") {
                     LabeledContent("Receta", value: "\(recipe)")
                 }
             }
