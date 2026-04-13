@@ -27,14 +27,14 @@ struct RecipeListView: View {
                             Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
                                 .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
                             Spacer()
-                            Label("\(recipe.yeast) g", systemImage: "microbe.fill")
+                            Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")//microbe.fill
                                 .foregroundStyle(.yellow)
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)                      
                         if let created = recipe.created {
                             HStack {
-                                Spacer()
+//                                Spacer()
                                 Image(systemName: "calendar.circle")
                                     .foregroundStyle(.red)
                                 Text(created, format: .dateTime.day().month().year())

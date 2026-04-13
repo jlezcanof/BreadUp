@@ -193,6 +193,29 @@ struct RecipeDetailView: View {
                 .navigationTitle("BreadUp")
             }
         }
+        .overlay {                                              // <-- NUEVO
+            if vm.isLoading {                                   // <-- NUEVO
+                ZStack {                                        // <-- NUEVO
+                    Color.black.opacity(0.4)                    // <-- NUEVO
+                        .ignoresSafeArea()                      // <-- NUEVO
+                                                                //
+                    VStack(spacing: 16) {                       // <-- NUEVO
+                        ProgressView()                          // <-- NUEVO
+                            .scaleEffect(1.5)                   // <-- NUEVO
+                            .tint(.white)                       // <-- NUEVO
+                        Text("Generando receta...")             // <-- NUEVO
+                            .font(.headline)                    // <-- NUEVO
+                            .foregroundStyle(.white)             // <-- NUEVO
+                    }                                           // <-- NUEVO
+                    .padding(32)                                // <-- NUEVO
+                    .background(.ultraThinMaterial)              // <-- NUEVO
+                    .clipShape(RoundedRectangle(cornerRadius: 16)) // <-- NUEVO
+                }                                               // <-- NUEVO
+                .transition(.opacity)                           // <-- NUEVO
+                .animation(.easeInOut, value: vm.isLoading)     // <-- NUEVO
+            }                                                   // <-- NUEVO
+        }                                                       // <-- NUEVO
+        .allowsHitTesting(!vm.isLoading)                        // <-- NUEVO (bloquea la interacción
     }
     
     private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)

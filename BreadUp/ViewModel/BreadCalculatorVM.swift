@@ -21,11 +21,10 @@ final class BreadCalculatorVM {
     let prompt = """
     Generate a list of suggested search terms for an app about visiting famous landmarks
     """
-    
     //"Cuál es la mejor manera de hacer una receta de pan"
     //let session: LanguageModelSession// = LanguageModelSession()
- 
     var recipe : String?
+    var isLoading = false
     
     init() {
 //        self.session = LanguageModelSession(tools: [GetBreadRecipeTool()], instructions: "hola.")
@@ -87,6 +86,9 @@ final class BreadCalculatorVM {
     }
     
     private func generateRecipeBread() async throws {
+        isLoading = true                    // <-- NUEVO
+        defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
+            
         let session = LanguageModelSession(
             tools:  [GetBreadRecipeTool()], instructions: """
             Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
@@ -104,7 +106,7 @@ final class BreadCalculatorVM {
         
         print(session.transcript)
         
-        time = 1
+        time = 1 // TODO campo fuera
         
     }
     
