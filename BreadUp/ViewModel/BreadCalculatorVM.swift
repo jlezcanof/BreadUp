@@ -70,9 +70,10 @@ final class BreadCalculatorVM {
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
                                              yeast: yeast,
-                                             createdAt: Date() )
+                                            createdAt: selectedDate)
         
         let result = BreadUpCalculate(id: UUID(), recipe: recipe ?? "")
+//        let result = BreadUpCalculate(id: UUID(), time: time, temperature: temperature)
         
         ingredients.calculateBread = result
         

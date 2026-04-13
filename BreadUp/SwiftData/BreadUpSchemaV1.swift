@@ -58,13 +58,4 @@ enum BreadUpSchemaV1: VersionedSchema {
             self.temperature = temperature
         }
     }
-    
 }
-
-//extension BreadUpSchemaV1.Ingredients  {
-//    @MainActor static let example = BreadUpIngredients(id: UUID(),
-//                                            water: 250,
-//                                            flourType: .corn,
-//                                            flourQuantity: 300,
-//                                            yeast: 150)
-//}

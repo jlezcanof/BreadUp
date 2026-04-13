@@ -8,8 +8,10 @@
 import Foundation
 import SwiftData
 
+// pending migrate to v2
+typealias BreadUpIngredients         = BreadUpSchemaV2.Ingredients
+typealias BreadUpCalculate           = BreadUpSchemaV2.CalculateBread
 
-//    var identifiersIngredientes: [UUID] = []
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
         
@@ -25,23 +27,8 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
     }
     
         static let migrationV1tovV2 = MigrationStage.custom(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self) { modelContext in
-//            let descriptor = FetchDescriptor< BreadUpSchemaV1.Ingredients>()
-//            let oldIngredients = try modelContext.fetch(descriptor)
-//            for old in oldIngredients {
-//                identifiersIngredientes.append(old.id)
-//            }
             print("Estoy haciendo el willMigrate")
         } didMigrate: { modelContext in
-//            for identifier in identifiersIngredientes {
-//                let descriptor = FetchDescriptor< BreadUpSchemaV2.Ingredients>(
-//                    predicate: #Predicate {$0.id == identifier}
-//                )
-//                let localIngredient = try modelContext.fetch(descriptor).first
-//                if let localIngredient {
-//                    localIngredient.calculateBread?.recipe = "Hay que guardar algo"
-//                    modelContext.insert(localIngredient)
-//                }
-//            }
             print("Estoy haciendo el didMigrate")
             
             let descriptor = FetchDescriptor<BreadUpSchemaV2.Ingredients>()
@@ -56,12 +43,6 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
             }
         }
 }
-
-
-// pending migrate to v2
-typealias BreadUpIngredients         = BreadUpSchemaV2.Ingredients// V1
-typealias BreadUpCalculate           = BreadUpSchemaV2.CalculateBread // v1
-
 
 enum TypeFlour: String, Identifiable, Codable, CaseIterable {
     
@@ -110,15 +91,14 @@ extension FlourType {
 }
 
 // BreadUpIngredients
-//extension BreadUpSchemaV1.Ingredients  {
-//
-//    @MainActor static let example = BreadUpIngredients(id: UUID(),
-//                                            water: 250,
-//                                            flourType: .corn,
-//                                            flourQuantity: 300,
-//                                            yeast: 150,
-//                                            createdAt: Date())
-//}
+extension BreadUpSchemaV1.Ingredients  {
+
+    @MainActor static let example = BreadUpIngredients(id: UUID(),
+                                            water: 250,
+                                            flourType: .corn,
+                                            flourQuantity: 300,
+                                            yeast: 150)
+}
 
 extension BreadUpSchemaV2.Ingredients  {
     @MainActor static let example = BreadUpSchemaV2.Ingredients(id: UUID(),

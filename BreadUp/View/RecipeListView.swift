@@ -29,8 +29,7 @@ struct RecipeListView: View {
                       
                         }
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                      
+                        .foregroundStyle(.secondary)                      
                         if let created = recipe.created {
                             HStack {
                                 Spacer()
