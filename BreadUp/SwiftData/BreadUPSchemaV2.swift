@@ -24,7 +24,7 @@ enum BreadUpSchemaV2: VersionedSchema {
         var flourQuantity: Int
 //        var saltQuantity: Int
         var yeast: Int
-        var created: Date
+        var created: Date?
 
         @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
         var calculateBread: CalculateBread?
@@ -36,7 +36,7 @@ enum BreadUpSchemaV2: VersionedSchema {
             flourQuantity: Int,
 //            saltQuantity: Int,
             yeast: Int,
-            createdAt: Date
+            createdAt: Date? = nil
         ) {
             self.id            = id
             self.water         = water
@@ -52,11 +52,11 @@ enum BreadUpSchemaV2: VersionedSchema {
     final class CalculateBread {
         @Attribute(.unique) var id: UUID
         
-        var recipe: String
+        var recipe: String?
 
         var ingredients: Ingredients?
 
-        init(id: UUID, recipe: String) {
+        init(id: UUID, recipe: String?) {
             self.id = id
             self.recipe = recipe
         }

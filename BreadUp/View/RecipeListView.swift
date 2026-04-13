@@ -5,7 +5,6 @@
 //  Created by Jose Manuel Lezcano Fresno on 8/4/26.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -27,19 +26,19 @@ struct RecipeListView: View {
                             Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
                             Spacer()
                             Label("\(recipe.yeast) g", systemImage: "microbe.fill")
+                      
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-
-                        if let result = recipe.calculateBread {
+                      
+                        if let created = recipe.created {
                             HStack {
-                                //Label("\(result.time) min", systemImage: "clock.fill")
                                 Spacer()
-                                //Label("\(result.temperature) °C", systemImage: "thermometer.medium")
-                                Label("\(result.recipe)", systemImage: "cooktop.fill")
+                                Image(systemName: "calendar.circle")
+                                Text(created, format: .dateTime.day().month().year())
                             }
                             .font(.subheadline)
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     .padding(.vertical, 4)
