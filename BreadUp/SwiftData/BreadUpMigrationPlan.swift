@@ -91,14 +91,14 @@ extension FlourType {
 }
 
 // BreadUpIngredients
-extension BreadUpSchemaV1.Ingredients  {
-
-    @MainActor static let example = BreadUpIngredients(id: UUID(),
-                                            water: 250,
-                                            flourType: .corn,
-                                            flourQuantity: 300,
-                                            yeast: 150)
-}
+//extension BreadUpSchemaV1.Ingredients  {
+//
+//    @MainActor static let example = BreadUpIngredients(id: UUID(),
+//                                            water: 250,
+//                                            flourType: .corn,
+//                                            flourQuantity: 300,
+//                                            yeast: 150)
+//}
 
 extension BreadUpSchemaV2.Ingredients  {
     @MainActor static let example = BreadUpSchemaV2.Ingredients(id: UUID(),

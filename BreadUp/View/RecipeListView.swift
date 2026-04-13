@@ -22,11 +22,13 @@ struct RecipeListView: View {
                             .font(.headline)
                         HStack {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
+                                .foregroundStyle(.blue)
                             Spacer()
                             Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
+                                .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
                             Spacer()
                             Label("\(recipe.yeast) g", systemImage: "microbe.fill")
-                      
+                                .foregroundStyle(.yellow)
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)                      
@@ -34,6 +36,7 @@ struct RecipeListView: View {
                             HStack {
                                 Spacer()
                                 Image(systemName: "calendar.circle")
+                                    .foregroundStyle(.red)
                                 Text(created, format: .dateTime.day().month().year())
                             }
                             .font(.subheadline)

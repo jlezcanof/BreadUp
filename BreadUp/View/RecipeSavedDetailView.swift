@@ -26,7 +26,7 @@ struct RecipeSavedDetailView: View {
                 LabeledContent("Cantidad", value: "\(recipe.water) ml")
             }
             if let result = recipe.calculateBread, let recipe = result.recipe {
-                Section("Resultado") {
+                Section("Receta") {// Resultado
                     LabeledContent("Receta", value: "\(recipe)")
                 }
             }

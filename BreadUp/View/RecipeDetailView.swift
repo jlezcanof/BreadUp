@@ -145,7 +145,7 @@ struct RecipeDetailView: View {
                         }
                     }
                     if let recipe = vm.recipe {
-                        Section("Resultado") {
+                        Section("Receta") {
 //                            LabeledContent("Tiempo", value: "\(vm.time) minutos")
 //                            LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                             if let messageMD = try? AttributedString(markdown: recipe, options: options) {
