@@ -18,16 +18,20 @@ final class BreadCalculatorVM {
     var time: Int = 0
     var temperature: Int = 0
     var selectedDate: Date = Date()
-    let prompt = """
-    Generate a list of suggested search terms for an app about visiting famous landmarks
-    """
+//    let prompt = """
+//    Generate a list of suggested search terms for an app about visiting famous landmarks
+//    """
+    
     //"Cuál es la mejor manera de hacer una receta de pan"
-    //let session: LanguageModelSession// = LanguageModelSession()
+    let session: LanguageModelSession
     var recipe : String?
     var isLoading = false
     
     init() {
-//        self.session = LanguageModelSession(tools: [GetBreadRecipeTool()], instructions: "hola.")
+        self.session = LanguageModelSession(
+                    tools:  [GetBreadRecipeTool()], instructions: """
+                    Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
+                    """)
     }
 
 
@@ -88,12 +92,7 @@ final class BreadCalculatorVM {
     private func generateRecipeBread() async throws {
         isLoading = true                    // <-- NUEVO
         defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
-            
-        let session = LanguageModelSession(
-            tools:  [GetBreadRecipeTool()], instructions: """
-            Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
-            """)
-      
+                 
         let prompt = """
             Me vas a dar una receta para hacer un pan con los ingredientes y cantidades indicadas. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo:
             - Agua: \(water) ml
