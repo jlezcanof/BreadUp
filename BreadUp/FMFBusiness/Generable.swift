@@ -5,10 +5,12 @@
 //  Created by Yomismista on 9/4/26.
 //
 import FoundationModels
+//import Contacts
 
 
 @Generable
-struct StepRecipe {// : Codable
+struct StepRecipe {
+    @Guide(description: "A exactly name of the step")
     let nameStep: String
     let descriptionStep: String
     
@@ -34,7 +36,7 @@ struct GetBreadRecipeTool: Tool {
     
     typealias Arguments = BreadArguments
     
-    let name = "calculate_break"
+    let name = "recipeBread"// calculate_break
     
     let description = "Calculates the preparation method for the recipe bread with the given ingredients"
     
@@ -64,7 +66,7 @@ struct GetBreadRecipeTool: Tool {
     }
     
     func call(arguments: BreadArguments) async throws -> ToolOutput {
-        
+//        CNContactStore()
         let output = ToolOutput(water: arguments.water,
                                 flourType: arguments.flourType,
                                 flourQuantity: arguments.flourQuantity,

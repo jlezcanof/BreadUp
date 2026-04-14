@@ -109,14 +109,13 @@ final class BreadCalculatorVM {
 //            self.recipe = response.content
             var steps :  [StepRecipe] = []
             for index in 0..<8 {
-                print("\(index)")
                 let stepRecipe = try await makeStep()
                 steps.append(stepRecipe)
             }
             
             recipe = steps.enumerated()
                 .map { index, step in
-                    "Paso \(index + 1). \(step.nameStep): \(step.descriptionStep)"
+                    "Paso \(index + 1): \(step.nameStep) \n \(step.descriptionStep)"
                 }
                 .joined(separator: "\n\n")
             
