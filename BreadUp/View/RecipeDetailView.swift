@@ -25,15 +25,13 @@ struct RecipeDetailView: View {
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
-                
                 switch model.availability {
                         case .available:
-                            Text("Model is available").foregroundStyle(.green)
+                            Text("Foundation Model is available").foregroundStyle(.green)
                         case .unavailable(let reason):
-                            Text("Model is unavailable").foregroundStyle(.red)
-                            Text("Reason: \(reason)")
+                            Text("Foundation Model is unavailable").foregroundStyle(.red)
+                            Text(verbatim: String(describing: reason))
                         }
-                
                 Form {
                     Section("Harina") {
                         Picker("Tipo de harina", selection: $vm.flourType) {

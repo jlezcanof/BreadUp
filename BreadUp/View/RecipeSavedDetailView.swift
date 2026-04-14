@@ -40,7 +40,7 @@ struct RecipeSavedDetailView: View {
                 }
             }
         }
-        .navigationTitle(recipe.flourType.displayName)
+        .navigationTitle(recipe.flourType.displayName)// TODO incluir tb. la fecha
     }
 }
 
