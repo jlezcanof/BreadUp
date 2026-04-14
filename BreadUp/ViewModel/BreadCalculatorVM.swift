@@ -26,8 +26,9 @@ final class BreadCalculatorVM {
     
     init() {
         self.session = LanguageModelSession(
-                    tools:  [GetBreadRecipeTool()], instructions: """
-                    Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas posibles en el mercado.
+                    tools:  [GetBreadRecipeTool()],
+                    instructions: """
+                    Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
                     """)
     }
 
@@ -73,7 +74,6 @@ final class BreadCalculatorVM {
                                             createdAt: selectedDate)
         
         let result = BreadUpCalculate(id: UUID(), recipe: recipe ?? "")
-//        let result = BreadUpCalculate(id: UUID(), time: time, temperature: temperature)
         
         ingredients.calculateBread = result
         
@@ -90,36 +90,29 @@ final class BreadCalculatorVM {
         isLoading = true                    // <-- NUEVO
         defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
       
-        //let otherPrompt = """
-        //    Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. No me des más de 8 pasos para su realización. Ingredientes/cantidades:
-        //    - Agua: \(water) ml
-        //    - Harina: \(flourType.rawValue), \(flourQuantity) ml
-        //    - Levadura: \(yeast) g
-        //"""
-                 
         let prompt = """
-            Me vas a dar una receta para hacer un pan con los ingredientes y cantidades indicadas. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo:
+            Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. No me des más de 8 pasos para su realización. Ingredientes/cantidades:
             - Agua: \(water) ml
             - Harina: \(flourType.rawValue), \(flourQuantity) ml
             - Levadura: \(yeast) g
         """
         
         do {
-//            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
-//            self.recipe = response.content
-            var steps :  [StepRecipe] = []
-            for index in 0..<8 {
-                let stepRecipe = try await makeStep()
-                steps.append(stepRecipe)
-            }
-            
-            recipe = steps.enumerated()
-                .map { index, step in
-                    "Paso \(index + 1): \(step.nameStep) \n \(step.descriptionStep)"
-                }
-                .joined(separator: "\n\n")
-            
-            print("recipe \(String(describing: recipe))")
+            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
+            self.recipe = response.content
+//            var steps :  [StepRecipe] = []
+//            for _ in 0 ..< 8 {
+//                let stepRecipe = try await makeStep()
+//                steps.append(stepRecipe)
+//            }
+//            
+//            recipe = steps.enumerated()
+//                .map { index, step in
+//                    "Paso \(index + 1): \(step.nameStep) \n \(step.descriptionStep)"
+//                }
+//                .joined(separator: "\n\n")
+//            
+//            print("recipe \(String(describing: recipe))")
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize {
 //            print("\(error)")
@@ -133,15 +126,15 @@ final class BreadCalculatorVM {
     
     private func makeStep() async throws -> StepRecipe {
         let prompt2 = """
-            Generate a character that step the recipe of a bread.
+            Genera un paso para la receta de un pan.
             
-            The output should be JSON, in the following structure:
+            La salida debe ser en un JSON, con la siguiente estructura:
             {
               "nameStep",
               "descriptionStep"
             }
             
-            ONLY output JSON, without ’’’,
+            SOLO salida JSON, sin ’’’,
             """
         let response = try await session.respond(generating: StepRecipe.self) {
             prompt2
