@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import FoundationModels
 
 struct RecipeDetailView: View {
     
@@ -19,11 +20,21 @@ struct RecipeDetailView: View {
     @State private var showSaveAlert = false
     @State private var showDatePicker = false
     
+    private let model = SystemLanguageModel.default
+    
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
+                
+                switch model.availability {
+                        case .available:
+                            Text("Model is available").foregroundStyle(.green)
+                        case .unavailable(let reason):
+                            Text("Model is unavailable").foregroundStyle(.red)
+                            Text("Reason: \(reason)")
+                        }
+                
                 Form {
-
                     Section("Harina") {
                         Picker("Tipo de harina", selection: $vm.flourType) {
                             ForEach(FlourType.allCases) { type in
