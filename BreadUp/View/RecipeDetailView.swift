@@ -90,7 +90,6 @@ struct RecipeDetailView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     }
-                    
                     Section("Agua") {
                         VStack(alignment: .leading) {
                             Text("\(vm.water) ml")
@@ -112,7 +111,6 @@ struct RecipeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
-                    
                     Section("Fecha") {
                         Button {
                             withAnimation {
@@ -127,7 +125,6 @@ struct RecipeDetailView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
-
                         if showDatePicker {
                             DatePicker(
                                 "Fecha de elaboración",
@@ -150,24 +147,16 @@ struct RecipeDetailView: View {
                             Label("Generar receta", systemImage: "apple.intelligence")
                                 .frame(maxWidth: .infinity)
                                 .font(.headline)
-//                            Text("Generar receta")
-//                                .frame(maxWidth: .infinity)
-//                                .font(.headline)
                         }
                     }
                     if let recipe = vm.recipe {
                         Section("Receta") {
-//                            LabeledContent("Tiempo", value: "\(vm.time) minutos")
-//                            LabeledContent("Temperatura", value: "\(vm.temperature) °C")
                             if let messageMD = try? AttributedString(markdown: recipe, options: options) {
                             ScrollView {
                                     Text(messageMD)
                                         .padding()
                                         .textSelection(.enabled)
                                         .frame(maxWidth: .infinity, alignment: .leading)
-//                                        .frame(height: 200)
-                                        .background(Color(.secondarySystemBackground))
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
                             Button {
