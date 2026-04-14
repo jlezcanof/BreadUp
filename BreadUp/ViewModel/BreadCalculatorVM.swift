@@ -143,23 +143,23 @@ final class BreadCalculatorVM {
         return response.content
     }
     
-    private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {
-        
-        //        let allEntries = previousSession.transcript.entries
-        
-        var condensedEntries =  [Transcript.Entry]()
-        
-        //        if let firstEntry = allEntries.first {
-//        condensedEntries.append(firstEntry)
-//        if allEntries.count > 1, let lastEntry = allEntries.last {
-//            condensedEntries.append(lastEntryy)
-//        }
-       //}
-        
-        let condensedTranscript = Transcript(entries: condensedEntries)
-        // Note: transcript include instructions.
-        return LanguageModelSession(transcript: condensedTranscript)
-    }
+//    private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {
+//        
+//        //        let allEntries = previousSession.transcript.entries
+//        
+//        var condensedEntries =  [Transcript.Entry]()
+//        
+//        //        if let firstEntry = allEntries.first {
+////        condensedEntries.append(firstEntry)
+////        if allEntries.count > 1, let lastEntry = allEntries.last {
+////            condensedEntries.append(lastEntryy)
+////        }
+//       //}
+//        
+//        let condensedTranscript = Transcript(entries: condensedEntries)
+//        // Note: transcript include instructions.
+//        return LanguageModelSession(transcript: condensedTranscript)
+//    }
     
     
 }
