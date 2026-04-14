@@ -25,14 +25,16 @@ struct RecipeDetailView: View {
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
-                switch model.availability {
-                        case .available:
-                            Text("Foundation Model is available").foregroundStyle(.green)
-                        case .unavailable(let reason):
-                            Text("Foundation Model is unavailable").foregroundStyle(.red)
-                            Text(verbatim: String(describing: reason))
-                        }
                 Form {
+                    Section("Foundation Model") {
+                        switch model.availability {
+                                case .available:
+                                    Text("Foundation Model is available").foregroundStyle(.green)
+                                case .unavailable(let reason):
+                                    Text("Foundation Model is unavailable").foregroundStyle(.red)
+                                    Text(verbatim: String(describing: reason))
+                                }
+                    }
                     Section("Harina") {
                         Picker("Tipo de harina", selection: $vm.flourType) {
                             ForEach(FlourType.allCases) { type in

@@ -34,7 +34,6 @@ struct RecipeListView: View {
                         .foregroundStyle(.secondary)                      
                         if let created = recipe.created {
                             HStack {
-//                                Spacer()
                                 Image(systemName: "calendar.circle")
                                     .foregroundStyle(.red)
                                 Text(created, format: .dateTime.day().month().year())

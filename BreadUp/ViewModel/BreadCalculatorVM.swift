@@ -18,9 +18,6 @@ final class BreadCalculatorVM {
     var time: Int = 0
     var temperature: Int = 0
     var selectedDate: Date = Date()
-//    let prompt = """
-//    Generate a list of suggested search terms for an app about visiting famous landmarks
-//    """
     
     //"Cuál es la mejor manera de hacer una receta de pan"
     let session: LanguageModelSession
@@ -100,13 +97,45 @@ final class BreadCalculatorVM {
             - Levadura: \(yeast) g
         """
         
-        let response = try await session.respond(to: prompt)
-        self.recipe = response.content
+        do {
+            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
+            self.recipe = response.content
+        } catch LanguageModelSession.GenerationError.exceededContextWindowSize {
+//            print("\(error)")
+//            let newSession = newSession(previousSession: session)
+        }
+        
+        let supportedLanguages = SystemLanguageModel.default.supportedLanguages
+        print(" \(supportedLanguages)")
+        
+        guard supportedLanguages.contains(Locale.current.language) else {
+            // show message
+            return
+        }
+      
         
         print(session.transcript)
         
         time = 1 // TODO campo fuera
         
+    }
+    
+    private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {
+        
+        //        let allEntries = previousSession.transcript.entries
+        
+        var condensedEntries =  [Transcript.Entry]()
+        
+        //        if let firstEntry = allEntries.first {
+//        condensedEntries.append(firstEntry)
+//        if allEntries.count > 1, let lastEntry = allEntries.last {
+//            condensedEntries.append(lastEntryy)
+//        }
+       //}
+        
+        let condensedTranscript = Transcript(entries: condensedEntries)
+        // Note: transcript include instructions.
+        return LanguageModelSession(transcript: condensedTranscript)
     }
     
     
