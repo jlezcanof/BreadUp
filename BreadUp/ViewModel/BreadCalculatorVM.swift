@@ -89,6 +89,13 @@ final class BreadCalculatorVM {
     private func generateRecipeBread() async throws {
         isLoading = true                    // <-- NUEVO
         defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
+      
+        //let otherPrompt = """
+        //    Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. No me des más de 8 pasos para su realización. Ingredientes/cantidades:
+        //    - Agua: \(water) ml
+        //    - Harina: \(flourType.rawValue), \(flourQuantity) ml
+        //    - Levadura: \(yeast) g
+        //"""
                  
         let prompt = """
             Me vas a dar una receta para hacer un pan con los ingredientes y cantidades indicadas. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo:
@@ -98,26 +105,50 @@ final class BreadCalculatorVM {
         """
         
         do {
-            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
-            self.recipe = response.content
+//            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
+//            self.recipe = response.content
+            var steps :  [StepRecipe] = []
+            for index in 0..<8 {
+                print("\(index)")
+                let stepRecipe = try await makeStep()
+                steps.append(stepRecipe)
+            }
+            
+            recipe = steps.enumerated()
+                .map { index, step in
+                    "Paso \(index + 1). \(step.nameStep): \(step.descriptionStep)"
+                }
+                .joined(separator: "\n\n")
+            
+            print("recipe \(String(describing: recipe))")
+            
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize {
 //            print("\(error)")
 //            let newSession = newSession(previousSession: session)
         }
         
-        let supportedLanguages = SystemLanguageModel.default.supportedLanguages
-        print(" \(supportedLanguages)")
-        
-        guard supportedLanguages.contains(Locale.current.language) else {
-            // show message
-            return
-        }
-      
-        
         print(session.transcript)
-        
         time = 1 // TODO campo fuera
         
+    }
+    
+    private func makeStep() async throws -> StepRecipe {
+        let prompt2 = """
+            Generate a character that step the recipe of a bread.
+            
+            The output should be JSON, in the following structure:
+            {
+              "nameStep",
+              "descriptionStep"
+            }
+            
+            ONLY output JSON, without ’’’,
+            """
+        let response = try await session.respond(generating: StepRecipe.self) {
+            prompt2
+        }
+                                                 
+        return response.content
     }
     
     private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {

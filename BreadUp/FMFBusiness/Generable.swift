@@ -6,6 +6,28 @@
 //
 import FoundationModels
 
+
+@Generable
+struct StepRecipe {// : Codable
+    let nameStep: String
+    let descriptionStep: String
+    
+    // Macro-generated
+    static var schema: GenerationSchema {
+        GenerationSchema(type: StepRecipe.self, properties: [
+            GenerationSchema.Property(name: "nameStep",description: "Name of the step of recipe a bread", type: String.self),
+            GenerationSchema.Property(name: "descriptionStep", description: "Detailed description",  type: String.self),
+        ])
+    }
+}
+
+//extension StepRecipe: Generable {
+//    init(_ content: GeneratedContent) throws {
+//        self.nameStep = try content.value(forProperty: "nameStep")
+//        self.descriptionStep = try content.value(forProperty: "descriptionStep")
+//    }
+//}
+
 struct GetBreadRecipeTool: Tool {
         
     typealias Output = ToolOutput
@@ -22,16 +44,16 @@ struct GetBreadRecipeTool: Tool {
     struct BreadArguments {
         // Aqui vamos a poner todos los ingredientes y su cantidad
 
-        @Guide(description: "The quantity of water")
+//        @Guide(description: "The quantity of water")
         var water: Int
         
-        @Guide(description: "Type of flour")
+//        @Guide(description: "Type of flour")
         var flourType: String
         
-        @Guide(description: "The quantity of flour")
+//        @Guide(description: "The quantity of flour")
         var flourQuantity: Int
         
-        @Guide(description: "The quantity of yeast")
+//        @Guide(description: "The quantity of yeast")
         var yeast: Int
         
 //        @Guide(description: "The number of bread recipes to fetch")
