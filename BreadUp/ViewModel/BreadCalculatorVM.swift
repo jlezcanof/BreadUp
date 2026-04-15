@@ -28,7 +28,7 @@ final class BreadCalculatorVM {
         self.session = LanguageModelSession(
                     tools:  [GetBreadRecipeTool()],
                     instructions: """
-                    Eres un panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
+                    Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
                     """)
     }
 
@@ -91,7 +91,7 @@ final class BreadCalculatorVM {
         defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
       
         let prompt = """
-            Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. No me des más de 8 pasos para su realización. Ingredientes/cantidades:
+            Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
             - Agua: \(water) ml
             - Harina: \(flourType.rawValue), \(flourQuantity) ml
             - Levadura: \(yeast) g
@@ -115,10 +115,13 @@ final class BreadCalculatorVM {
 //            print("recipe \(String(describing: recipe))")
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize {
+            print("exeeded content windows size")
 //            print("\(error)")
 //            let newSession = newSession(previousSession: session)
         }
-        
+        catch LanguageModelSession.GenerationError.guardrailViolation {
+            print("safety guard rail violation ocurred.")
+        }
         print(session.transcript)
         time = 1 // TODO campo fuera
         

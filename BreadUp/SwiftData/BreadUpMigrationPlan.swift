@@ -12,6 +12,12 @@ import SwiftData
 typealias BreadUpIngredients         = BreadUpSchemaV2.Ingredients
 typealias BreadUpCalculate           = BreadUpSchemaV2.CalculateBread
 
+//actor BreadUpSchema {
+//    
+//}
+//
+//@BreadUpSchema
+//var identifierIngredients : [String] = []
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
         
@@ -27,7 +33,16 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
     }
     
         static let migrationV1tovV2 = MigrationStage.custom(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self) { modelContext in
+            
+//            let descriptor = FetchDescriptor<BreadUpSchemaV1.Ingredients>()
+//            let ingredients = try modelContext.fetch(descriptor)
+//            
+//            for ingredient in ingredients {
+//                identifierIngredients.append(ingredient.id.uuidString)
+//            }
             print("Estoy haciendo el willMigrate")
+            
+            
         } didMigrate: { modelContext in
             print("Estoy haciendo el didMigrate")
             

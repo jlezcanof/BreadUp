@@ -12,6 +12,7 @@ import FoundationModels
 struct StepRecipe {
     @Guide(description: "A exactly name of the step")
     let nameStep: String
+    @Guide(description: "Detailed description of the step")
     let descriptionStep: String
     
     // Macro-generated
@@ -39,6 +40,7 @@ struct GetBreadRecipeTool: Tool {
     let name = "recipeBread"// calculate_break
     
     let description = "Calculates the preparation method for the recipe bread with the given ingredients"
+//    let description = "Pasos para hacer un muñeco de papel con papiroflexia"
     
     let includesSchemaInInstructions = false
         
