@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 import FoundationModels
+import Observation
 
 @Observable
 final class BreadCalculatorVM {
@@ -20,7 +21,7 @@ final class BreadCalculatorVM {
     var selectedDate: Date = Date()
     
     //"Cuál es la mejor manera de hacer una receta de pan"
-    let session: LanguageModelSession
+    private let session: LanguageModelSession
     var recipe : String?
     var isLoading = false
     
@@ -30,6 +31,10 @@ final class BreadCalculatorVM {
                     instructions: """
                     Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
                     """)
+        
+//        let otherSession = LanguageModelSession(tools:  [GetBreadRecipeTool()]) {
+//            "Your job is to create an recipe of the bread"
+//        }
     }
 
 

@@ -140,37 +140,55 @@ struct RecipeDetailView: View {
                         }
                     }
                     
-                    Section {
-                        Button {
-                            vm.calculateRecipe()
-                        } label: {
-                            Label("Generar receta", systemImage: "apple.intelligence")
+                    switch model.availability {
+                        
+                    case .available:
+                            Button {
+                                vm.calculateRecipe()
+                            } label: {
+                                Label("Generar receta", systemImage: "sparkles")// apple.intelligence
                                 .frame(maxWidth: .infinity)
                                 .font(.headline)
+                            }
+                    case .unavailable(.appleIntelligenceNotEnabled):
+                            HStack {
+                                    Text("El calculador de recetas de pan no está disponible porque Apple Inteligence no está habilitado")
+                            }
+                    case .unavailable(.modelNotReady):
+                            HStack {
+                                        Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
+                            }
+                    case .unavailable(.deviceNotEligible):
+                        HStack {
+                                    Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
+                        }
+                    default:
+                        Text("model.availabiltiy.default")
+                    }
+                    
+               
+                    Section("Receta") {
+                        if let recipe = vm.recipe {
+                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
+                                ScrollView {
+                                        Text(messageMD)
+                                            .padding()
+                                            .textSelection(.enabled)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                }
+                        }
+                        Button {
+                            // TODO decidir que guardar aqui
+                            showSaveAlert = true
+                        } label: {
+                                HStack {
+                                    Spacer()
+                                    Label("Guardar receta", systemImage: "cooktop.fill")
+                            }
                         }
                     }
-                    if let recipe = vm.recipe {
-                        Section("Receta") {
-                            if let messageMD = try? AttributedString(markdown: recipe, options: options) {
-                            ScrollView {
-                                    Text(messageMD)
-                                        .padding()
-                                        .textSelection(.enabled)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                            }
-                            Button {
-                                // TODO decidir que guardar aqui
-                                showSaveAlert = true
-                            } label: {
-                                    HStack {
-                                        Spacer()
-                                        Label("Guardar receta", systemImage: "cooktop.fill")
-                                }
-                            }
-                        }
-                        .id(resultID)
-                    }
+                    .id(resultID)
                 }
                 .onChange(of: vm.water) {vm.resetResult()}
                 .onChange(of: vm.flourType) {vm.resetResult()}
