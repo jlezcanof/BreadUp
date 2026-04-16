@@ -15,8 +15,6 @@ final class BreadCalculatorVM {
     var flourType: FlourType = .wheat
     var flourQuantity: Int = 250
     var yeast: Int = 10
-
-    var time: Int = 0 // TODO problemas de compilacion al eliminar esta propiedad
     var selectedDate: Date = Date()
     
     //"Cuál es la mejor manera de hacer una receta de pan"
@@ -78,7 +76,6 @@ final class BreadCalculatorVM {
     }
     
     func resetResult() {
-        time = 0
     }
     
     func save(context: ModelContext) {
@@ -139,7 +136,6 @@ final class BreadCalculatorVM {
             print("safety guard rail violation ocurred.")
         }
         print(session.transcript)
-        time = 1 // TODO campo fuera
     }
     
     private func suggestRecipeBread() async throws {

@@ -194,13 +194,6 @@ struct RecipeDetailView: View {
                 .onChange(of: vm.flourType) {vm.resetResult()}
                 .onChange(of: vm.flourQuantity) {vm.resetResult()}
                 .onChange(of: vm.yeast) {vm.resetResult()}
-                .onChange(of: vm.time) {
-                    if vm.time > 0 {
-                        withAnimation {
-                            proxy.scrollTo(resultID, anchor: .bottom)
-                        }
-                    }
-                }
                 .alert("Guardar receta", isPresented: $showSaveAlert) {
                     Button("No", role: .cancel) { }
                        Button("Sí") {
