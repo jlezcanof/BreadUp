@@ -24,7 +24,7 @@ final class BreadCalculatorVM {
     
     private(set) var recipeBread: BreadRecipe?
     
-    private(set) var recipeBreadSequence: BreadRecipe.PartiallyGenerated?
+    private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
     init() {
         var instructions = """
@@ -95,7 +95,9 @@ final class BreadCalculatorVM {
     func calculateRecipe() {
         Task {
 //            try? await self.generateRecipeBread()
-            try? await self.suggestRecipeBread()
+//            try? await self.suggestRecipeBread()
+            try? await self.suggestSequenceBread()
+            print("end of calculateREcipe")
         }
     }
     
@@ -162,11 +164,11 @@ final class BreadCalculatorVM {
         self.recipe = recipeString
     }
     
-    private func suggestSEquenceBread() async throws {
+    private func suggestSequenceBread() async throws {
         isLoading = true
         defer { isLoading = false }
-        
-        let stream = session.streamResponse(generating: BreadRecipe.self) {
+        prewarn()
+        let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
                     """
                         Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
                         - Agua: \(water) ml
@@ -175,23 +177,13 @@ final class BreadCalculatorVM {
                     """
         }
         
-        //recipeBreadSequence
         for try await partial in stream {
-            // TODO recipeBreadSequence = partial
-            //self.recipeBreadSequence = partialRecipeBread
+            self.recipeBreadSequence = partial
         }
-        
-//        self.recipeBread = response.content
-        //        print("\(self.recipeBread, default: "nada de nada")")
-
-        
-        let recipeString = self.recipeBread?.steps.enumerated()
-            .map { index, step in
-                "Paso \(index + 1): \(step.nameStep)\n\(step.descriptionStep)"
-            }
-            .joined(separator: "\n\n")
-        
-        self.recipe = recipeString
+    }
+    
+    private func prewarn() {
+        self.session.prewarm()
     }
     
     private func makeStep() async throws -> StepRecipe {
@@ -235,3 +227,5 @@ final class BreadCalculatorVM {
     
     
 }
+
+//let intent = BreadRecipeIn

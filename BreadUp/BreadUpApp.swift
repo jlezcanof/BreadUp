@@ -19,6 +19,7 @@ struct BreadUpApp: App {
             container = try ModelContainer(for: BreadUpIngredients.self, migrationPlan: BreadUpMigrationPlan.self)
         } catch {
             fatalError("No se puede crear el ModelContainer: \(error)")
+//            container = try ModelContainer(for: BreadUpIngredients.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         }
     }
     

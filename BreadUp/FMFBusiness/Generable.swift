@@ -24,6 +24,11 @@ struct StepRecipe : Equatable {
     }
 }
 
+extension StepRecipe {
+    static let example = StepRecipe(nameStep: "Reposo corto (autólisis ligera)",
+                                    descriptionStep: "Deja reposar la mezcla 10-15 minutos. Mejora la hidratación y facilita el amasado.")
+}
+
 //extension StepRecipe: Generable {
 //    init(_ content: GeneratedContent) throws {
 //        self.nameStep = try content.value(forProperty: "nameStep")

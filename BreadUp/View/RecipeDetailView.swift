@@ -178,6 +178,19 @@ struct RecipeDetailView: View {
                                     }
                                 }
                         }
+                        if let sequence = vm.recipeBreadSequence {
+//                            sequence.rawContent.promptRepresentation
+                            Text(sequence.rawContent.jsonString)
+                            .padding()
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+//                        if let sequence = vm.recipeBreadSequence {
+//                            Text(sequence)
+//                                .padding()
+//                                .textSelection(.enabled)
+//                                .frame(maxWidth: .infinity, alignment: .leading)
+//                        }
                         Button {
                             // TODO decidir que guardar aqui
                             showSaveAlert = true
