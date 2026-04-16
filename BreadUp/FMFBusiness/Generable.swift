@@ -9,12 +9,12 @@ import FoundationModels
 
 
 @Generable
-struct StepRecipe {
-    @Guide(description: "A exactly name of the step")
+struct StepRecipe : Equatable {
+    @Guide(description: "A short title describing a step in a bread-making recipe")
     let nameStep: String
-    @Guide(description: "Detailed description of the step")
+    @Guide(description: "Detailed description of a step in making bread")
     let descriptionStep: String
-    
+
     // Macro-generated
     static var schema: GenerationSchema {
         GenerationSchema(type: StepRecipe.self, properties: [
@@ -31,70 +31,31 @@ struct StepRecipe {
 //    }
 //}
 
-struct GetBreadRecipeTool: Tool {
-        
-    typealias Output = ToolOutput
+@Generable()
+struct BreadRecipe {
     
-    typealias Arguments = BreadArguments
-    
-    let name = "recipeBread"// calculate_break
-    
-    let description = "Calculates the preparation method for the recipe bread with the given ingredients"
-//    let description = "Pasos para hacer un muñeco de papel con papiroflexia"
-    
-    let includesSchemaInInstructions = false
-        
-    @Generable
-    struct BreadArguments {
-        // Aqui vamos a poner todos los ingredientes y su cantidad
-
-//        @Guide(description: "The quantity of water")
-        var water: Int
-        
-//        @Guide(description: "Type of flour")
-        var flourType: String
-        
-//        @Guide(description: "The quantity of flour")
-        var flourQuantity: Int
-        
-//        @Guide(description: "The quantity of yeast")
-        var yeast: Int
-        
-//        @Guide(description: "The number of bread recipes to fetch")
-        var time: Int
-        
-//        @Guide(description: "The number of bread recipes to fetch")
-        var temperature: Int
-    }
-    
-    func call(arguments: BreadArguments) async throws -> ToolOutput {
-//        CNContactStore()
-        let output = ToolOutput(water: arguments.water,
-                                flourType: arguments.flourType,
-                                flourQuantity: arguments.flourQuantity,
-                                yeast: arguments.yeast)
-        
-        return output
-    }
-    
+    @Guide(description: "The set of steps that together make it possible to prepare bread dough", .count(8))
+    let steps: [StepRecipe]
 }
 
-struct ToolOutput : PromptRepresentable {
-    
-    var water: Int
-    
-    var flourType: String
-    
-    var flourQuantity: Int
-    
-    var yeast: Int
-        
-    // Aqui podremos el prompt de usuario indicando la cantidad de los ingredientes y que queremos hacer pan
-    nonisolated var promptRepresentation: Prompt {
-        """
-            Bread result:
-            - Preparation method for making break: \(water)
-        """
-    }
-    
+extension BreadRecipe {
+    static let exampleRecipeBread = BreadRecipe(steps:  [
+        StepRecipe(nameStep: "Mezcla inicial", descriptionStep: "Disuelve la levadura en el agua templada (no caliente). Añade la harina y mezcla hasta integrar."),
+        StepRecipe(nameStep: "Reposo corto (autólisis ligera)", descriptionStep: "Deja reposar la mezcla 10–15 minutos. Mejora la hidratación y facilita el amasado."),
+        StepRecipe(nameStep: "Añadir sal y amasar", descriptionStep: "Incorpora la sal y amasa durante 10–12 minutos (a mano o máquina) hasta obtener una masa elástica y homogénea."),
+        StepRecipe(nameStep: "Primera fermentación (bloque)", descriptionStep: "Deja reposar la masa en un bol tapado durante 1–2 horas a temperatura ambiente, hasta que doble su volumen."),
+        StepRecipe(nameStep: "Formado", descriptionStep: "Desgasifica suavemente y da forma de hogaza (tensión superficial en la masa, sin desgarrar)."),
+        StepRecipe(nameStep: "Segunda fermentación (prueba)", descriptionStep: "Deja reposar la pieza formada durante 45–60 minutos."),
+        StepRecipe(nameStep: "Horneado", descriptionStep:
+                  """
+                  •    Precalienta el horno a 230 °C
+                      •    Haz un corte superficial en la masa
+                      •    Hornea:
+                      •    10 min a 230 °C con vapor (puedes poner un recipiente con agua)
+                      •    25–30 min a 200 °C sin vapor
+                      •    Enfría sobre rejilla al menos 1 hora antes de cortar
+                  """
+                  )
+    ]
+    )
 }

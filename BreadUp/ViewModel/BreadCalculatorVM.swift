@@ -16,8 +16,8 @@ final class BreadCalculatorVM {
     var flourQuantity: Int = 250
     var yeast: Int = 10
 
-    var time: Int = 0
-    var temperature: Int = 0
+    var time: Int = 0 // TODO problemas de compilacion al eliminar esta propiedad
+//    var temperature: Int = 0
     var selectedDate: Date = Date()
     
     //"Cuál es la mejor manera de hacer una receta de pan"
@@ -25,12 +25,22 @@ final class BreadCalculatorVM {
     var recipe : String?
     var isLoading = false
     
+    private(set) var recipeBread: BreadRecipe?
+    
     init() {
+        var instructions = """
+                    Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
+                    """
+        instructions.append("Vas a obtener recetas de pan en función de los ingredientes y cantidades indicadas. Aqui tienes un ejemplo \(BreadRecipe.exampleRecipeBread)")
+        
+        
         self.session = LanguageModelSession(
                     tools:  [GetBreadRecipeTool()],
-                    instructions: """
-                    Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
-                    """)
+                    instructions: instructions)
+        
+//                            """
+//                            Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
+//                            """
         
 //        let otherSession = LanguageModelSession(tools:  [GetBreadRecipeTool()]) {
 //            "Your job is to create an recipe of the bread"
@@ -40,35 +50,35 @@ final class BreadCalculatorVM {
 
     // TODO pendiente de calcular
     func calculate() {
-        let hydration = Double(water) / Double(flourQuantity)
-
-        let flourFactor: Double = switch flourType {
-        case .wheat:      1.0
-        case .wholewheat:  1.15
-        case .rye:         1.2
-        case .spelt:       1.1
-        case .corn:        1.25
-        }
-
-        let baseTime = 60.0 - (Double(yeast) * 0.8)
-        let adjustedTime = baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
-        time = max(25, Int(adjustedTime.rounded()))
-
-        let baseTemp: Double = switch flourType {
-        case .wheat:      200
-        case .wholewheat:  190
-        case .rye:         195
-        case .spelt:       185
-        case .corn:        210
-        }
-
-        let tempAdjustment = (hydration - 0.6) * 15
-        temperature = Int((baseTemp - tempAdjustment).rounded())
+//        let hydration = Double(water) / Double(flourQuantity)
+//
+//        let flourFactor: Double = switch flourType {
+//        case .wheat:      1.0
+//        case .wholewheat:  1.15
+//        case .rye:         1.2
+//        case .spelt:       1.1
+//        case .corn:        1.25
+//        }
+//
+//        let baseTime = 60.0 - (Double(yeast) * 0.8)
+//        let adjustedTime = baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
+//        time = max(25, Int(adjustedTime.rounded()))
+//
+//        let baseTemp: Double = switch flourType {
+//        case .wheat:      200
+//        case .wholewheat:  190
+//        case .rye:         195
+//        case .spelt:       185
+//        case .corn:        210
+//        }
+//
+//        let tempAdjustment = (hydration - 0.6) * 15
+//        temperature = Int((baseTemp - tempAdjustment).rounded())
     }
     
     func resetResult() {
         time = 0
-        temperature = 0
+//        temperature = 0
     }
     
     func save(context: ModelContext) {
@@ -87,7 +97,8 @@ final class BreadCalculatorVM {
         
     func calculateRecipe() {
         Task {
-            try? await self.generateRecipeBread()
+//            try? await self.generateRecipeBread()
+            try? await self.suggestRecipeBread()
         }
     }
     
@@ -129,7 +140,28 @@ final class BreadCalculatorVM {
         }
         print(session.transcript)
         time = 1 // TODO campo fuera
+    }
+    
+    private func suggestRecipeBread() async throws {
+        let response = try await session.respond(generating: BreadRecipe.self) {
+                    """
+                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
+                        - Agua: \(water) ml
+                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
+                        - Levadura: \(yeast) g
+                    """
+        }
+        self.recipeBread = response.content
+        //        print("\(self.recipeBread, default: "nada de nada")")
+
         
+        let recipeString = self.recipeBread?.steps.enumerated()
+            .map { index, step in
+                "Paso \(index + 1): \(step.nameStep)\n\(step.descriptionStep)"
+            }
+            .joined(separator: "\n\n")
+        
+        self.recipe = recipeString
     }
     
     private func makeStep() async throws -> StepRecipe {
@@ -150,6 +182,8 @@ final class BreadCalculatorVM {
                                                  
         return response.content
     }
+    
+ 
     
 //    private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {
 //        

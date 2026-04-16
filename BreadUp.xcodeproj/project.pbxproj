@@ -6,13 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9EFE3DE62F8E527F00392988 /* basura.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE3DE52F8E527B00392988 /* basura.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		9E27310D2F7446EA0008A3B9 /* BreadUp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreadUp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EFE3DE52F8E527B00392988 /* basura.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = basura.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9EFE3DEF2F8FD84800392988 /* Exceptions for "BreadUp" folder in "BreadUp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				FMFBusiness/PlaygroundExperiments.swift,
+			);
+			target = 9E27310C2F7446EA0008A3B9 /* BreadUp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9E27310F2F7446EA0008A3B9 /* BreadUp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9EFE3DEF2F8FD84800392988 /* Exceptions for "BreadUp" folder in "BreadUp" target */,
+			);
 			path = BreadUp;
 			sourceTree = "<group>";
 		};
@@ -32,6 +50,7 @@
 		9E2731042F7446EA0008A3B9 = {
 			isa = PBXGroup;
 			children = (
+				9EFE3DE52F8E527B00392988 /* basura.swift */,
 				9E27310F2F7446EA0008A3B9 /* BreadUp */,
 				9E27310E2F7446EA0008A3B9 /* Products */,
 			);
@@ -119,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EFE3DE62F8E527F00392988 /* basura.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
