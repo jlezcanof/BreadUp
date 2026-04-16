@@ -7,15 +7,15 @@
 import FoundationModels
 
 struct GetBreadRecipeTool: Tool {
-
-    typealias Output = ToolOutput
-
-    typealias Arguments = BreadArguments
-
+    
     let name = "recipeBread"// calculate_break
 
     let description = "Calculates the preparation method for the recipe bread with the given ingredients"
 //    let description = "Pasos para hacer un muñeco de papel con papiroflexia"
+
+    typealias Output = ToolOutput
+
+    typealias Arguments = BreadArguments
 
     let includesSchemaInInstructions = false
 

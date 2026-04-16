@@ -17,7 +17,6 @@ final class BreadCalculatorVM {
     var yeast: Int = 10
 
     var time: Int = 0 // TODO problemas de compilacion al eliminar esta propiedad
-//    var temperature: Int = 0
     var selectedDate: Date = Date()
     
     //"Cuál es la mejor manera de hacer una receta de pan"
@@ -26,6 +25,8 @@ final class BreadCalculatorVM {
     var isLoading = false
     
     private(set) var recipeBread: BreadRecipe?
+    
+    private(set) var recipeBreadSequence: BreadRecipe.PartiallyGenerated?
     
     init() {
         var instructions = """
@@ -78,7 +79,6 @@ final class BreadCalculatorVM {
     
     func resetResult() {
         time = 0
-//        temperature = 0
     }
     
     func save(context: ModelContext) {
@@ -143,6 +143,8 @@ final class BreadCalculatorVM {
     }
     
     private func suggestRecipeBread() async throws {
+        isLoading = true                    // <-- NUEVO
+        defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
         let response = try await session.respond(generating: BreadRecipe.self) {
                     """
                         Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
@@ -152,6 +154,38 @@ final class BreadCalculatorVM {
                     """
         }
         self.recipeBread = response.content
+        //        print("\(self.recipeBread, default: "nada de nada")")
+
+        
+        let recipeString = self.recipeBread?.steps.enumerated()
+            .map { index, step in
+                "Paso \(index + 1): \(step.nameStep)\n\(step.descriptionStep)"
+            }
+            .joined(separator: "\n\n")
+        
+        self.recipe = recipeString
+    }
+    
+    private func suggestSEquenceBread() async throws {
+        isLoading = true
+        defer { isLoading = false }
+        
+        let stream = session.streamResponse(generating: BreadRecipe.self) {
+                    """
+                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
+                        - Agua: \(water) ml
+                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
+                        - Levadura: \(yeast) g
+                    """
+        }
+        
+        //recipeBreadSequence
+        for try await partial in stream {
+            // TODO recipeBreadSequence = partial
+            //self.recipeBreadSequence = partialRecipeBread
+        }
+        
+//        self.recipeBread = response.content
         //        print("\(self.recipeBread, default: "nada de nada")")
 
         
