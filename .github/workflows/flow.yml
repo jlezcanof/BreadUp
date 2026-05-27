@@ -48,10 +48,9 @@ jobs:
             claudecode-error.log
 
       - name: Fail workflow if Claude review failed
-      if: always()
-      shell: bash
-      run: |
-
+        if: always()
+        shell: bash
+        run: |
          echo "Checking Claude review results..."
 
          if [ -f claudecode-error.log ]; then
