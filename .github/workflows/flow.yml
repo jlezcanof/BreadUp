@@ -5,13 +5,16 @@ permissions:
   contents: read
 
 on:
+  push:
+    branches: ["main"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify secret existsss
+      - name: Verify secret exists
         run: |
           if [ -z "${{ secrets.CLAUDE_API_KEY }}" ]; then
             echo "Secret missing"
