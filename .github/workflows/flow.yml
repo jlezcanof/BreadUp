@@ -18,9 +18,9 @@ jobs:
         run: |
           if [ -z "${{ secrets.CLAUDE_API_KEY }}" ]; then
             echo "Secret missing"
-          exit 1
-          else
-            echo "Secret exists"
+            exit 1
+          fi
+          echo "Claude API secret detected"
           fi
    
       - uses: actions/checkout@v4
@@ -28,9 +28,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 2
       
-      - uses: anthropics/claude-code-security-review@main
+      - name: Claude Security Review
+        id: claude_review
+        uses: anthropics/claude-code-security-review@main
         with:
           comment-pr: true
           claude-api-key: ${{ secrets.CCLAUDE_API_KEY }}
           run-every-commit: true
           claude-mode: claude-haiku-4-5-20251001
+       
+      - name: Fail workflow if Claude review failed
+        if: steps.claude_review.outcome != 'success'
+        run: |
+           echo "::error::Claude security review failed"
+           exit 1
