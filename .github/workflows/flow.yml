@@ -13,6 +13,10 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
+
+    env:
+      ACTIONS_STEP_DEBUG: true
+
     steps:
       - name: Verify secret exists
         run: |
@@ -36,7 +40,7 @@ jobs:
           run-every-commit: true
           #claude-mode: claude-haiku-4-5-20251001
           #claude-mode: claude-3-5-haiku-20241022
-          #claude-mode: claude-haiku-4-5
+          claude-mode: claude-haiku-4-5
 
       - name: Upload Claude logs
         if: always()
