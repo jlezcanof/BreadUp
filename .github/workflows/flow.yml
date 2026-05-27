@@ -11,6 +11,15 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
+      - name: Verify secret exists
+        run: |
+          if [ -z "${{ secrets.CLAUDE_API_KEY }}" ]; then
+            echo "Secret missing"
+          exit 1
+          else
+            echo "Secret exists"
+          fi
+   
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -21,3 +30,4 @@ jobs:
           comment-pr: true
           claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
           run-every-commit: true
+          claude-mode: claude-haiku-4-5-20251001
