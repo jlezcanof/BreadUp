@@ -21,7 +21,6 @@ jobs:
             exit 1
           fi
           echo "Claude API secret detected"
-          fi
    
       - uses: actions/checkout@v4
         with:
