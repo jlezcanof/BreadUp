@@ -38,7 +38,7 @@ jobs:
           comment-pr: true
           claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
           run-every-commit: true
-          claude-mode: claude-haiku-4-5
+          claude-mode: claude-sonnet-4-6
 
       - name: Upload Claude logs
         if: always()
