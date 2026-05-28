@@ -7,7 +7,6 @@ permissions:
 on:
   push:
     branches: ["main"]
-    #branches: ["feature/branch-initial-empty"]
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
