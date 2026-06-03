@@ -1,0 +1,79 @@
+name: Security Review
+
+permissions:
+  pull-requests: write  # Needed for leaving PR comments
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+    #branches: ["feature/branch-initial-empty"]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    env:
+      ACTIONS_STEP_DEBUG: true
+
+    steps:
+      - name: Verify secret exists
+        run: |
+          if [ -z "${{ secrets.CLAUDE_API_KEY }}" ]; then
+            echo "Secret missing"
+            exit 1
+          fi
+          echo "Claude API secret detected"
+   
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+      
+      - name: Claude Security Review
+        id: claude_review
+        uses: anthropics/claude-code-security-review@main
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
+          run-every-commit: true
+          #claude-mode: claude-haiku-4-5-20251001
+          #claude-mode: claude-3-5-haiku-20241022
+          claude-mode: claude-haiku-4-5
+
+      - name: Upload Claude logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-review-logs
+          path: |
+            claudecode-results.json
+            claudecode-error.log
+
+      - name: Fail workflow if Claude review failed
+        if: always()
+        shell: bash
+        run: |
+         echo "Checking Claude review results..."
+
+         if [ -f claudecode-error.log ]; then
+           cat claudecode-error.log
+
+         if grep -E "Error code: 404|Error code: 529|is_error.:true|Overloaded errors|API Error" claudecode-error.log; then
+           echo "::error::Claude security review failed"
+           exit 1
+         fi
+         fi
+
+         if [ -f claudecode-results.json ]; then
+           cat claudecode-results.json
+
+           if grep -E "is_error\":true|529 Overloaded|API Error|Security audit failed" claudecode-results.json; then
+             echo "::error::Claude security review failed"
+             exit 1
+           fi
+         fi
+
+         echo "Claude review completed successfully"

@@ -10,6 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     var body: some View {
+            // TODO sistema de pestañas
             NavigationStack {
                 RecipeListView()
             }

@@ -29,6 +29,7 @@ final class BreadCalculatorVM {
     init() {
         var instructions = """
                     Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
+                    Vas a hacer uso de la tool recipeBread y vas a devolver siempre con el resultado de dicha Tool.
                     """
         instructions.append("Vas a obtener recetas de pan en función de los ingredientes y cantidades indicadas. Aqui tienes un ejemplo \(BreadRecipe.exampleRecipeBread)")
         
@@ -36,6 +37,8 @@ final class BreadCalculatorVM {
         self.session = LanguageModelSession(
                     tools:  [GetBreadRecipeTool()],
                     instructions: instructions)
+        
+        session.prewarm()
         
 //                            """
 //                            Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
@@ -93,11 +96,12 @@ final class BreadCalculatorVM {
     }
         
     func calculateRecipe() {
+        print("init of method calculateREcipe")
         Task {
 //            try? await self.generateRecipeBread()
 //            try? await self.suggestRecipeBread()
             try? await self.suggestSequenceBread()
-            print("end of calculateREcipe")
+            print("end of method calculateREcipe")
         }
     }
     
