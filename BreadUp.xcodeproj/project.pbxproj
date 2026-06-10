@@ -19,7 +19,6 @@
 		9EFE3DEF2F8FD84800392988 /* Exceptions for "BreadUp" folder in "BreadUp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				FMFBusiness/PlaygroundExperiments.swift,
 				Info.plist,
 			);
 			target = 9E27310C2F7446EA0008A3B9 /* BreadUp */;

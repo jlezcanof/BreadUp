@@ -8,8 +8,6 @@
 		<string>CheckWeatherIntent</string>
 	</array>
 	<key>UIAppFonts</key>
-	<array>
-		<string>bootstrap-icons.otf</string>
-	</array>
+	<array/>
 </dict>
 </plist>
