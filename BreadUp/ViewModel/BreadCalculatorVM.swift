@@ -8,7 +8,7 @@ import SwiftData
 import FoundationModels
 import Observation
 
-@Observable
+@Observable @MainActor
 final class BreadCalculatorVM {
     
     var water: Int = 250
@@ -92,13 +92,12 @@ final class BreadCalculatorVM {
         context.insert(ingredients)
     }
         
-    func calculateRecipe() {
-        Task {
+    func calculateRecipe() async {
 //            try? await self.generateRecipeBread()
 //            try? await self.suggestRecipeBread()
+            
             try? await self.suggestSequenceBread()
             print("end of calculateREcipe")
-        }
     }
     
     private func generateRecipeBread() async throws {

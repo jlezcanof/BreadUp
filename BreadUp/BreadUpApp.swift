@@ -9,19 +9,21 @@ import SwiftUI
 import SwiftData
 import FoundationModels
 
+@MainActor
+enum AppModelStore {
+    static let shared: ModelContainer = {
+        do {
+            return try ModelContainer(for: BreadUpIngredients.self, migrationPlan: BreadUpMigrationPlan.self)
+        } catch {
+            fatalError("No se puede crear la base de datos")
+        }
+    }()
+}
+
 @main
 struct BreadUpApp: App {
     
-    let container: ModelContainer
-    
-    init() {
-        do {
-            container = try ModelContainer(for: BreadUpIngredients.self, migrationPlan: BreadUpMigrationPlan.self)
-        } catch {
-            fatalError("No se puede crear el ModelContainer: \(error)")
-//            container = try ModelContainer(for: BreadUpIngredients.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-        }
-    }
+    let container = AppModelStore.shared
     
     var body: some Scene {
         WindowGroup {

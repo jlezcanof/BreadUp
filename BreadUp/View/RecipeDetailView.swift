@@ -63,25 +63,9 @@ struct RecipeDetailView: View {
                     }
 
                     Section("Levadura") {
-                        Text("\(vm.yeast) gramos")
-                            .font(.headline)
-                        Slider(
-                            value: Binding(
-                                get: { Double(vm.yeast) },
-                                set: { vm.yeast = Int($0) }
-                            ),
-                            in: 5...50,
-                            step:5,
-                            onEditingChanged: { editing in
-    //                            isEditing = editing
-//                                if editing {
-//                                    print("Empieza a mover el slider")
-//                                } else {
-//                                    print("Termina de mover el slider")
-//                                    // Aquí haces algo pesado: guardar, enviar, etc.
-//                                }
-                            }
-                        )
+                        yeast
+                        sliderYeast
+        
                         HStack {
                             Text("5 gr")
                             Spacer()
@@ -92,8 +76,9 @@ struct RecipeDetailView: View {
                     }
                     Section("Agua") {
                         VStack(alignment: .leading) {
-                            Text("\(vm.water) ml")
-                                .font(.headline)
+                            water
+//                            Text("\(vm.water) ml")
+//                                .font(.headline)
                             Slider(
                                 value: Binding(
                                     get: { Double(vm.water) },
@@ -144,7 +129,9 @@ struct RecipeDetailView: View {
                         
                     case .available:
                             Button {
-                                vm.calculateRecipe()
+                                Task {
+                                    await vm.calculateRecipe()
+                                }
                             } label: {
                                 Label("Generar receta", systemImage: "sparkles")// apple.intelligence
                                 .frame(maxWidth: .infinity)
@@ -240,6 +227,36 @@ struct RecipeDetailView: View {
             }                                                   // <-- NUEVO
         }                                                       // <-- NUEVO
         .allowsHitTesting(!vm.isLoading)                        // <-- NUEVO (bloquea la interacción
+    }
+    
+    private var water: some View {
+        Text("\(vm.water) ml")
+            .font(.headline)
+    }
+    
+    private var yeast: some View {
+        Text("\(vm.yeast) gramos")
+            .font(.headline)
+    }
+    
+    private var sliderYeast: some View {
+        Slider(
+            value: Binding(
+                get: { Double(vm.yeast) },
+                set: { vm.yeast = Int($0) }
+            ),
+            in: 5...50,
+            step:5,
+            onEditingChanged: { editing in
+//                            isEditing = editing
+//                                if editing {
+//                                    print("Empieza a mover el slider")
+//                                } else {
+//                                    print("Termina de mover el slider")
+//                                    // Aquí haces algo pesado: guardar, enviar, etc.
+//                                }
+            }
+        )
     }
     
     private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
