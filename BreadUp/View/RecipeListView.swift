@@ -58,7 +58,7 @@ struct RecipeListView: View {
         }
         .navigationTitle("Mis Recetas")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .navigation) {// TODO iphone .navigationBarTrailing
                 Button {
                     showNewRecipe = true
                 } label: {
