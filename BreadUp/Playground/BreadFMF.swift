@@ -26,8 +26,14 @@ struct PasoDeReceta {
 }
 
 func getStreamReceta(receta: RecetaDePan) {
+    var step = 1
     for paso in receta.pasos {
-        print("> \(paso.titulo) -- \(paso.descripcion)")
+        print("Paso \(step)")
+//        print("> \(paso.titulo) --  \(paso.descripcion)"
+        print("> **\(paso.titulo)** ")
+        print("> \(paso.descripcion)")
+        print("\n")
+        step += 1
     }
 }
 
@@ -49,20 +55,19 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
 
 #Playground {
     let model = SystemLanguageModel.default
+    
     switch model.availability {
-    case .available:
-        print("Model OK")
-    case .unavailable(.appleIntelligenceNotEnabled):
-        print("Apple Intelligence no está disponible")
-    case .unavailable(.deviceNotEligible):
-        print("Este dispositivo NO soporta Apple Intelligence")
-    case .unavailable(.modelNotReady):
-        print("El modelo aún no está disponible. Intentelo dentro de unos minutos")
-    case .unavailable(let error):
-        print(error)
+        case .available:
+            print("Model OK")
+        case .unavailable(.appleIntelligenceNotEnabled):
+            print("Apple Intelligence no está disponible")
+        case .unavailable(.deviceNotEligible):
+            print("Este dispositivo NO soporta Apple Intelligence")
+        case .unavailable(.modelNotReady):
+            print("El modelo aún no está disponible. Intentelo dentro de unos minutos")
+        case .unavailable(let error):
+            print(error)
     }
-
-
     
 //    let total = model.contextSize
 //    print("Tokens \(total)")
@@ -83,6 +88,7 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
             5. Si te preguntan algo ajeno a la panadería, responde amablemente que
                solo ayudas con recetas de pan.
             """
+    // 3.               Para los títulos usa vocabulario de panaderia.
     
     let session = LanguageModelSession(model: model, instructions: instructions)
     
@@ -93,7 +99,7 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
         Crea una receta de pan casero usando estos ingredientes/cantidades:
         - Agua: 100 mililitros
         - Harina de trigo: 300 gramos
-        - Levadura: 3 gramos.
+        - Levadura fresca de panaderia: 3 gramos.
     """
 
 //    Responde con un string normal y corriente
@@ -106,16 +112,26 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
     
     
     // #############################
-//    let options = GenerationOptions(sampling: .greedy, temperature: 0.8, maximumResponseTokens: 150)
-//    let options = GenerationOptions(temperature: 0.3, maximumResponseTokens: 150)
+//    let options = GenerationOptions(sampling: .greedy, temperature: 0.3, maximumResponseTokens: 150)
+    let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)//800
 
-    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self)
+    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
+                                        , options: options)
 
-    let recetaResponse = try await stream.collect()
-    getStreamReceta(receta: recetaResponse.content)
-
+//    let recetaResponse = try await stream.collect()
+//    getStreamReceta(receta: recetaResponse.content)
+//    getStepResponse(pasos: stream)
+//    getStreamReceta(receta: stream)
+    
+    for try await snapshot in stream {
+        print(snapshot.content)
+//        print("\n")
+    }
+    
     totaltokens = try await model.tokenCount(for: session.transcript)
     print("\n Tokens consumidos despues del stream Response \(totaltokens)")
-
+    
+    let formated = Date.now.formatted(date: .complete, time: .shortened)
+    print("Timestamp: \(formated)")
     // #############################
 }
