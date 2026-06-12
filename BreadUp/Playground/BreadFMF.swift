@@ -10,22 +10,22 @@ import Foundation
 import FoundationModels
 import Playgrounds
 
-@Generable
-struct RecetaDePan {
-    @Guide(description: "Listado de todos los pasos que tiene que realizar para la receta de pan", .minimumCount(6), .maximumCount(9))
-    let pasos: [PasoDeReceta]
-}
+//@Generable
+//struct RecetaDePan {
+//    @Guide(description: "Listado de todos los pasos que tiene que realizar para la receta de pan", .minimumCount(6), .maximumCount(9))
+//    let pasos: [PasoDeReceta]
+//}
+//
+//@Generable
+//struct PasoDeReceta {
+//        @Guide(description: "Pequeño título del paso en la receta")
+//        let titulo: String
+//    
+//        @Guide(description: "Descripcion detallada y completa del paso a realizar")
+//        let descripcion: String
+//}
 
-@Generable
-struct PasoDeReceta {
-        @Guide(description: "Pequeño título del paso en la receta")
-        let titulo: String
-    
-        @Guide(description: "Descripcion detallada y completa del paso a realizar")
-        let descripcion: String
-}
-
-func getStreamReceta(receta: RecetaDePan) {
+func getStreamReceta(receta: BreadRecipe) {
     var step = 1
     for paso in receta.pasos {
         print("Paso \(step)")
@@ -37,7 +37,7 @@ func getStreamReceta(receta: RecetaDePan) {
     }
 }
 
-func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
+func getStepResponse(pasos: [RecipeStep.PartiallyGenerated]) {
     for paso in pasos {
         var linea = "> "
         if let titulo = paso.titulo {
@@ -50,6 +50,39 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
         }
 
         print(linea)
+    }
+}
+
+func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
+    var step = 1
+    for paso in pasos {
+        var linea = "> "
+//        if let titulo = paso.titulo {
+//                    linea += titulo + " -- "
+//        }
+//        if let descripcion = paso.descripcion {
+////                    linea += "\n"
+////                    linea += descripcion// + " -- "
+//                    linea += descripcion + " -- "
+//        }
+//
+////        print(linea)
+//        print("Paso \(step)")
+////        print("> \(paso.titulo) --  \(paso.descripcion)"
+//        print("> **\(paso.titulo)** ")
+//        print("> \(paso.descripcion)")
+//        print("\n")
+        if let titulo = paso.titulo {
+            linea += titulo
+        }
+        linea += "\n"
+        if let descripcion = paso.descripcion {
+//            linea += " -- \(paso.descripcion)"
+            linea += descripcion
+        }
+        print(linea)
+        
+        step += 1
     }
 }
 
@@ -107,15 +140,18 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
 //    let respuesta = try await session.respond(to: prompt)
     //print(respuesta.content)
     
-    var totaltokens = try await model.tokenCount(for: session.transcript)
-    print("Tokens consumidos \(totaltokens)")
+//    var totaltokens = try await model.tokenCount(for: session.transcript)
+//    print("Tokens consumidos \(totaltokens)")
     
     
     // #############################
 //    let options = GenerationOptions(sampling: .greedy, temperature: 0.3, maximumResponseTokens: 150)
     let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)//800
 
-    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
+//    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
+//                                        , options: options)
+    
+    let stream = session.streamResponse(to: prompt, generating: [RecipeStep].self
                                         , options: options)
 
 //    let recetaResponse = try await stream.collect()
@@ -124,12 +160,13 @@ func getStepResponse(pasos: [PasoDeReceta.PartiallyGenerated]) {
 //    getStreamReceta(receta: stream)
     
     for try await snapshot in stream {
-        print(snapshot.content)
-//        print("\n")
+//        getStepResponse(pasos: snapshot.content)
+        getStepResponse2(pasos: snapshot.content)
+        print("Otro snapshot")
     }
     
-    totaltokens = try await model.tokenCount(for: session.transcript)
-    print("\n Tokens consumidos despues del stream Response \(totaltokens)")
+    // totaltokens = try await model.tokenCount(for: session.transcript)
+    // print("\n Tokens consumidos despues del stream Response \(totaltokens)")
     
     let formated = Date.now.formatted(date: .complete, time: .shortened)
     print("Timestamp: \(formated)")

@@ -20,14 +20,14 @@ struct RecipeDetailView: View {
     @State private var showSaveAlert = false
     @State private var showDatePicker = false
     
-    private let model = SystemLanguageModel.default
+//    private let model = SystemLanguageModel.default
     
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 Form {
                     Section("Foundation Model") {
-                        switch model.availability {
+                        switch vm.availableModel()  { // model.availability
                                 case .available:
                                     Text("Foundation Model is available").foregroundStyle(.green)
                                 case .unavailable(let reason):
@@ -61,7 +61,6 @@ struct RecipeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
-
                     Section("Levadura") {
                         yeast
                         sliderYeast
@@ -124,36 +123,32 @@ struct RecipeDetailView: View {
                             }
                         }
                     }
-                    
-                    switch model.availability {
-                        
-                    case .available:
-                            Button {
-                                Task {
-                                    await vm.calculateRecipe()
+                    switch vm.availableModel() {
+                        case .available:
+                                Button {
+                                    Task {
+                                        await vm.calculateRecipe()
+                                    }
+                                } label: {
+                                    Label("Generar receta", systemImage: "sparkles")// apple.intelligence
+                                    .frame(maxWidth: .infinity)
+                                    .font(.headline)
                                 }
-                            } label: {
-                                Label("Generar receta", systemImage: "sparkles")// apple.intelligence
-                                .frame(maxWidth: .infinity)
-                                .font(.headline)
-                            }
-                    case .unavailable(.appleIntelligenceNotEnabled):
-                            HStack {
-                                    Text("El calculador de recetas de pan no está disponible porque Apple Inteligence no está habilitado")
-                            }
-                    case .unavailable(.modelNotReady):
+                        case .unavailable(.appleIntelligenceNotEnabled):
+                                HStack {
+                                        Text("El calculador de recetas de pan no está disponible porque Apple Inteligence no está habilitado")
+                                }
+                        case .unavailable(.modelNotReady):
+                                HStack {
+                                            Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
+                                }
+                        case .unavailable(.deviceNotEligible):
                             HStack {
                                         Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
                             }
-                    case .unavailable(.deviceNotEligible):
-                        HStack {
-                                    Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
-                        }
-                    default:
-                        Text("model.availabiltiy.default")
+                        default:
+                            Text("model.availabiltiy.default")
                     }
-                    
-               
                     Section("Receta") {
                         if let recipe = vm.recipe {
                                 if let messageMD = try? AttributedString(markdown: recipe, options: options) {
@@ -178,15 +173,14 @@ struct RecipeDetailView: View {
 //                                .textSelection(.enabled)
 //                                .frame(maxWidth: .infinity, alignment: .leading)
 //                        }
-                        Button {
-                            // TODO decidir que guardar aqui
-                            showSaveAlert = true
-                        } label: {
-                                HStack {
-                                    Spacer()
-                                    Label("Guardar receta", systemImage: "cooktop.fill")
-                            }
-                        }
+//                        Button {
+//                            showSaveAlert = true
+//                        } label: {
+//                                HStack {
+//                                    Spacer()
+//                                    Label("Guardar receta", systemImage: "cooktop.fill")
+//                            }
+//                        }
                     }
                     .id(resultID)
                 }
@@ -194,13 +188,13 @@ struct RecipeDetailView: View {
                 .onChange(of: vm.flourType) {vm.resetResult()}
                 .onChange(of: vm.flourQuantity) {vm.resetResult()}
                 .onChange(of: vm.yeast) {vm.resetResult()}
-                .alert("Guardar receta", isPresented: $showSaveAlert) {
-                    Button("No", role: .cancel) { }
-                       Button("Sí") {
-                           vm.save(context: modelContext)
-                           dismiss()
-                       }
-                }
+//                .alert("Guardar receta", isPresented: $showSaveAlert) {
+//                    Button("No", role: .cancel) { }
+//                       Button("Sí") {
+//                           vm.save(context: modelContext)
+//                           dismiss()
+//                       }
+//                }
                 .navigationTitle("BreadUp")
             }
         }

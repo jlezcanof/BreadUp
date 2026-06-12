@@ -9,13 +9,13 @@ import SwiftUI
 
 struct StepView: View {
     
-    let step: StepRecipe
+    let step: RecipeStep
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(step.nameStep)
+            Text(step.titulo)
                 .font(.headline)
-            Text(step.descriptionStep)
+            Text(step.descripcion)
                 .font(.body)
         }
     }

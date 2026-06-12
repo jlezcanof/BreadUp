@@ -17,8 +17,9 @@ final class BreadCalculatorVM {
     var yeast: Int = 10
     var selectedDate: Date = Date()
     
-    //"Cuál es la mejor manera de hacer una receta de pan"
+    private let model: SystemLanguageModel
     private let session: LanguageModelSession
+    
     var recipe : String?
     var isLoading = false
     
@@ -26,24 +27,53 @@ final class BreadCalculatorVM {
     
     private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
+    private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
+
+    
     init() {
-        var instructions = """
-                    Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
-                    """
-        instructions.append("Vas a obtener recetas de pan en función de los ingredientes y cantidades indicadas. Aqui tienes un ejemplo \(BreadRecipe.exampleRecipeBread)")
+        model = SystemLanguageModel.default
+        let instructions = """
+                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
+                    reales y contrastadas, explicadas con un toque cercano y evocador.
+
+                    Reglas:
+                    1. Responde siempre en castellano.
+                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
+                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
+                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
+                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
+                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
+                       y propón el ajuste mínimo necesario.
+                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
+                       solo ayudas con recetas de pan.
+        """
+  
+//        self.session = LanguageModelSession(
+//                    tools:  [GetBreadRecipeTool()],
+//                    instructions: instructions)
         
-        
+        print("BEFORE SELF.SESSION")
         self.session = LanguageModelSession(
-                    tools:  [GetBreadRecipeTool()],
+                    model: model,
                     instructions: instructions)
         
-//                            """
-//                            Eres un maestro panadero con más de 40 años de experiencia que ha realizado pan con todos los tipos de harinas existentes en el mercado.
-//                            """
-        
-//        let otherSession = LanguageModelSession(tools:  [GetBreadRecipeTool()]) {
-//            "Your job is to create an recipe of the bread"
-//        }
+//        print("PREWARN")
+//        prewarn()
+//        print("POST WARN")
+    }
+    
+    private func availableLanguageModel() -> Bool {
+        switch model.availability {
+        case .available:
+            return true
+        case .unavailable(let reason):
+        print("reason: \(reason)")
+        return false
+        }
+    }
+    
+    func availableModel() -> SystemLanguageModel.Availability {
+        model.availability
     }
 
 
@@ -93,91 +123,60 @@ final class BreadCalculatorVM {
     }
         
     func calculateRecipe() async {
-//            try? await self.generateRecipeBread()
-//            try? await self.suggestRecipeBread()
-            
-            try? await self.suggestSequenceBread()
+            try? await self.generateRecipeBread()// generateRecipeBread
             print("end of calculateREcipe")
     }
-    
-    private func generateRecipeBread() async throws {
-        isLoading = true                    // <-- NUEVO
-        defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
-      
-        let prompt = """
-            Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
-            - Agua: \(water) ml
-            - Harina: \(flourType.rawValue), \(flourQuantity) ml
-            - Levadura: \(yeast) g
-        """
         
-        do {
-            let response = try await session.respond(to: prompt, options: GenerationOptions(sampling: .greedy, maximumResponseTokens: 500))
-            self.recipe = response.content
-//            var steps :  [StepRecipe] = []
-//            for _ in 0 ..< 8 {
-//                let stepRecipe = try await makeStep()
-//                steps.append(stepRecipe)
-//            }
-//            
-//            recipe = steps.enumerated()
-//                .map { index, step in
-//                    "Paso \(index + 1): \(step.nameStep) \n \(step.descriptionStep)"
-//                }
-//                .joined(separator: "\n\n")
-//            
-//            print("recipe \(String(describing: recipe))")
-            
-        } catch LanguageModelSession.GenerationError.exceededContextWindowSize {
-            print("exeeded content windows size")
-//            print("\(error)")
-//            let newSession = newSession(previousSession: session)
+    private func generateRecipeBread() async throws {//suggestSequenceBread
+        guard availableLanguageModel() else {
+            print("Language model not available")
+            return
         }
-        catch LanguageModelSession.GenerationError.guardrailViolation {
-            print("safety guard rail violation ocurred.")
-        }
-        print(session.transcript)
-    }
-    
-    private func suggestRecipeBread() async throws {
-        isLoading = true                    // <-- NUEVO
-        defer { isLoading = false }         // <-- NUEVO (se ejecuta siempre, incluso si hay error)
-        let response = try await session.respond(generating: BreadRecipe.self) {
-                    """
-                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
-                        - Agua: \(water) ml
-                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
-                        - Levadura: \(yeast) g
-                    """
-        }
-        self.recipeBread = response.content
-        //        print("\(self.recipeBread, default: "nada de nada")")
-
         
-        let recipeString = self.recipeBread?.steps.enumerated()
-            .map { index, step in
-                "Paso \(index + 1): \(step.nameStep)\n\(step.descriptionStep)"
-            }
-            .joined(separator: "\n\n")
-        
-        self.recipe = recipeString
-    }
-    
-    private func suggestSequenceBread() async throws {
         isLoading = true
         defer { isLoading = false }
-        prewarn()
-        let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
-                    """
-                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
-                        - Agua: \(water) ml
-                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
-                        - Levadura: \(yeast) g
-                    """
-        }
         
-        for try await partial in stream {
-            self.recipeBreadSequence = partial
+//        prewarn()
+        do {
+//            let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
+//                    """
+//                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
+//                        - Agua: \(water) ml
+//                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
+//                        - Levadura: \(yeast) g
+//                    """
+            
+            let prompt =
+            """
+                Crea una receta de pan casero usando estos ingredientes/cantidades:
+                - Agua: \(water) mililitros
+                - Harina de \(flourType.rawValue): \(flourQuantity) gramos
+                - Levadura fresca de panaderia: \(yeast) gramos.
+            """
+            var partialCount = 0
+        //    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
+        //                                        , options: options)
+            
+            
+            //[RecipeStep]
+            let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
+                                                , options: options)
+            for try await partial in stream {
+                partialCount += 1
+                self.recipeBreadSequence = partial
+            }
+        } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
+            print("exeeded content windows size")
+            print("\(content.debugDescription)")
+            self.recipe = "Se ha excedido el contexto del tamaño de la ventana"
+        }
+        catch LanguageModelSession.GenerationError.guardrailViolation(let content) {
+            print("blocked by GUARDRAILS.")
+            print("\(content.debugDescription)")
+            self.recipe = "No podemos responder a dicha petición de receta"
+        } catch {
+            print(error)
+            self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
         }
     }
     
@@ -185,7 +184,7 @@ final class BreadCalculatorVM {
         self.session.prewarm()
     }
     
-    private func makeStep() async throws -> StepRecipe {
+    private func makeStep() async throws -> RecipeStep {
         let prompt2 = """
             Genera un paso para la receta de un pan.
             
@@ -197,7 +196,7 @@ final class BreadCalculatorVM {
             
             SOLO salida JSON, sin ’’’,
             """
-        let response = try await session.respond(generating: StepRecipe.self) {
+        let response = try await session.respond(generating: RecipeStep.self) {
             prompt2
         }
                                                  

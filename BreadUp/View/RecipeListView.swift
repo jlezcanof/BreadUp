@@ -56,7 +56,8 @@ struct RecipeListView: View {
                 )
             }
         }
-        .navigationTitle("Mis Recetas")
+        .navigationTitle("Mis Recetas de pan")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigation) {// TODO iphone .navigationBarTrailing
                 Button {
