@@ -23,15 +23,21 @@ enum AppModelStore {
 @main
 struct BreadUpApp: App {
     
+    @State private var vm = BreadCalculatorVM()
     let container = AppModelStore.shared
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    vm.initVM()
+                }
+                .environment(vm)
         }
         .modelContainer(container)
 //        WindowGroup {
 //            PruebaFoundationModels(session2: LanguageModelSession())
 //        }
+        
     }
 }

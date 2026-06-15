@@ -14,16 +14,15 @@ struct RecipeDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    @State private var vm = BreadCalculatorVM()
+    @Environment(BreadCalculatorVM.self) private var vm
     
     @State private var resultID = "resultado"
     @State private var showSaveAlert = false
     @State private var showDatePicker = false
-    
-//    private let model = SystemLanguageModel.default
-    
+        
     var body: some View {
-        NavigationStack {
+        @Bindable var vm = vm
+        return NavigationStack {
             ScrollViewReader { proxy in
                 Form {
                     Section("Foundation Model") {
@@ -161,12 +160,12 @@ struct RecipeDetailView: View {
                                 }
                         }
                         if let sequence = vm.recipeBreadSequence {
-//                            sequence.rawContent.promptRepresentation
                             Text(sequence.rawContent.jsonString)
                             .padding()
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        //                            sequence.rawContent.promptRepresentation
 //                        if let sequence = vm.recipeBreadSequence {
 //                            Text(sequence)
 //                                .padding()
@@ -221,6 +220,9 @@ struct RecipeDetailView: View {
             }                                                   // <-- NUEVO
         }                                                       // <-- NUEVO
         .allowsHitTesting(!vm.isLoading)                        // <-- NUEVO (bloquea la interacción
+        .task {
+            vm.load()
+        }
     }
     
     private var water: some View {

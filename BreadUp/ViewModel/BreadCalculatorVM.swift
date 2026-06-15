@@ -18,7 +18,7 @@ final class BreadCalculatorVM {
     var selectedDate: Date = Date()
     
     private let model: SystemLanguageModel
-    private let session: LanguageModelSession
+    private var session: LanguageModelSession
     
     var recipe : String?
     var isLoading = false
@@ -30,8 +30,41 @@ final class BreadCalculatorVM {
     private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
 
     
+  //        self.session = LanguageModelSession(
+  //                    tools:  [GetBreadRecipeTool()],
+  //                    instructions: instructions)
+    
     init() {
         model = SystemLanguageModel.default
+//        let instructions = """
+//                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
+//                    reales y contrastadas, explicadas con un toque cercano y evocador.
+//
+//                    Reglas:
+//                    1. Responde siempre en castellano.
+//                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
+//                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
+//                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
+//                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
+//                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
+//                       y propón el ajuste mínimo necesario.
+//                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
+//                       solo ayudas con recetas de pan.
+//        """
+        
+        print("INIT: BEFORE SELF.SESSION")
+//        session = LanguageModelSession(
+//                    model: model,
+//                    instructions: instructions)
+        
+        session = LanguageModelSession()
+        print("INIT")
+//        print("PREWARN")
+//        self.session.prewarm()
+//        print("POST WARN")
+    }
+    
+    func initVM() {//modelContext: ModelContext
         let instructions = """
                     Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
                     reales y contrastadas, explicadas con un toque cercano y evocador.
@@ -47,19 +80,14 @@ final class BreadCalculatorVM {
                     5. Si te preguntan algo ajeno a la panadería, responde amablemente que
                        solo ayudas con recetas de pan.
         """
-  
-//        self.session = LanguageModelSession(
-//                    tools:  [GetBreadRecipeTool()],
-//                    instructions: instructions)
         
-        print("BEFORE SELF.SESSION")
-        self.session = LanguageModelSession(
-                    model: model,
-                    instructions: instructions)
-        
-//        print("PREWARN")
-//        prewarn()
-//        print("POST WARN")
+        self.session = LanguageModelSession(model: model, instructions: instructions)
+        print("initVM")
+//        session.prewarm()//prueba
+//        print("hemos hecho la carga de recursos requeridos para la sesión en memoria")
+    }
+    func load () {
+//        session.prewarm()
     }
     
     private func availableLanguageModel() -> Bool {
@@ -136,8 +164,9 @@ final class BreadCalculatorVM {
         isLoading = true
         defer { isLoading = false }
         
-//        prewarn()
+        
         do {
+            
 //            let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
 //                    """
 //                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
@@ -146,13 +175,19 @@ final class BreadCalculatorVM {
 //                        - Levadura: \(yeast) g
 //                    """
             
+            
+            // \(water)
+            // Harina de \(flourType.rawValue): \(flourQuantity) gramos
+            // Levadura fresca de panaderia: \(yeast) gramos.
+            
             let prompt =
             """
                 Crea una receta de pan casero usando estos ingredientes/cantidades:
-                - Agua: \(water) mililitros
-                - Harina de \(flourType.rawValue): \(flourQuantity) gramos
-                - Levadura fresca de panaderia: \(yeast) gramos.
+                - Agua: 100 mililitros
+                - Harina de trigo: 300 gramos
+                - Levadura fresca de panaderia: 3 gramos.
             """
+            
             var partialCount = 0
         //    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
         //                                        , options: options)
@@ -174,14 +209,16 @@ final class BreadCalculatorVM {
             print("blocked by GUARDRAILS.")
             print("\(content.debugDescription)")
             self.recipe = "No podemos responder a dicha petición de receta"
-        } catch {
+        }
+        catch LanguageModelSession.GenerationError.assetsUnavailable(let content) {
+            print("Assets unavailable")
+            print("\(content.debugDescription)")
+            self.recipe = "Los assets del modelo no están disponible"
+        }
+        catch {
             print(error)
             self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
         }
-    }
-    
-    private func prewarn() {
-        self.session.prewarm()
     }
     
     private func makeStep() async throws -> RecipeStep {
