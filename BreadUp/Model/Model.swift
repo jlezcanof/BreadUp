@@ -22,8 +22,6 @@ struct RecipeStep {
         let descripcion: String
 }
 
-
-
 //
 //@Generable
 //struct StepRecipe : Equatable {
@@ -78,7 +76,6 @@ extension RecipeStep {
     static let tenStep = RecipeStep(titulo: "Incorporar harina", descripcion: "Agrega la harina de trigo a la mezcla de levadura y agua. Amasa suavemente con las manos o un tenedor hasta formar una masa homogénea. La masa debe ser suave y elástica, sin pegajosa.")
     
 }
-
 
 //extension StepRecipe: Generable {
 //    init(_ content: GeneratedContent) throws {

@@ -63,7 +63,6 @@ struct RecipeDetailView: View {
                     Section("Levadura") {
                         yeast
                         sliderYeast
-        
                         HStack {
                             Text("5 gr")
                             Spacer()
@@ -165,7 +164,8 @@ struct RecipeDetailView: View {
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        //                            sequence.rawContent.promptRepresentation
+                        // sequence.rawContent.promptRepresentation
+                        
 //                        if let sequence = vm.recipeBreadSequence {
 //                            Text(sequence)
 //                                .padding()
@@ -220,9 +220,6 @@ struct RecipeDetailView: View {
             }                                                   // <-- NUEVO
         }                                                       // <-- NUEVO
         .allowsHitTesting(!vm.isLoading)                        // <-- NUEVO (bloquea la interacción
-        .task {
-            vm.load()
-        }
     }
     
     private var water: some View {
