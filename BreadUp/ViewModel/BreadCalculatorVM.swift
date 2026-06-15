@@ -136,9 +136,7 @@ final class BreadCalculatorVM {
         isLoading = true
         defer { isLoading = false }
         
-        
         do {
-            
 //            let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
 //                    """
 //                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
@@ -160,20 +158,19 @@ final class BreadCalculatorVM {
                 - Levadura fresca de panaderia: \(yeast) gramos.
             """
             
-            var partialCount = 0
-        //    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
-        //                                        , options: options)
+        var partialCount = 0
             
-            print("Agua \(water) harina \(flourType.rawValue) \(flourQuantity) y levadura \(yeast)")
+        print("Agua \(water) harina \(flourType.rawValue) \(flourQuantity) y levadura \(yeast)")
             
             
-            //[RecipeStep]
-            let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
+        //[RecipeStep]
+        let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                                 , options: options)
-            for try await partial in stream {
-                partialCount += 1
-                self.recipeBreadSequence = partial
-            }
+        for try await partial in stream {
+            partialCount += 1
+            self.recipeBreadSequence = partial
+        }
+            
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
             print("exeeded content windows size")
             print("\(content.debugDescription)")

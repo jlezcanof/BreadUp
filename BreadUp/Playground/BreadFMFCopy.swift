@@ -10,6 +10,21 @@ import Foundation
 import FoundationModels
 import Playgrounds
 
+//@Generable
+//struct RecetaDePan {
+//    @Guide(description: "Listado de todos los pasos que tiene que realizar para la receta de pan", .minimumCount(6), .maximumCount(9))
+//    let pasos: [PasoDeReceta]
+//}
+//
+//@Generable
+//struct PasoDeReceta {
+//        @Guide(description: "Pequeño título del paso en la receta")
+//        let titulo: String
+//
+//        @Guide(description: "Descripcion detallada y completa del paso a realizar")
+//        let descripcion: String
+//}
+
 func getStreamReceta(receta: BreadRecipe) {
     var step = 1
     for paso in receta.pasos {
@@ -45,20 +60,52 @@ func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async thr
 //        print("No hay pasos disponibles en la receta parcial")
 //    }
 //}
-
+//
+//func getStepResponse(pasos: [RecipeStep.PartiallyGenerated]) {
+//    for paso in pasos {
+//        var linea = "> "
+//        if let titulo = paso.titulo {
+//                    linea += titulo + " -- "
+//        }
+//        if let descripcion = paso.descripcion {
+////                    linea += "\n"
+////                    linea += descripcion// + " -- "
+//                    linea += descripcion + " -- "
+//        }
+//
+//        print(linea)
+//    }
+//}
 
 func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
     var step = 1
     for paso in pasos {
         var linea = "> "
+//        if let titulo = paso.titulo {
+//                    linea += titulo + " -- "
+//        }
+//        if let descripcion = paso.descripcion {
+////                    linea += "\n"
+////                    linea += descripcion// + " -- "
+//                    linea += descripcion + " -- "
+//        }
+//
+////        print(linea)
+//        print("Paso \(step)")
+////        print("> \(paso.titulo) --  \(paso.descripcion)"
+//        print("> **\(paso.titulo)** ")
+//        print("> \(paso.descripcion)")
+//        print("\n")
         if let titulo = paso.titulo {
             linea += titulo
         }
         linea += "\n"
         if let descripcion = paso.descripcion {
+//            linea += " -- \(paso.descripcion)"
             linea += descripcion
         }
         print(linea)
+        
         step += 1
     }
 }
