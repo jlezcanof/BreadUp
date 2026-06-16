@@ -18,7 +18,7 @@ struct RecipeDetailView: View {
     
     @State private var resultID = "resultado"
     @State private var showSaveAlert = false
-    @State private var showDatePicker = false
+//    @State private var showDatePicker = false
         
     var body: some View {
         @Bindable var vm = vm
@@ -74,8 +74,6 @@ struct RecipeDetailView: View {
                     Section("Agua") {
                         VStack(alignment: .leading) {
                             water
-//                            Text("\(vm.water) ml")
-//                                .font(.headline)
                             Slider(
                                 value: Binding(
                                     get: { Double(vm.water) },
@@ -93,34 +91,34 @@ struct RecipeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
-                    Section("Fecha") {
-                        Button {
-                            withAnimation {
-                                showDatePicker.toggle()
-                            }
-                        } label: {
-                            HStack {
-                                Text("Fecha de elaboración")
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                Text(vm.selectedDate, format: .dateTime.day().month().year())
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        if showDatePicker {
-                            DatePicker(
-                                "Fecha de elaboración",
-                                selection: $vm.selectedDate,
-                                displayedComponents: [.date]
-                            )
-                            .datePickerStyle(.graphical)
-                            .onChange(of: vm.selectedDate) {
-                                withAnimation {
-                                    showDatePicker = false
-                                }
-                            }
-                        }
-                    }
+//                    Section("Fecha") {
+//                        Button {
+//                            withAnimation {
+//                                showDatePicker.toggle()
+//                            }
+//                        } label: {
+//                            HStack {
+//                                Text("Fecha de elaboración")
+//                                    .foregroundStyle(.primary)
+//                                Spacer()
+//                                Text(vm.selectedDate, format: .dateTime.day().month().year())
+//                                    .foregroundStyle(.secondary)
+//                            }
+//                        }
+//                        if showDatePicker {
+//                            DatePicker(
+//                                "Fecha de elaboración",
+//                                selection: $vm.selectedDate,
+//                                displayedComponents: [.date]
+//                            )
+//                            .datePickerStyle(.graphical)
+//                            .onChange(of: vm.selectedDate) {
+//                                withAnimation {
+//                                    showDatePicker = false
+//                                }
+//                            }
+//                        }
+//                    }
                     switch vm.availableModel() {
                         case .available:
                                 Button {

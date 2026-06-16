@@ -9,6 +9,8 @@ import FoundationModels
 struct GenerateBreadRecipeView: View {
     
     @Environment(BreadCalculatorVM.self) private var vm
+    
+    @State private var showDatePicker = false
 
     var body: some View {
         @Bindable var vm = vm
@@ -25,6 +27,43 @@ struct GenerateBreadRecipeView: View {
                             StepRow(step: step)
                         }
                     }
+                }
+                if vm.receivedTotalInformationAboutRecipe {
+                    Text("Se ha finalizado la generación de la receta")
+                    //INI WIP
+                    Section("Fecha") {
+                        Button {
+                            withAnimation {
+                                showDatePicker.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Text("Fecha de elaboración")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Text(
+                                    vm.selectedDate,
+                                    format: .dateTime.day().month().year()
+                                )
+                                .foregroundStyle(.secondary)
+                            }
+                        }
+                        if showDatePicker {
+                            DatePicker(
+                                "Fecha de elaboración",
+                                selection: $vm.selectedDate,
+                                displayedComponents: [.date]
+                            )
+                            .datePickerStyle(.graphical)
+                            .onChange(of: vm.selectedDate) {
+                                withAnimation {
+                                    showDatePicker = false
+                                }
+                            }
+                        }
+                    }
+
+                    //END WIP
                 }
             }
             .frame(maxWidth: .infinity)

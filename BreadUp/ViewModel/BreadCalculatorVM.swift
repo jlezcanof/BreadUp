@@ -23,19 +23,14 @@ final class BreadCalculatorVM {
     var recipe : String?
     var isLoading = false
     var hasGenerationError = false
-    
     var showRecipeDetail = false
     var navigateToGenerate = false
-    var hasErrorsInModel = false
-    
-    private(set) var recipeBread: BreadRecipe?
-    
+    var receivedTotalInformationAboutRecipe = false
+        
     private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
     private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
-    
-//    private(set) var pepe: BreadRecipe.PartiallyGenerated?
-    
+        
     init() {
         model = SystemLanguageModel.default
         print("INIT: BEFORE SELF.SESSION")
@@ -44,7 +39,7 @@ final class BreadCalculatorVM {
     }
     
     func initVM() {//modelContext: ModelContext
-        // TODO Actúa??
+        // TODO "Actúa??
         let instructions = """
                     Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
                     reales y contrastadas, explicadas con un toque cercano y evocador.
@@ -130,7 +125,7 @@ final class BreadCalculatorVM {
     }
         
     func calculateRecipe() async {
-            try? await self.generateRecipeBread()// generateRecipeBread
+            try? await self.generateRecipeBread()
             print("end of calculateREcipe")
     }
     
@@ -144,7 +139,7 @@ final class BreadCalculatorVM {
         showRecipeDetail = false
     }
         
-    private func generateRecipeBread() async throws {//suggestSequenceBread
+    private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
             print("Language model not available")
             return
@@ -188,6 +183,7 @@ final class BreadCalculatorVM {
             partialCount += 1
             self.recipeBreadSequence = partial
         }
+        receivedTotalInformationAboutRecipe = true
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
             print("exeeded content windows size")
