@@ -96,9 +96,7 @@ struct GenerateBreadRecipeView: View {
         .navigationTitle("Receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .alert(
-            "Ha habido problemas para la generación de la receta. Por favor, inténtelo en unos minutos",
-            isPresented: $vm.hasGenerationError
+        .alert(vm.alert, isPresented: $vm.hasGenerationError
         ) {
             Button("Cerrar") {
                 vm.hasGenerationError = false

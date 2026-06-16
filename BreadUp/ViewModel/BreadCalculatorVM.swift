@@ -26,10 +26,11 @@ final class BreadCalculatorVM {
     var showRecipeDetail = false
     var navigateToGenerate = false
     var receivedTotalInformationAboutRecipe = false
+    var alert = "Ha habido problemas para la generación de la receta. Por favor, inténtelo en unos minutos"
         
     private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
-    private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
+    private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)// 0.8....12000
         
     init() {
         model = SystemLanguageModel.default
@@ -172,42 +173,66 @@ final class BreadCalculatorVM {
             """
             
         var partialCount = 0
-            
         print("Agua \(water) harina \(flourType.rawValue) \(flourQuantity) y levadura \(yeast)")
             
             
-        //[RecipeStep]
         let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                                 , options: options)
         for try await partial in stream {
             partialCount += 1
             self.recipeBreadSequence = partial
         }
+        print("Total steps: \(partialCount)")
         receivedTotalInformationAboutRecipe = true
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
             print("exeeded content windows size")
             print("\(content.debugDescription)")
-            self.recipe = "Se ha excedido el contexto del tamaño de la ventana"
+            self.alert = "Se ha excedido el contexto del tamaño de la ventana"
             hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.guardrailViolation(let content) {
             print("blocked by GUARDRAILS.")
             print("\(content.debugDescription)")
-            self.recipe = "No podemos responder a dicha petición de receta"
+            self.alert = "No podemos responder a dicha petición de receta"
             hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.assetsUnavailable(let content) {
             print("Assets unavailable")
             print("\(content.debugDescription)")
-            self.recipe = "Los assets del modelo no están disponible"
+            self.alert = "Los assets del modelo no están disponible"
             hasGenerationError = true
         }
         catch {
-            print(error)
-            self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
+            if containsSafetyAssetFailure(error) {
+                print("Safety classifier assets missing/corrupt")
+//                self.recipe = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
+                self.alert  = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
+            } else {
+                print(error)
+//                self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
+                self.alert = "Por algún motivo desconocido, no podemos atender su petición."
+            }
             hasGenerationError = true
         }
+    }
+    
+    private func containsSafetyAssetFailure(_ error: Error) -> Bool {
+        let ns = error as NSError
+
+        if ns.domain == "com.apple.SensitiveContentAnalysisML" { return true }
+
+        // Algunos errores meten varios underlying en esta clave (no estándar en NSError API).
+        if let multiple = ns.userInfo[NSMultipleUnderlyingErrorsKey] as? [Error],
+           multiple.contains(where: { containsSafetyAssetFailure($0) }) {
+            return true
+        }
+        // El underlying "clásico".
+        if let underlying = ns.userInfo[NSUnderlyingErrorKey] as? Error,
+           containsSafetyAssetFailure(underlying) {
+            return true
+        }
+        return false
     }
     
     private func makeStep() async throws -> RecipeStep {

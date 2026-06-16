@@ -127,16 +127,21 @@ func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
 //    let options = GenerationOptions(sampling: .greedy, temperature: 0.3, maximumResponseTokens: 150)
     let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)//800
 
+//    try await streamResponseRecipeStep(session: session, prompt: prompt, options: options)
+    try await streamResponseBreadRecipe(session: session, prompt: prompt, options: options)
+}
 
+// ################################### ini stream response array recipe step ###############################
+
+func streamResponseRecipeStep(session: LanguageModelSession, prompt: String, options: GenerationOptions) async throws {
+    // ini funciona perfectamente, PERO escribe muchas veces lo mismo (por aquello del flujo )
+    let stream = session.streamResponse(to: prompt, generating: [RecipeStep].self
+                                        , options: options)
     
     //    let recetaResponse = try await stream.collect()
     //    getStreamReceta(receta: recetaResponse.content)
     //    getStepResponse(pasos: stream)
     //    getStreamReceta(receta: stream)
-    
-    // ini funciona perfectamente, PERO escribe muchas veces lo mismo (por aquello del flujo )
-    let stream = session.streamResponse(to: prompt, generating: [RecipeStep].self
-                                        , options: options)
     
     for try await snapshot in stream {
         getStepsInResponse(pasos: snapshot.content)
@@ -150,45 +155,54 @@ func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
     let formated = Date.now.formatted(date: .complete, time: .shortened)
     print("Timestamp: \(formated)")
     // #############################
-    
+}
+
+// ################################### end stream response array recipe step ###############################
+
+
+// ################################### ini stream response bread recipe ###############################
 
 //    var breadRecipeContent: BreadRecipe.PartiallyGenerated?
-     let streamBreadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self
+func streamResponseBreadRecipe(session: LanguageModelSession, prompt: String, options: GenerationOptions) async throws {
+    let streamBreadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                              , options: options)
-    
+
+    // WIP
     let coll = try await streamBreadRecipe.collect().rawContent
-    
+
     print("coll \(coll)")
         
     //for try await breadRecipe in streamBreadRecipe {
-//        let juan = breadRecipe.content
+    //        let juan = breadRecipe.content
         
       //  steps(pasos: breadRecipe.content.pasos)
         
-//        print(juan.pasos)
+    //        print(juan.pasos)
         //print(" \(juan.title) ")
-//        let titulo = juan.title
+    //        let titulo = juan.title
     //}
-    
-//     for try await partial in stream {
-//         partialCount += 1
-//         self.recipeBreadSequence = partial
-//     }
-    
-//    let breadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self,
-//                                             options: options)
-//
-    
-//    for try await partial in breadRecipe.content {
-//       
-//    }
-//    var parte: LanguageModelSession
-//    for try await partial in breadRecipe {
+
+    //     for try await partial in stream {
+    //         partialCount += 1
+    //         self.recipeBreadSequence = partial
+    //     }
+
+    //    let breadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self,
+    //                                             options: options)
+    //
+
+    //    for try await partial in breadRecipe.content {
+    //
+    //    }
+    //    var parte: LanguageModelSession
+    //    for try await partial in breadRecipe {
         
-//        print(" \(partial.content.) ")
-//    }
+    //        print(" \(partial.content.) ")
+    //    }
 
     //try await getBreadRecipe(bread: breadRecipe.collect())
     //print("##########################################")
-    //print("se acabo el strem response de breadRecibe")
+    print("se acabo el strem response de breadRecibe")
+
 }
+// ################################### end stream response bread recipe ###############################
