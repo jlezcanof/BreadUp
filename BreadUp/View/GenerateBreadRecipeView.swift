@@ -11,7 +11,8 @@ struct GenerateBreadRecipeView: View {
     @Environment(BreadCalculatorVM.self) private var vm
 
     var body: some View {
-        ScrollView {
+        @Bindable var vm = vm
+        return ScrollView {
             VStack(spacing: 16) {
                 if let breadRecipe = vm.recipeBreadSequence,
                    let titleBreadRecipe = breadRecipe.content.title,
@@ -56,6 +57,15 @@ struct GenerateBreadRecipeView: View {
         .navigationTitle("Receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
+        .alert(
+            "Ha habido problemas para la generación de la receta. Por favor, inténtelo en unos minutos",
+            isPresented: $vm.hasGenerationError
+        ) {
+            Button("Cerrar") {
+                vm.hasGenerationError = false
+                vm.navigateToGenerate = false
+            }
+        }
     }
     
     private struct StepRow: View {

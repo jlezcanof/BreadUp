@@ -22,9 +22,11 @@ final class BreadCalculatorVM {
     
     var recipe : String?
     var isLoading = false
+    var hasGenerationError = false
     
     var showRecipeDetail = false
     var navigateToGenerate = false
+    var hasErrorsInModel = false
     
     private(set) var recipeBread: BreadRecipe?
     
@@ -149,6 +151,7 @@ final class BreadCalculatorVM {
         }
         
         isLoading = true
+        hasGenerationError = false
         defer { isLoading = false }
         
         do {
@@ -190,20 +193,24 @@ final class BreadCalculatorVM {
             print("exeeded content windows size")
             print("\(content.debugDescription)")
             self.recipe = "Se ha excedido el contexto del tamaño de la ventana"
+            hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.guardrailViolation(let content) {
             print("blocked by GUARDRAILS.")
             print("\(content.debugDescription)")
             self.recipe = "No podemos responder a dicha petición de receta"
+            hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.assetsUnavailable(let content) {
             print("Assets unavailable")
             print("\(content.debugDescription)")
             self.recipe = "Los assets del modelo no están disponible"
+            hasGenerationError = true
         }
         catch {
             print(error)
             self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
+            hasGenerationError = true
         }
     }
     
