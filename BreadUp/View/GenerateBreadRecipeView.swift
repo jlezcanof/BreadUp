@@ -11,19 +11,23 @@ struct GenerateBreadRecipeView: View {
     @Environment(BreadCalculatorVM.self) private var vm
 
     var body: some View {
-        VStack {
-            if let breadRecipe = vm.recipeBreadSequence,
-               let titleBreadRecipe = breadRecipe.content.title,
-               let steps = breadRecipe.content.pasos
-            {
-                Text(titleBreadRecipe)
-                    .font(.title2.bold())
-                LazyVStack(spacing: 12) {
-                    ForEach(steps) { step in
-                        StepRow(step: step)
+        ScrollView {
+            VStack(spacing: 16) {
+                if let breadRecipe = vm.recipeBreadSequence,
+                   let titleBreadRecipe = breadRecipe.content.title,
+                   let steps = breadRecipe.content.pasos
+                {
+                    Text(titleBreadRecipe)
+                        .font(.title2.bold())
+                    LazyVStack(spacing: 12) {
+                        ForEach(steps) { step in
+                            StepRow(step: step)
+                        }
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {

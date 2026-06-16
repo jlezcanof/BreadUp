@@ -147,25 +147,25 @@ struct RecipeDetailView: View {
                         default:
                             Text("model.availabiltiy.default")
                     }
-                    Section("Receta") {
-                        if let recipe = vm.recipe {
-                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
-                                ScrollView {
-                                        Text(messageMD)
-                                            .padding()
-                                            .textSelection(.enabled)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                }
-                        }
-                        if let sequence = vm.recipeBreadSequence {
-                            Text(sequence.rawContent.jsonString)
-                            .padding()
-                            .textSelection(.enabled)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .id(resultID)
+//                    Section("Receta") {
+//                        if let recipe = vm.recipe {
+//                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
+//                                ScrollView {
+//                                        Text(messageMD)
+//                                            .padding()
+//                                            .textSelection(.enabled)
+//                                            .frame(maxWidth: .infinity, alignment: .leading)
+//                                    }
+//                                }
+//                        }
+//                        if let sequence = vm.recipeBreadSequence {
+//                            Text(sequence.rawContent.jsonString)
+//                            .padding()
+//                            .textSelection(.enabled)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                        }
+//                    }
+//                    .id(resultID)
                 }
                 .onChange(of: vm.water) {vm.resetResult()}
                 .onChange(of: vm.flourType) {vm.resetResult()}
