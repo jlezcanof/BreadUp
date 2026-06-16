@@ -164,22 +164,6 @@ struct RecipeDetailView: View {
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        // sequence.rawContent.promptRepresentation
-                        
-//                        if let sequence = vm.recipeBreadSequence {
-//                            Text(sequence)
-//                                .padding()
-//                                .textSelection(.enabled)
-//                                .frame(maxWidth: .infinity, alignment: .leading)
-//                        }
-//                        Button {
-//                            showSaveAlert = true
-//                        } label: {
-//                                HStack {
-//                                    Spacer()
-//                                    Label("Guardar receta", systemImage: "cooktop.fill")
-//                            }
-//                        }
                     }
                     .id(resultID)
                 }

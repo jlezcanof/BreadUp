@@ -30,6 +30,23 @@ struct GenerateBreadRecipeView: View {
                     }
                 }
             }
+            //                        Button {
+            //                            showSaveAlert = true
+            //                        } label: {
+            //                                HStack {
+            //                                    Spacer()
+            //                                    Label("Guardar receta", systemImage: "cooktop.fill")
+            //                            }
+            //                        }
+//                                }
+            
+            //                .alert("Guardar receta", isPresented: $showSaveAlert) {
+            //                    Button("No", role: .cancel) { }
+            //                       Button("Sí") {
+            //                           vm.save(context: modelContext)
+            //                           dismiss()
+            //                       }
+            //                }
             .overlay {                                              // <-- NUEVO
                 if vm.isLoading {                                   // <-- NUEVO
                     ZStack {                                        // <-- NUEVO
@@ -53,16 +70,16 @@ struct GenerateBreadRecipeView: View {
                 }                                                   // <-- NUEVO
             }                                                       // <-- NUEVO
             .allowsHitTesting(!vm.isLoading)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                            vm.backToRecipeList()
-                    } label: {
-                            Label("Mis recetas", systemImage: "list.bullet")
-                    }
-                    .buttonStyle(.glass)
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    Button {
+//                            vm.backToRecipeList()
+//                    } label: {
+//                            Label("Mis recetas", systemImage: "list.bullet")
+//                    }
+//                    .buttonStyle(.glass)
+//                }
+//            }
         }
     }
     
