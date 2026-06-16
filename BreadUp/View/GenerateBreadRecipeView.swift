@@ -11,76 +11,44 @@ struct GenerateBreadRecipeView: View {
     @Environment(BreadCalculatorVM.self) private var vm
 
     var body: some View {
-        if let breadRecipe = vm.recipeBreadSequence
-            , let titleBreadRecipe = breadRecipe.content.title,
-           let steps = breadRecipe.content.pasos
-        {
-//            // ini prueba
-//            Text(breadRecipe.rawContent.jsonString)
-//            .padding()
-//            .textSelection(.enabled)
-//            .frame(maxWidth: .infinity, alignment: .leading)
-//            //end prueba
-            VStack {
+        VStack {
+            if let breadRecipe = vm.recipeBreadSequence,
+               let titleBreadRecipe = breadRecipe.content.title,
+               let steps = breadRecipe.content.pasos
+            {
                 Text(titleBreadRecipe)
                     .font(.title2.bold())
-                LazyVStack (spacing: 12) {// breadRecipe.content.pasos
+                LazyVStack(spacing: 12) {
                     ForEach(steps) { step in
                         StepRow(step: step)
                     }
                 }
             }
-            //                        Button {
-            //                            showSaveAlert = true
-            //                        } label: {
-            //                                HStack {
-            //                                    Spacer()
-            //                                    Label("Guardar receta", systemImage: "cooktop.fill")
-            //                            }
-            //                        }
-//                                }
-            
-            //                .alert("Guardar receta", isPresented: $showSaveAlert) {
-            //                    Button("No", role: .cancel) { }
-            //                       Button("Sí") {
-            //                           vm.save(context: modelContext)
-            //                           dismiss()
-            //                       }
-            //                }
-            .overlay {                                              // <-- NUEVO
-                if vm.isLoading {                                   // <-- NUEVO
-                    ZStack {                                        // <-- NUEVO
-                        Color.black.opacity(0.4)                    // <-- NUEVO
-                            .ignoresSafeArea()                      // <-- NUEVO
-                                                                    //
-                        VStack(spacing: 16) {                       // <-- NUEVO
-                            ProgressView()                          // <-- NUEVO
-                                .scaleEffect(1.5)                   // <-- NUEVO
-                                .tint(.white)                       // <-- NUEVO
-                            Text("Generando receta...")             // <-- NUEVO
-                                .font(.headline)                    // <-- NUEVO
-                                .foregroundStyle(.white)             // <-- NUEVO
-                        }                                           // <-- NUEVO
-                        .padding(32)                                // <-- NUEVO
-                        .background(.ultraThinMaterial)              // <-- NUEVO
-                        .clipShape(RoundedRectangle(cornerRadius: 16)) // <-- NUEVO
-                    }                                               // <-- NUEVO
-                    .transition(.opacity)                           // <-- NUEVO
-                    .animation(.easeInOut, value: vm.isLoading)     // <-- NUEVO
-                }                                                   // <-- NUEVO
-            }                                                       // <-- NUEVO
-            .allowsHitTesting(!vm.isLoading)
-//            .toolbar {
-//                ToolbarItem(placement: .topBarTrailing) {
-//                    Button {
-//                            vm.backToRecipeList()
-//                    } label: {
-//                            Label("Mis recetas", systemImage: "list.bullet")
-//                    }
-//                    .buttonStyle(.glass)
-//                }
-//            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay {
+            if vm.isLoading {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                        Text("Generando receta...")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+                    .padding(32)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .transition(.opacity)
+                .animation(.easeInOut, value: vm.isLoading)
+            }
+        }
+        .allowsHitTesting(!vm.isLoading)
     }
     
     private struct StepRow: View {
