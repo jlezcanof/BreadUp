@@ -7,6 +7,7 @@ import Foundation
 import SwiftData
 import FoundationModels
 import Observation
+import os
 
 @Observable @MainActor
 final class BreadCalculatorVM {
@@ -27,6 +28,11 @@ final class BreadCalculatorVM {
     var navigateToGenerate = false
     var receivedTotalInformationAboutRecipe = false
     var alert = "Ha habido problemas para la generación de la receta. Por favor, inténtelo en unos minutos"
+    
+    private static let log = Logger(
+            subsystem: "com.josemanuel.lezcano.BreadUp",
+            category: "FMDiagnostics"
+        )
         
     private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
@@ -41,20 +47,25 @@ final class BreadCalculatorVM {
     
     func initVM() {//modelContext: ModelContext
         // TODO "Actúa??
+//        let instructions = """
+//                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
+//                    reales y contrastadas, explicadas con un toque cercano y evocador.
+//
+//                    Reglas:
+//                    1. Responde siempre en castellano.
+//                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
+//                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
+//                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
+//                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
+//                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
+//                       y propón el ajuste mínimo necesario.
+//                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
+//                       solo ayudas con recetas de pan.
+//        """
+        
         let instructions = """
-                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
-                    reales y contrastadas, explicadas con un toque cercano y evocador.
-
-                    Reglas:
-                    1. Responde siempre en castellano.
-                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
-                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
-                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
-                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
-                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
-                       y propón el ajuste mínimo necesario.
-                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
-                       solo ayudas con recetas de pan.
+            Eres un humorista reputado con más de 30 años de reputación en las televisiones españolas, 
+        conociendo a todos los humoristas que existen en ese país.
         """
         
         //        self.session = LanguageModelSession(
@@ -69,11 +80,11 @@ final class BreadCalculatorVM {
     
     private func availableLanguageModel() -> Bool {
         switch model.availability {
-        case .available:
-            return true
-        case .unavailable(let reason):
-        print("reason: \(reason)")
-        return false
+            case .available:
+                return true
+            case .unavailable(let reason):
+                print("reason: \(reason)")
+                return false
         }
     }
     
@@ -127,9 +138,11 @@ final class BreadCalculatorVM {
         context.insert(ingredients)
     }
         
-    func calculateRecipe() async {
-            try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo
-            print("end of calculateREcipe")
+    private func calculateRecipe() async {
+        try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo
+//        try? await self.generateArevaloChiste()
+        
+        print("end of calculateREcipe")
     }
     
     func navigateToGenerateView() async {
@@ -141,9 +154,46 @@ final class BreadCalculatorVM {
         navigateToGenerate = false
         showRecipeDetail = false
     }
+    
+    private func generateArevaloChiste() async throws {
+        guard availableLanguageModel() else {
+            self.alert = "No está disponible el modelo del lenguaje"
+            print("Language model not available")
+            return
+        }
         
+        isLoading = true
+        hasGenerationError = false
+        defer { isLoading = false }
+        
+        let prompt =
+        """
+            Cuéntame un chiste de Arévalo.
+        """
+        
+        do {
+            let salida = try await session.respond(to: prompt, options: options)
+            print("chistaco: \(salida.content)")
+        } catch {
+//            if containsSafetyAssetFailure(error) {
+//                print("Safety classifier assets missing/corrupt")
+////                self.recipe = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
+//                self.alert  = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
+//            } else {
+//                print(error)
+////                self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
+//                self.alert = "Por algún motivo desconocido, no podemos atender su petición."
+//            }
+            print("\(error)")
+            hasGenerationError = true
+        }
+        
+ //    self.recipeBreadSequence = salida.content
+    }
+    
     private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
+            self.alert = "No está disponible el modelo del lenguaje"
             print("Language model not available")
             return
         }
@@ -174,17 +224,13 @@ final class BreadCalculatorVM {
                 - Levadura fresca de panaderia: \(yeast) gramos.
             """
             
-        var partialCount = 0
         print("Agua \(water) harina \(flourType.rawValue) \(flourQuantity) y levadura \(yeast)")
-            
             
         let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                                 , options: options)
         for try await partial in stream {
-            partialCount += 1
             self.recipeBreadSequence = partial
         }
-        print("Total steps: \(partialCount)")
         receivedTotalInformationAboutRecipe = true
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
@@ -236,6 +282,20 @@ final class BreadCalculatorVM {
         }
         return false
     }
+    
+    /// Recorre la jerarquía de NSError subyacentes hasta la raíz.
+        private static func dump(_ error: Error) {
+            var current: NSError? = error as NSError
+            var level = 0
+            while let ns = current {
+                log.error("""
+                       [\(level)] domain=\(ns.domain, privacy: .public) \
+                    code=\(ns.code) desc=\(ns.localizedDescription, privacy: .public)
+                    """)
+                current = ns.userInfo[NSUnderlyingErrorKey] as? NSError
+                level += 1
+            }
+        }
     
     private func makeStep() async throws -> RecipeStep {
         let prompt2 = """

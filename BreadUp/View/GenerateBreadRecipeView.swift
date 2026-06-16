@@ -29,7 +29,6 @@ struct GenerateBreadRecipeView: View {
                     }
                 }
                 if vm.receivedTotalInformationAboutRecipe {
-                    Text("Se ha finalizado la generación de la receta")
                     //INI WIP
                     Section("Fecha") {
                         Button {
@@ -62,7 +61,6 @@ struct GenerateBreadRecipeView: View {
                             }
                         }
                     }
-
                     //END WIP
                 }
             }
