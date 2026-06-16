@@ -62,6 +62,8 @@ final class BreadCalculatorVM {
         //                    instructions: instructions)
         
         self.session = LanguageModelSession(model: model, instructions: instructions)
+        // TODO prueba
+//        session.prewarm()
         print("initVM")
     }
     
@@ -126,7 +128,7 @@ final class BreadCalculatorVM {
     }
         
     func calculateRecipe() async {
-            try? await self.generateRecipeBread()
+            try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo
             print("end of calculateREcipe")
     }
     

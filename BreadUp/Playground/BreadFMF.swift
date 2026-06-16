@@ -98,7 +98,7 @@ func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
     
     let session = LanguageModelSession(model: model, instructions: instructions)
     
-    session.prewarm()
+//    session.prewarm()
     
     let prompt =
     """
