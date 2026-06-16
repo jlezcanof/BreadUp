@@ -20,6 +20,7 @@ final class BreadCalculatorVM {
     
     private let model: SystemLanguageModel
     private var session: LanguageModelSession
+//    private var context: ModelContext = nil
     
     var recipe : String?
     var isLoading = false
@@ -45,28 +46,28 @@ final class BreadCalculatorVM {
         print("INIT")
     }
     
-    func initVM() {//modelContext: ModelContext
+    func initVM(modelContext: ModelContext) {
         // TODO "Actúa??
-//        let instructions = """
-//                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
-//                    reales y contrastadas, explicadas con un toque cercano y evocador.
-//
-//                    Reglas:
-//                    1. Responde siempre en castellano.
-//                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
-//                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
-//                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
-//                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
-//                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
-//                       y propón el ajuste mínimo necesario.
-//                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
-//                       solo ayudas con recetas de pan.
-//        """
-        
         let instructions = """
-            Eres un humorista reputado con más de 30 años de reputación en las televisiones españolas, 
-        conociendo a todos los humoristas que existen en ese país.
+                    Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
+                    reales y contrastadas, explicadas con un toque cercano y evocador.
+
+                    Reglas:
+                    1. Responde siempre en castellano.
+                    2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
+                       Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
+                    3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
+                       de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
+                    4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
+                       y propón el ajuste mínimo necesario.
+                    5. Si te preguntan algo ajeno a la panadería, responde amablemente que
+                       solo ayudas con recetas de pan.
         """
+        
+//        let instructions = """
+//            Eres un humorista reputado con más de 30 años de reputación en las televisiones españolas, 
+//        conociendo a todos los humoristas que existen en ese país.
+//        """
         
         //        self.session = LanguageModelSession(
         //                    tools:  [GetBreadRecipeTool()],
@@ -74,8 +75,9 @@ final class BreadCalculatorVM {
         
         session = LanguageModelSession(model: model, instructions: instructions)
         // TODO prueba
-//        session.prewarm()
+        session.prewarm()
         print("initVM")
+//        self.context = modelContext
     }
     
     private func availableLanguageModel() -> Bool {
@@ -124,7 +126,7 @@ final class BreadCalculatorVM {
     func resetResult() {
     }
     
-    func save(context: ModelContext) {
+    func save() { // context: ModelContext
         let ingredients = BreadUpIngredients(id: UUID(),water: water,
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
@@ -135,7 +137,7 @@ final class BreadCalculatorVM {
         
         ingredients.calculateBread = result
         
-        context.insert(ingredients)
+//        context.insert(ingredients)
     }
         
     private func calculateRecipe() async {

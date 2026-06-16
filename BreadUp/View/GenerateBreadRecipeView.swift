@@ -5,67 +5,75 @@
 
 import SwiftUI
 import FoundationModels
+import SwiftData
 
 struct GenerateBreadRecipeView: View {
     
     @Environment(BreadCalculatorVM.self) private var vm
     
+    // provisional, deberiamos meterlo directamente en el VM
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
     @State private var showDatePicker = false
+    @State private var showSaveAlert = false
 
     var body: some View {
         @Bindable var vm = vm
-        return ScrollView {
-            VStack(spacing: 16) {
-                if let breadRecipe = vm.recipeBreadSequence,
-                   let titleBreadRecipe = breadRecipe.content.title,
-                   let steps = breadRecipe.content.pasos
-                {
-                    Text(titleBreadRecipe)
-                        .font(.title2.bold())
-                    LazyVStack(spacing: 12) {
-                        ForEach(steps) { step in
-                            StepRow(step: step)
+        return ScrollViewReader {proxy in
+            ScrollView {//return
+                VStack(spacing: 16) {
+                    if let breadRecipe = vm.recipeBreadSequence,
+                       let titleBreadRecipe = breadRecipe.content.title,
+                       let steps = breadRecipe.content.pasos
+                    {
+                        Text(titleBreadRecipe)
+                            .font(.title2.bold())
+                        LazyVStack(spacing: 12) {
+                            ForEach(steps) { step in
+                                StepRow(step: step)
+                            }
                         }
                     }
-                }
-                if vm.receivedTotalInformationAboutRecipe {
-                    //INI WIP
-                    Section("Fecha") {
-                        Button {
-                            withAnimation {
-                                showDatePicker.toggle()
-                            }
-                        } label: {
-                            HStack {
-                                Text("Fecha de elaboración")
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                Text(
-                                    vm.selectedDate,
-                                    format: .dateTime.day().month().year()
-                                )
-                                .foregroundStyle(.secondary)
-                            }
-                        }
-                        if showDatePicker {
-                            DatePicker(
-                                "Fecha de elaboración",
-                                selection: $vm.selectedDate,
-                                displayedComponents: [.date]
-                            )
-                            .datePickerStyle(.graphical)
-                            .onChange(of: vm.selectedDate) {
+                    if vm.receivedTotalInformationAboutRecipe {
+                        //INI WIP
+                        Section("Fecha") {
+                            Button {
                                 withAnimation {
-                                    showDatePicker = false
+                                    showDatePicker.toggle()
+                                }
+                            } label: {
+                                HStack {
+                                    Text("Fecha de elaboración")
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    Text(
+                                        vm.selectedDate,
+                                        format: .dateTime.day().month().year()
+                                    )
+                                    .foregroundStyle(.secondary)
+                                }
+                            }
+                            if showDatePicker {
+                                DatePicker(
+                                    "Fecha de elaboración",
+                                    selection: $vm.selectedDate,
+                                    displayedComponents: [.date]
+                                )
+                                .datePickerStyle(.graphical)
+                                .onChange(of: vm.selectedDate) {
+                                    withAnimation {
+                                        showDatePicker = false
+                                    }
                                 }
                             }
                         }
+                        //END WIP
                     }
-                    //END WIP
                 }
+                .frame(maxWidth: .infinity)
+                .padding()
             }
-            .frame(maxWidth: .infinity)
-            .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
@@ -94,11 +102,17 @@ struct GenerateBreadRecipeView: View {
         .navigationTitle("Receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .alert(vm.alert, isPresented: $vm.hasGenerationError
-        ) {
+        .alert(vm.alert, isPresented: $vm.hasGenerationError) {
             Button("Cerrar") {
                 vm.hasGenerationError = false
                 vm.navigateToGenerate = false
+            }
+        }
+        .alert("Guardar receta", isPresented: $showSaveAlert) {
+            Button("No", role: .cancel) {}
+            Button("Sí") {
+//                vm.save(context: modelContext)
+                dismiss()
             }
         }
     }

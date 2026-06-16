@@ -30,7 +30,7 @@ struct BreadUpApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    vm.initVM()
+                    vm.initVM(modelContext: container.mainContext)
                 }
                 .environment(vm)
         }
