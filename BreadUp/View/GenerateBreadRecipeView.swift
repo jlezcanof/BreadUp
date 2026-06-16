@@ -53,6 +53,9 @@ struct GenerateBreadRecipeView: View {
             }
         }
         .allowsHitTesting(!vm.isLoading)
+        .navigationTitle("Receta")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
     
     private struct StepRow: View {
