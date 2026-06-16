@@ -61,7 +61,7 @@ final class BreadCalculatorVM {
         //                    tools:  [GetBreadRecipeTool()],
         //                    instructions: instructions)
         
-        self.session = LanguageModelSession(model: model, instructions: instructions)
+        session = LanguageModelSession(model: model, instructions: instructions)
         // TODO prueba
 //        session.prewarm()
         print("initVM")
