@@ -28,12 +28,6 @@ func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async thr
         print("\(paso.descripcion)")
     }
 }
-//    if let pasos = bread.content.pasos {
-//        //getStepResponse2(pasos: pasos)
-//    } else {
-//        // No pasos available yet — nothing to do
-//        print("No hay pasos disponibles en la receta parcial")
-//    }
 
 func getStepsInResponse(pasos: [RecipeStep.PartiallyGenerated]) {
     var step = 1
@@ -126,6 +120,7 @@ func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
     // #############################
 //    let options = GenerationOptions(sampling: .greedy, temperature: 0.3, maximumResponseTokens: 150)
     let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)//800
+    
 
 //    try await streamResponseRecipeStep(session: session, prompt: prompt, options: options)
     try await streamResponseBreadRecipe(session: session, prompt: prompt, options: options)
@@ -162,47 +157,30 @@ func streamResponseRecipeStep(session: LanguageModelSession, prompt: String, opt
 
 // ################################### ini stream response bread recipe ###############################
 
-//    var breadRecipeContent: BreadRecipe.PartiallyGenerated?
 func streamResponseBreadRecipe(session: LanguageModelSession, prompt: String, options: GenerationOptions) async throws {
+    
+    //    var breadRecipeContent: BreadRecipe.PartiallyGenerated?
+
     let streamBreadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                              , options: options)
+    
 
-    // WIP
-    let coll = try await streamBreadRecipe.collect().rawContent
-
-    print("coll \(coll)")
+    let dataBreadRecipe = try await streamBreadRecipe.collect().content
+    
+    print("\(dataBreadRecipe.title)")
+    
+    dataBreadRecipe.pasos.forEach { paso in
+        var linea = "> "
+        linea += paso.titulo
+        linea += "\n"
+        linea += paso.descripcion
+        print(linea)
         
-    //for try await breadRecipe in streamBreadRecipe {
-    //        let juan = breadRecipe.content
-        
-      //  steps(pasos: breadRecipe.content.pasos)
-        
-    //        print(juan.pasos)
-        //print(" \(juan.title) ")
-    //        let titulo = juan.title
-    //}
-
-    //     for try await partial in stream {
-    //         partialCount += 1
-    //         self.recipeBreadSequence = partial
-    //     }
-
-    //    let breadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self,
-    //                                             options: options)
-    //
-
-    //    for try await partial in breadRecipe.content {
-    //
-    //    }
-    //    var parte: LanguageModelSession
-    //    for try await partial in breadRecipe {
-        
-    //        print(" \(partial.content.) ")
-    //    }
+    }
 
     //try await getBreadRecipe(bread: breadRecipe.collect())
     //print("##########################################")
-    print("se acabo el strem response de breadRecibe")
+    print("se acabo el stream response de breadRecibe")
 
 }
 // ################################### end stream response bread recipe ###############################
