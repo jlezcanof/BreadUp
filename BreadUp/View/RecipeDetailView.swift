@@ -125,7 +125,7 @@ struct RecipeDetailView: View {
                         case .available:
                                 Button {
                                     Task {
-                                        await vm.calculateRecipe()
+                                        await vm.navigateToGenerateView()
                                     }
                                 } label: {
                                     Label("Generar receta", systemImage: "sparkles")// apple.intelligence
@@ -195,6 +195,9 @@ struct RecipeDetailView: View {
 //                       }
 //                }
                 .navigationTitle("BreadUp")
+                .navigationDestination(isPresented: $vm.navigateToGenerate) {
+                    GenerateBreadRecipeView()
+                }
             }
         }
         .overlay {                                              // <-- NUEVO

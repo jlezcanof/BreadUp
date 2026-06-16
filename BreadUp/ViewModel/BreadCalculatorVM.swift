@@ -23,11 +23,16 @@ final class BreadCalculatorVM {
     var recipe : String?
     var isLoading = false
     
+    var showRecipeDetail = false
+    var navigateToGenerate = false
+    
     private(set) var recipeBread: BreadRecipe?
     
     private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
     
     private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
+    
+//    private(set) var pepe: BreadRecipe.PartiallyGenerated?
     
     init() {
         model = SystemLanguageModel.default
@@ -125,6 +130,16 @@ final class BreadCalculatorVM {
     func calculateRecipe() async {
             try? await self.generateRecipeBread()// generateRecipeBread
             print("end of calculateREcipe")
+    }
+    
+    func navigateToGenerateView() async {
+        navigateToGenerate = true
+        await calculateRecipe()
+    }
+    
+    func backToRecipeList() {
+        navigateToGenerate = false
+        showRecipeDetail = false
     }
         
     private func generateRecipeBread() async throws {//suggestSequenceBread

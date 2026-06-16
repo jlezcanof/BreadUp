@@ -8,36 +8,31 @@ import FoundationModels
 //import Contacts
 
 @Generable
-struct BreadRecipe {
+struct BreadRecipe: Equatable {
+    
+    @Guide(description: "Un título sugerente para la receta de pan")
+    let title: String
+    
     @Guide(description: "Listado de todos los pasos que tiene que realizar para la receta de pan", .minimumCount(6), .maximumCount(9))
     let pasos: [RecipeStep]
 }
 
 @Generable
-struct RecipeStep {
+struct RecipeStep : Equatable {
         @Guide(description: "Pequeño título del paso en la receta")
         let titulo: String
     
         @Guide(description: "Descripcion detallada y completa del paso a realizar")
         let descripcion: String
-}
-
-//
-//@Generable
-//struct StepRecipe : Equatable {
-//    @Guide(description: "A short title describing a step in a bread-making recipe")
-//    let nameStep: String
-//    @Guide(description: "Detailed description of a step in making bread")
-//    let descriptionStep: String
-//
-//    // Macro-generated
+    
 //    static var schema: GenerationSchema {
-//        GenerationSchema(type: StepRecipe.self, properties: [
-//            GenerationSchema.Property(name: "nameStep",description: "Name of the step of recipe a bread", type: String.self),
-//            GenerationSchema.Property(name: "descriptionStep", description: "Detailed description",  type: String.self),
-//        ])
+//        GenerationSchema(type: RecipeStep.self, properties:  [
+//            GenerationSchema.Property(name: "titulo",description: "Nombre del paso en la receta", type: String.self),
+//            GenerationSchema.Property(name: "descripcion", description: "Descripcion detallada",  type: String.self),
+//        ]
+//        )
 //    }
-//}
+}
 
 extension RecipeStep {
     static let example = RecipeStep(titulo: "Reposo corto (autólisis ligera)",

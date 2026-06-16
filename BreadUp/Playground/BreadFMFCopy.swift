@@ -25,7 +25,7 @@ import Playgrounds
 //        let descripcion: String
 //}
 
-func getStreamReceta(receta: BreadRecipe) {
+func getStreamReceta2(receta: BreadRecipe) {
     var step = 1
     for paso in receta.pasos {
         print("Paso \(step)")
@@ -37,7 +37,7 @@ func getStreamReceta(receta: BreadRecipe) {
     }
 }
 
-func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async throws {
+func getBreadRecipe2(bread: LanguageModelSession.Response<BreadRecipe>) async throws {
     bread.content.pasos.forEach { paso in
         print("Titulo \(paso.titulo)")
         print("Descripcion \(paso.descripcion)")
@@ -77,7 +77,7 @@ func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async thr
 //    }
 //}
 
-func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
+func getStepResponse3(pasos: [RecipeStep.PartiallyGenerated]) {
     var step = 1
     for paso in pasos {
         var linea = "> "
@@ -186,7 +186,7 @@ func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
     
     for try await snapshot in stream {
 //        getStepResponse(pasos: snapshot.content)
-        getStepResponse2(pasos: snapshot.content)
+        getStepResponse3(pasos: snapshot.content)
 //        print("Otro snapshot")
     }
     

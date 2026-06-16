@@ -10,10 +10,11 @@ import SwiftData
 
 struct RecipeListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(BreadCalculatorVM.self) private var vm
     @Query private var recipes: [BreadUpIngredients]
-    @State private var showNewRecipe = false
 
     var body: some View {
+        @Bindable var vm = vm
 //        List(recipes) {recipe in
 //            NavigationLink {
 //                RecipeSavedDetailView(recipe: recipe)
@@ -93,13 +94,13 @@ struct RecipeListView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {// TODO iphone .navigationBarTrailing
                 Button {
-                    showNewRecipe = true
+                    vm.showRecipeDetail = true
                 } label: {
                     Image(systemName: "plus")
                 }
             }
         }
-        .navigationDestination(isPresented: $showNewRecipe) {
+        .navigationDestination(isPresented: $vm.showRecipeDetail) {
             RecipeDetailView()
         }
     }

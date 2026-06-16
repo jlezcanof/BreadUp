@@ -24,8 +24,8 @@ func getStreamReceta(receta: BreadRecipe) {
 
 func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async throws {
     bread.content.pasos.forEach { paso in
-        print("Titulo \(paso.titulo)")
-        print("Descripcion \(paso.descripcion)")
+        print("\(paso.titulo)")
+        print("\(paso.descripcion)")
     }
 }
 //    if let pasos = bread.content.pasos {
@@ -35,19 +35,7 @@ func getBreadRecipe(bread: LanguageModelSession.Response<BreadRecipe>) async thr
 //        print("No hay pasos disponibles en la receta parcial")
 //    }
 
-//func getBreadRecipe(bread: BreadRecipe.PartiallyGenerated) {
-//    // `bread.pasos` is optional (PartiallyGenerated?), unwrap safely before iterating
-//    if let pasos = bread.pasos {
-//        // Reuse existing helper to print partial steps
-//        getStepResponse2(pasos: pasos)
-//    } else {
-//        // No pasos available yet — nothing to do
-//        print("No hay pasos disponibles en la receta parcial")
-//    }
-//}
-
-
-func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
+func getStepsInResponse(pasos: [RecipeStep.PartiallyGenerated]) {
     var step = 1
     for paso in pasos {
         var linea = "> "
@@ -60,6 +48,20 @@ func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
         }
         print(linea)
         step += 1
+    }
+}
+
+func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
+    for paso in pasos {
+        var linea = "> "
+        if let titulo = paso.titulo {
+            linea += titulo
+        }
+        if let descripcion = paso.descripcion {
+            linea += descripcion
+        }
+        
+        print(linea)
     }
 }
 
@@ -98,7 +100,7 @@ func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
             5. Si te preguntan algo ajeno a la panadería, responde amablemente que
                solo ayudas con recetas de pan.
             """
-    // 3.               Para los títulos usa vocabulario de panaderia.
+    // 3.               Para los títulos usa un vocabulario de panaderia.
     
     let session = LanguageModelSession(model: model, instructions: instructions)
     
@@ -125,23 +127,22 @@ func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
 //    let options = GenerationOptions(sampling: .greedy, temperature: 0.3, maximumResponseTokens: 150)
     let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)//800
 
-//    let stream = session.streamResponse(to: prompt, generating: RecetaDePan.self
-//                                        , options: options)
+
     
-    // BreadRecipe
+    //    let recetaResponse = try await stream.collect()
+    //    getStreamReceta(receta: recetaResponse.content)
+    //    getStepResponse(pasos: stream)
+    //    getStreamReceta(receta: stream)
+    
+    // ini funciona perfectamente, PERO escribe muchas veces lo mismo (por aquello del flujo )
     let stream = session.streamResponse(to: prompt, generating: [RecipeStep].self
                                         , options: options)
-
-//    let recetaResponse = try await stream.collect()
-//    getStreamReceta(receta: recetaResponse.content)
-//    getStepResponse(pasos: stream)
-//    getStreamReceta(receta: stream)
     
     for try await snapshot in stream {
-//        getStepResponse(pasos: snapshot.content)
-        getStepResponse2(pasos: snapshot.content)
-//        print("Otro snapshot")
+        getStepsInResponse(pasos: snapshot.content)
     }
+    print("se acabo el stream response de [RecipeStep]")
+    // end funciona perfectamente
     
     // totaltokens = try await model.tokenCount(for: session.transcript)
     // print("\n Tokens consumidos despues del stream Response \(totaltokens)")
@@ -150,10 +151,44 @@ func getStepResponse2(pasos: [RecipeStep.PartiallyGenerated]) {
     print("Timestamp: \(formated)")
     // #############################
     
-//    
+
+//    var breadRecipeContent: BreadRecipe.PartiallyGenerated?
+     let streamBreadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self
+                                             , options: options)
+    
+    let coll = try await streamBreadRecipe.collect().rawContent
+    
+    print("coll \(coll)")
+        
+    //for try await breadRecipe in streamBreadRecipe {
+//        let juan = breadRecipe.content
+        
+      //  steps(pasos: breadRecipe.content.pasos)
+        
+//        print(juan.pasos)
+        //print(" \(juan.title) ")
+//        let titulo = juan.title
+    //}
+    
+//     for try await partial in stream {
+//         partialCount += 1
+//         self.recipeBreadSequence = partial
+//     }
+    
 //    let breadRecipe = session.streamResponse(to: prompt, generating: BreadRecipe.self,
 //                                             options: options)
+//
     
+//    for try await partial in breadRecipe.content {
+//       
+//    }
+//    var parte: LanguageModelSession
+//    for try await partial in breadRecipe {
+        
+//        print(" \(partial.content.) ")
+//    }
 
-//    getBreadRecipe(bread: breadRecipe.collect())
+    //try await getBreadRecipe(bread: breadRecipe.collect())
+    //print("##########################################")
+    //print("se acabo el strem response de breadRecibe")
 }
