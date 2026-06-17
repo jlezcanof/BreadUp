@@ -47,9 +47,9 @@ struct GenerateBreadRecipeView: View {
                             }
 
                             Spacer(minLength: 12)
-
                             Button {
-                                showSaveAlert = true
+//                                showSaveAlert = true
+                                showSaveAlert.toggle()
                             } label: {
                                 Label("Guardar", systemImage: "square.and.arrow.down")
                                     .font(.headline)

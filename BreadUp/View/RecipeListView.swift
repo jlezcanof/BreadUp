@@ -51,7 +51,7 @@ struct RecipeListView: View {
             ForEach(recipes) { recipe in
                 NavigationLink(destination: RecipeSavedDetailView(recipe: recipe)) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(recipe.flourType.displayName)
+                        Text(recipe.calculateBread?.recipe ?? "no hay titulo")
                             .font(.headline)
                         HStack {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
