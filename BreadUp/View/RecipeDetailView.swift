@@ -17,7 +17,7 @@ struct RecipeDetailView: View {
     @Environment(BreadCalculatorVM.self) private var vm
     
     @State private var resultID = "resultado"
-    @State private var showSaveAlert = false
+//    @State private var showSaveAlert = true // false prueba
 //    @State private var showDatePicker = false
         
     var body: some View {

@@ -2,7 +2,6 @@
 //  BreadCalculatorViewModel.swift
 //  BreadUp
 //
-
 import Foundation
 import SwiftData
 import FoundationModels
@@ -126,18 +125,24 @@ final class BreadCalculatorVM {
     func resetResult() {
     }
     
-    func save() { // context: ModelContext
+    func save(context: ModelContext) {
         let ingredients = BreadUpIngredients(id: UUID(),water: water,
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
                                              yeast: yeast,
                                             createdAt: selectedDate)
         
-        let result = BreadUpCalculate(id: UUID(), recipe: recipe ?? "")
+        let recipeTitle = recipeBreadSequence?.content.title?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let result = BreadUpCalculate(id: UUID(), recipe: recipeTitle)
         
         ingredients.calculateBread = result
         
-//        context.insert(ingredients)
+        context.insert(ingredients)
+        
+        if context.hasChanges {
+            try? context.save()
+        }
     }
         
     private func calculateRecipe() async {
@@ -156,43 +161,7 @@ final class BreadCalculatorVM {
         navigateToGenerate = false
         showRecipeDetail = false
     }
-    
-    private func generateArevaloChiste() async throws {
-        guard availableLanguageModel() else {
-            self.alert = "No está disponible el modelo del lenguaje"
-            print("Language model not available")
-            return
-        }
         
-        isLoading = true
-        hasGenerationError = false
-        defer { isLoading = false }
-        
-        let prompt =
-        """
-            Cuéntame un chiste de Arévalo.
-        """
-        
-        do {
-            let salida = try await session.respond(to: prompt, options: options)
-            print("chistaco: \(salida.content)")
-        } catch {
-//            if containsSafetyAssetFailure(error) {
-//                print("Safety classifier assets missing/corrupt")
-////                self.recipe = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
-//                self.alert  = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
-//            } else {
-//                print(error)
-////                self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
-//                self.alert = "Por algún motivo desconocido, no podemos atender su petición."
-//            }
-            print("\(error)")
-            hasGenerationError = true
-        }
-        
- //    self.recipeBreadSequence = salida.content
-    }
-    
     private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
             self.alert = "No está disponible el modelo del lenguaje"

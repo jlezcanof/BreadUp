@@ -15,7 +15,6 @@ struct GenerateBreadRecipeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
-    @State private var showDatePicker = false
     @State private var showSaveAlert = false
 
     var body: some View {
@@ -35,39 +34,30 @@ struct GenerateBreadRecipeView: View {
                         }
                     }
                     if vm.receivedTotalInformationAboutRecipe {
-                        //INI WIP
-                        Section("Fecha") {
-                            Button {
-                                withAnimation {
-                                    showDatePicker.toggle()
-                                }
-                            } label: {
-                                HStack {
-                                    Text("Fecha de elaboración")
-                                        .foregroundStyle(.primary)
-                                    Spacer()
-                                    Text(
-                                        vm.selectedDate,
-                                        format: .dateTime.day().month().year()
-                                    )
+                        HStack(spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "calendar")
                                     .foregroundStyle(.secondary)
-                                }
-                            }
-                            if showDatePicker {
                                 DatePicker(
                                     "Fecha de elaboración",
                                     selection: $vm.selectedDate,
                                     displayedComponents: [.date]
                                 )
-                                .datePickerStyle(.graphical)
-                                .onChange(of: vm.selectedDate) {
-                                    withAnimation {
-                                        showDatePicker = false
-                                    }
-                                }
+                                .labelsHidden()
                             }
+
+                            Spacer(minLength: 12)
+
+                            Button {
+                                showSaveAlert = true
+                            } label: {
+                                Label("Guardar", systemImage: "square.and.arrow.down")
+                                    .font(.headline)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .buttonBorderShape(.capsule)
                         }
-                        //END WIP
+                        .padding(.vertical, 8)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -108,11 +98,15 @@ struct GenerateBreadRecipeView: View {
             }
         }
         .alert("Guardar receta", isPresented: $showSaveAlert) {
-            Button("No", role: .cancel) {}
-            Button("Sí") {
-//                vm.save(context: modelContext)
+            Button("Cancelar", role: .cancel) {
                 dismiss()
             }
+            Button("Guardar") {
+                vm.save(context: modelContext)
+                vm.backToRecipeList()
+            }
+        } message: {
+            Text("¿Quieres guardar esta receta en tu recetario?")
         }
     }
     
