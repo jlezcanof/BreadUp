@@ -93,7 +93,7 @@ struct GenerateBreadRecipeView: View {
         .alert(vm.alert, isPresented: $vm.hasGenerationError) {
             Button("Cerrar") {
                 vm.hasGenerationError = false
-                vm.navigateToGenerate = false
+                dismiss()
             }
         }
         .alert("Guardar receta", isPresented: $showSaveAlert) {

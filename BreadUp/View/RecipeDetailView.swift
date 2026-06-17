@@ -22,9 +22,8 @@ struct RecipeDetailView: View {
         
     var body: some View {
         @Bindable var vm = vm
-        return NavigationStack {
-            ScrollViewReader { proxy in
-                Form {
+        return ScrollViewReader { proxy in
+            Form {
                     Section("Foundation Model") {
                         switch vm.availableModel()  { // model.availability
                                 case .available:
@@ -177,11 +176,7 @@ struct RecipeDetailView: View {
 //                       }
 //                }
                 .navigationTitle("BreadUp")
-                .navigationDestination(isPresented: $vm.navigateToGenerate) {
-                    GenerateBreadRecipeView()
-                }
             }
-        }
         .overlay {                                              // <-- NUEVO
             if vm.isLoading {                                   // <-- NUEVO
                 ZStack {                                        // <-- NUEVO

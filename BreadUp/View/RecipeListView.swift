@@ -14,42 +14,9 @@ struct RecipeListView: View {
     @Query private var recipes: [BreadUpIngredients]
 
     var body: some View {
-        @Bindable var vm = vm
-//        List(recipes) {recipe in
-//            NavigationLink {
-//                RecipeSavedDetailView(recipe: recipe)
-//            } label: {
-//                VStack(alignment: .leading, spacing: 6) {
-//                    Text(recipe.flourType.displayName)
-//                        .font(.headline)
-//                    HStack {
-//                        Label("\(recipe.water) ml", systemImage: "drop.fill")
-//                            .foregroundStyle(.blue)
-//                        Spacer()
-//                        Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
-//                            .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
-//                        Spacer()
-//                        Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")//microbe.fill
-//                            .foregroundStyle(.yellow)
-//                    }
-//                    .font(.subheadline)
-//                    .foregroundStyle(.secondary)
-//                    if let created = recipe.created {
-//                        HStack {
-//                            Image(systemName: "calendar.circle")
-//                                .foregroundStyle(.red)
-//                            Text(created, format: .dateTime.day().month().year())
-//                        }
-//                        .font(.subheadline)
-//                        .foregroundStyle(.secondary)
-//                    }
-//                }
-//                .padding(.vertical, 4)
-//            }
-//        }
         List {
             ForEach(recipes) { recipe in
-                NavigationLink(value: recipe) {
+                NavigationLink(value: Route.saved(recipe)) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(recipe.calculateBread?.recipe ?? "no hay titulo")
                             .font(.headline)
@@ -60,11 +27,11 @@ struct RecipeListView: View {
                             Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
                                 .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
                             Spacer()
-                            Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")//microbe.fill
+                            Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
                                 .foregroundStyle(.yellow)
                         }
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)                      
+                        .foregroundStyle(.secondary)
                         if let created = recipe.created {
                             HStack {
                                 Image(systemName: "calendar.circle")
@@ -92,19 +59,13 @@ struct RecipeListView: View {
         .navigationTitle("Mis Recetas de pan")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigation) {// TODO iphone .navigationBarTrailing
+            ToolbarItem(placement: .navigation) {
                 Button {
-                    vm.showRecipeDetail = true
+                    vm.path.append(.detail)
                 } label: {
                     Image(systemName: "plus")
                 }
             }
-        }
-        .navigationDestination(for: BreadUpIngredients.self) { recipe in
-            RecipeSavedDetailView(recipe: recipe)
-        }
-        .navigationDestination(isPresented: $vm.showRecipeDetail) {
-            RecipeDetailView()
         }
     }
 
@@ -119,4 +80,5 @@ struct RecipeListView: View {
 
 #Preview {
     RecipeListView()
+        .environment(BreadCalculatorVM())
 }

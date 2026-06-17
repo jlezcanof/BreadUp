@@ -24,8 +24,7 @@ final class BreadCalculatorVM {
     var recipe : String?
     var isLoading = false
     var hasGenerationError = false
-    var showRecipeDetail = false
-    var navigateToGenerate = false
+    var path: [Route] = []
     var receivedTotalInformationAboutRecipe = false
     var alert = "Ha habido problemas para la generación de la receta. Por favor, inténtelo en unos minutos"
     
@@ -153,13 +152,12 @@ final class BreadCalculatorVM {
     }
     
     func navigateToGenerateView() async {
-        navigateToGenerate = true
+        path.append(.generate)
         await calculateRecipe()
     }
     
     func backToRecipeList() {
-        navigateToGenerate = false
-        showRecipeDetail = false
+        path.removeAll()
     }
         
     private func generateRecipeBread() async throws {
