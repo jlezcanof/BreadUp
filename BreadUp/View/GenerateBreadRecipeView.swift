@@ -28,9 +28,9 @@ struct GenerateBreadRecipeView: View {
                     {
                         Text(titleBreadRecipe)
                             .font(.title2.bold())
-                        LazyVStack(spacing: 12) {
-                            ForEach(steps) { step in
-                                StepRow(step: step)
+                        LazyVStack(spacing: 16) {
+                            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                                StepRow(step: step, number: index + 1)
                             }
                         }
                     }
@@ -119,15 +119,11 @@ struct GenerateBreadRecipeView: View {
     private struct StepRow: View {
         
         let step: RecipeStep.PartiallyGenerated
+        let number: Int
         
         var body: some View {
             if let titulo = step.titulo, let descripcion = step.descripcion {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(titulo)
-                        .font(.title3.bold())
-                    Text(descripcion)
-                        .font(.body)
-                }
+                StepCard(number: number, titulo: titulo, descripcion: descripcion)
             }
         }
     }
