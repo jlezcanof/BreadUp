@@ -202,6 +202,8 @@ final class BreadCalculatorVM {
         
         isLoading = true
         hasGenerationError = false
+        receivedTotalInformationAboutRecipe = false
+        recipeBreadSequence = nil
         defer { isLoading = false }
         
         do {
