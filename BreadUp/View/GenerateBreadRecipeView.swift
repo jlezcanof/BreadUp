@@ -20,8 +20,7 @@ struct GenerateBreadRecipeView: View {
 
     var body: some View {
         @Bindable var vm = vm
-        return ScrollViewReader {proxy in
-            ScrollView {//return
+        return ScrollView {
                 VStack(spacing: 16) {
                     if let breadRecipe = vm.recipeBreadSequence,
                        let titleBreadRecipe = breadRecipe.content.title,
@@ -74,7 +73,7 @@ struct GenerateBreadRecipeView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
             }
-        }
+            .defaultScrollAnchor(.bottom, for: .sizeChanges)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             if vm.isLoading {
