@@ -49,7 +49,7 @@ struct RecipeListView: View {
 //        }
         List {
             ForEach(recipes) { recipe in
-                NavigationLink(destination: RecipeSavedDetailView(recipe: recipe)) {
+                NavigationLink(value: recipe) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(recipe.calculateBread?.recipe ?? "no hay titulo")
                             .font(.headline)
@@ -99,6 +99,9 @@ struct RecipeListView: View {
                     Image(systemName: "plus")
                 }
             }
+        }
+        .navigationDestination(for: BreadUpIngredients.self) { recipe in
+            RecipeSavedDetailView(recipe: recipe)
         }
         .navigationDestination(isPresented: $vm.showRecipeDetail) {
             RecipeDetailView()

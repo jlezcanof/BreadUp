@@ -45,7 +45,6 @@ struct GenerateBreadRecipeView: View {
                                 )
                                 .labelsHidden()
                             }
-
                             Spacer(minLength: 12)
                             Button {
 //                                showSaveAlert = true
