@@ -22,6 +22,8 @@ final class BreadCalculatorVM {
 //    private var context: ModelContext = nil
     
     var recipe : String?
+    var recipeTitle: String = ""
+    var recipeSteps: [RecipeStep] = []
     var isLoading = false
     var hasGenerationError = false
     var path: [Route] = []
@@ -142,6 +144,13 @@ final class BreadCalculatorVM {
         if context.hasChanges {
             try? context.save()
         }
+        
+        print("vemos si tenemos info de la receta")
+        
+        print("\(self.recipeTitle)")
+        self.recipeSteps.forEach { recipeStep in
+            print(" Título: \(recipeStep.titulo), descripción: \(recipeStep.descripcion)")
+        }
     }
         
     private func calculateRecipe() async {
@@ -171,6 +180,8 @@ final class BreadCalculatorVM {
         hasGenerationError = false
         receivedTotalInformationAboutRecipe = false
         recipeBreadSequence = nil
+        recipeTitle = ""
+        recipeSteps = []
         defer { isLoading = false }
         
         do {
@@ -201,6 +212,11 @@ final class BreadCalculatorVM {
                                                 , options: options)
         for try await partial in stream {
             self.recipeBreadSequence = partial
+        }
+        self.recipeTitle = recipeBreadSequence?.content.title ?? ""
+        self.recipeSteps = (recipeBreadSequence?.content.pasos ?? []).compactMap { step in
+            guard let titulo = step.titulo, let descripcion = step.descripcion else { return nil }
+            return RecipeStep(titulo: titulo, descripcion: descripcion)
         }
         receivedTotalInformationAboutRecipe = true
             

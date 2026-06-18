@@ -52,9 +52,10 @@ enum BreadUpSchemaV2: VersionedSchema {
     final class CalculateBread {
         @Attribute(.unique) var id: UUID
         
+        var ingredients: Ingredients?
+        
         var recipe: String?
 
-        var ingredients: Ingredients?
 
         init(id: UUID, recipe: String?) {
             self.id = id
