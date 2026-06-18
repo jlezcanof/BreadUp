@@ -97,6 +97,18 @@ struct GenerateBreadRecipeView: View {
             .onChange(of: vm.receivedTotalInformationAboutRecipe) {
                 scrollToBottom(proxy)
             }
+            // Al desplegar el calendario, baja para que quede a la vista.
+            // Se retrasa el scroll para dar tiempo a que el calendario se
+            // inserte y mida; si no, el scroll se queda corto.
+            .onChange(of: showDatePicker) { _, isShowing in
+                guard isShowing else { return }
+                Task {
+                    try? await Task.sleep(for: .milliseconds(300))
+                    withAnimation(.easeInOut) {
+                        proxy.scrollTo(Self.bottomID, anchor: .bottom)
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
