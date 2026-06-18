@@ -9,8 +9,9 @@ import Foundation
 import SwiftData
 
 // pending migrate to v2
-typealias BreadUpIngredients         = BreadUpSchemaV2.Ingredients
-typealias BreadUpCalculate           = BreadUpSchemaV2.CalculateBread
+typealias BreadUpIngredients         = BreadUpSchemaV3.Ingredients
+typealias BreadUpCalculate           = BreadUpSchemaV3.CalculateBread
+typealias BreadUpStepRecipe          = BreadUpSchemaV3.StepRecipe
 
 //actor BreadUpSchema {
 //    
@@ -22,17 +23,25 @@ typealias BreadUpCalculate           = BreadUpSchemaV2.CalculateBread
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
         
     static var schemas: [any VersionedSchema.Type] {
-        [BreadUpSchemaV1.self, BreadUpSchemaV2.self]
+        [BreadUpSchemaV1.self, BreadUpSchemaV2.self, BreadUpSchemaV3.self]
     }
     
     static var stages: [MigrationStage] {
         [
 //            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
-            migrationV1tovV2
+            migrationV1toV2,
+            migrationV2toV3
         ]
     }
     
-        static let migrationV1tovV2 = MigrationStage.custom(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self) { modelContext in
+        // V2 -> V3: solo añade la entidad StepRecipe y la relación 1-N (parte vacía),
+        // por lo que no requiere transformación de datos: migración ligera.
+        static let migrationV2toV3 = MigrationStage.lightweight(
+            fromVersion: BreadUpSchemaV2.self,
+            toVersion: BreadUpSchemaV3.self
+        )
+    
+        static let migrationV1toV2 = MigrationStage.custom(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self) { modelContext in
             
 //            let descriptor = FetchDescriptor<BreadUpSchemaV1.Ingredients>()
 //            let ingredients = try modelContext.fetch(descriptor)
@@ -115,8 +124,8 @@ extension FlourType {
 //                                            yeast: 150)
 //}
 
-extension BreadUpSchemaV2.Ingredients  {
-    @MainActor static let example = BreadUpSchemaV2.Ingredients(id: UUID(),
+extension BreadUpSchemaV3.Ingredients  {
+    @MainActor static let example = BreadUpSchemaV3.Ingredients(id: UUID(),
                                             water: 250,
                                             flourType: .corn,
                                             flourQuantity: 300,

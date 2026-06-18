@@ -127,17 +127,21 @@ final class BreadCalculatorVM {
     }
     
     func save(context: ModelContext) {
-        let ingredients = BreadUpIngredients(id: UUID(),water: water,
+        let ingredients = BreadUpIngredients(id: UUID(),
+                                             water: water,
                                              flourType: flourType.toSchemaType,
                                              flourQuantity: flourQuantity,
                                              yeast: yeast,
                                             createdAt: selectedDate)
+                
+        let calculateBread = BreadUpCalculate(recipe: recipeTitle)
         
-        let recipeTitle = recipeBreadSequence?.content.title?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let result = BreadUpCalculate(id: UUID(), recipe: recipeTitle)
-        
-        ingredients.calculateBread = result
+        recipeSteps.forEach { recipeStep in
+            calculateBread.steps.append(BreadUpStepRecipe(
+                                                          title: recipeStep.titulo,
+                                                          descripcion: recipeStep.descripcion))
+        }
+        ingredients.calculateBread = calculateBread
         
         context.insert(ingredients)
         
