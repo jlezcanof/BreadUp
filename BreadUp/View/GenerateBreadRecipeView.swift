@@ -16,7 +16,7 @@ struct GenerateBreadRecipeView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var showDatePicker = false
-    @State private var showSaveAlert = false
+    @State private var showSaveDialog = false
 
     private static let bottomID = "recipeBottomAnchor"
 
@@ -55,7 +55,7 @@ struct GenerateBreadRecipeView: View {
                                 Spacer(minLength: 12)
 
                                 Button {
-                                    showSaveAlert.toggle()
+                                    showSaveDialog.toggle()
                                 } label: {
                                     Label("Guardar", systemImage: "square.and.arrow.down")
                                         .font(.headline)
@@ -143,12 +143,16 @@ struct GenerateBreadRecipeView: View {
                 dismiss()
             }
         }
-        .alert("Guardar receta", isPresented: $showSaveAlert) {
-            Button("Cancelar", role: .cancel) { }
+        .confirmationDialog(
+            "¿Guardar esta receta?",
+            isPresented: $showSaveDialog,
+            titleVisibility: .visible
+        ) {
             Button("Guardar") {
                 vm.save(context: modelContext)
                 vm.backToRecipeList()
             }
+            Button("Cancelar", role: .cancel) { }
         } message: {
             Text("¿Quieres guardar esta receta en tu recetario?")
         }
