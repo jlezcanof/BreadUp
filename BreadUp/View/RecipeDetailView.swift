@@ -11,172 +11,97 @@ import FoundationModels
 
 struct RecipeDetailView: View {
     
-    @Environment(\.modelContext) private var modelContext
-    @Environment(\.dismiss) private var dismiss
-
+//    @Environment(\.modelContext) private var modelContext
+//    @Environment(\.dismiss) private var dismiss
     @Environment(BreadCalculatorVM.self) private var vm
     
     @State private var resultID = "resultado"
-//    @State private var showSaveAlert = true // false prueba
-//    @State private var showDatePicker = false
-        
+      
     var body: some View {
         @Bindable var vm = vm
         return ScrollViewReader { proxy in
             Form {
-                    Section("Foundation Model") {
-                        switch vm.availableModel()  { // model.availability
-                                case .available:
-                                    Text("Foundation Model is available").foregroundStyle(.green)
-                                case .unavailable(let reason):
-                                    Text("Foundation Model is unavailable").foregroundStyle(.red)
-                                    Text(verbatim: String(describing: reason))
-                                }
-                    }
-                    Section("Harina") {
-                        Picker("Tipo de harina", selection: $vm.flourType) {
-                            ForEach(FlourType.allCases) { type in
-                                Text(type.rawValue).tag(type)
-                            }
-                        }
-                        VStack(alignment: .leading) {
-                            Text("\(vm.flourQuantity) ml")
-                                .font(.headline)
-                            Slider(
-                                value: Binding(
-                                    get: { Double(vm.flourQuantity) },
-                                    set: { vm.flourQuantity = Int($0) }
-                                ),
-                                in: 125...400,
-                                step: 25
-                            )
-                            HStack {
-                                Text("125 ml")
-                                Spacer()
-                                Text("400 ml")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                Section("Harina") {
+                    Picker("Tipo de harina", selection: $vm.flourType) {
+                        ForEach(FlourType.allCases) { type in
+                            Text(type.rawValue).tag(type)
                         }
                     }
-                    Section("Levadura") {
-                        yeast
-                        sliderYeast
+                    VStack(alignment: .leading) {
+                        Text("\(vm.flourQuantity) ml")
+                            .font(.headline)
+                        Slider(
+                            value: Binding(
+                                get: { Double(vm.flourQuantity) },
+                                set: { vm.flourQuantity = Int($0) }
+                            ),
+                            in: 125...400,
+                            step: 25
+                        )
                         HStack {
-                            Text("5 gr")
+                            Text("125 ml")
                             Spacer()
-                            Text("50 gr")
+                            Text("400 ml")
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     }
-                    Section("Agua") {
-                        VStack(alignment: .leading) {
-                            water
-                            Slider(
-                                value: Binding(
-                                    get: { Double(vm.water) },
-                                    set: { vm.water = Int($0) }
-                                ),
-                                in: 125...500,
-                                step: 25
-                            )
-                            HStack {
-                                Text("125 ml")
-                                Spacer()
-                                Text("500 ml")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    }
-//                    Section("Fecha") {
-//                        Button {
-//                            withAnimation {
-//                                showDatePicker.toggle()
-//                            }
-//                        } label: {
-//                            HStack {
-//                                Text("Fecha de elaboración")
-//                                    .foregroundStyle(.primary)
-//                                Spacer()
-//                                Text(vm.selectedDate, format: .dateTime.day().month().year())
-//                                    .foregroundStyle(.secondary)
-//                            }
-//                        }
-//                        if showDatePicker {
-//                            DatePicker(
-//                                "Fecha de elaboración",
-//                                selection: $vm.selectedDate,
-//                                displayedComponents: [.date]
-//                            )
-//                            .datePickerStyle(.graphical)
-//                            .onChange(of: vm.selectedDate) {
-//                                withAnimation {
-//                                    showDatePicker = false
-//                                }
-//                            }
-//                        }
-//                    }
-                    switch vm.availableModel() {
-                        case .available:
-                                Button {
-                                    Task {
-                                        await vm.navigateToGenerateView()
-                                    }
-                                } label: {
-                                    Label("Generar receta", systemImage: "sparkles")// apple.intelligence
-                                    .frame(maxWidth: .infinity)
-                                    .font(.headline)
-                                }
-                        case .unavailable(.appleIntelligenceNotEnabled):
-                                HStack {
-                                        Text("El calculador de recetas de pan no está disponible porque Apple Inteligence no está habilitado")
-                                }
-                        case .unavailable(.modelNotReady):
-                                HStack {
-                                            Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
-                                }
-                        case .unavailable(.deviceNotEligible):
-                            HStack {
-                                        Text("Calculador de recetas de pan aún no está listo. Inténtalo más tarde ")
-                            }
-                        default:
-                            Text("model.availabiltiy.default")
-                    }
-//                    Section("Receta") {
-//                        if let recipe = vm.recipe {
-//                                if let messageMD = try? AttributedString(markdown: recipe, options: options) {
-//                                ScrollView {
-//                                        Text(messageMD)
-//                                            .padding()
-//                                            .textSelection(.enabled)
-//                                            .frame(maxWidth: .infinity, alignment: .leading)
-//                                    }
-//                                }
-//                        }
-//                        if let sequence = vm.recipeBreadSequence {
-//                            Text(sequence.rawContent.jsonString)
-//                            .padding()
-//                            .textSelection(.enabled)
-//                            .frame(maxWidth: .infinity, alignment: .leading)
-//                        }
-//                    }
-//                    .id(resultID)
                 }
-                .onChange(of: vm.water) {vm.resetResult()}
-                .onChange(of: vm.flourType) {vm.resetResult()}
-                .onChange(of: vm.flourQuantity) {vm.resetResult()}
-                .onChange(of: vm.yeast) {vm.resetResult()}
-//                .alert("Guardar receta", isPresented: $showSaveAlert) {
-//                    Button("No", role: .cancel) { }
-//                       Button("Sí") {
-//                           vm.save(context: modelContext)
-//                           dismiss()
-//                       }
-//                }
-                .navigationTitle("BreadUp")
+                Section("Levadura") {
+                    yeast
+                    sliderYeast
+                    HStack {
+                        Text("5 gr")
+                        Spacer()
+                        Text("50 gr")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                Section("Agua") {
+                    VStack(alignment: .leading) {
+                        water
+                        Slider(
+                            value: Binding(
+                                get: { Double(vm.water) },
+                                set: { vm.water = Int($0) }
+                            ),
+                            in: 125...500,
+                            step: 25
+                        )
+                        HStack {
+                            Text("125 ml")
+                            Spacer()
+                            Text("500 ml")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+                Section {
+                    Button {
+                        Task {
+                            await vm.navigateToGenerateView()
+                        }
+                    } label: {
+                        Label("Generar receta", systemImage: "sparkles")
+                            .frame(maxWidth: .infinity)
+                            .font(.headline)
+                    }
+                    //.buttonStyle(.borderedProminent)
+                    .disabled(!isModelAvailable)
+                } footer: {
+                    if let unavailableNote {
+                        Text(unavailableNote)
+                    }
+                }
             }
+            .onChange(of: vm.water) { vm.resetResult() }
+            .onChange(of: vm.flourType) { vm.resetResult() }
+            .onChange(of: vm.flourQuantity) { vm.resetResult() }
+            .onChange(of: vm.yeast) { vm.resetResult() }
+            .navigationTitle("Nueva receta")
+        }
         .overlay {                                              // <-- NUEVO
             if vm.isLoading {                                   // <-- NUEVO
                 ZStack {                                        // <-- NUEVO
@@ -200,6 +125,27 @@ struct RecipeDetailView: View {
             }                                                   // <-- NUEVO
         }                                                       // <-- NUEVO
         .allowsHitTesting(!vm.isLoading)                        // <-- NUEVO (bloquea la interacción
+    }
+    
+    /// El modelo está disponible para generar.
+    private var isModelAvailable: Bool {
+        if case .available = vm.availableModel() { return true }
+        return false
+    }
+    
+    /// Nota explicativa (footer) cuando la generación no está disponible.
+    private var unavailableNote: String? {
+        guard case .unavailable(let reason) = vm.availableModel() else { return nil }
+        switch reason {
+        case .appleIntelligenceNotEnabled:
+            return "Activa Apple Intelligence en los Ajustes del sistema para generar recetas."
+        case .modelNotReady:
+            return "El modelo se está preparando. Vuelve a intentarlo en unos minutos."
+        case .deviceNotEligible:
+            return "Este dispositivo no es compatible con la generación de recetas."
+        @unknown default:
+            return "La generación de recetas no está disponible ahora mismo."
+        }
     }
     
     private var water: some View {
