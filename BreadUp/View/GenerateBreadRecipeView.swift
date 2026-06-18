@@ -15,6 +15,7 @@ struct GenerateBreadRecipeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    @State private var showDatePicker = false
     @State private var showSaveAlert = false
 
     var body: some View {
@@ -34,27 +35,43 @@ struct GenerateBreadRecipeView: View {
                         }
                     }
                     if vm.receivedTotalInformationAboutRecipe {
-                        HStack(spacing: 12) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "calendar")
-                                    .foregroundStyle(.secondary)
+                        VStack(spacing: 12) {
+                            HStack(spacing: 12) {
+                                Button {
+                                    withAnimation { showDatePicker.toggle() }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "calendar")
+                                        Text(vm.selectedDate, format: .dateTime.day().month().year())
+                                    }
+                                    .font(.subheadline)
+                                }
+                                .buttonStyle(.bordered)
+                                .buttonBorderShape(.capsule)
+
+                                Spacer(minLength: 12)
+
+                                Button {
+                                    showSaveAlert.toggle()
+                                } label: {
+                                    Label("Guardar", systemImage: "square.and.arrow.down")
+                                        .font(.headline)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.capsule)
+                            }
+
+                            if showDatePicker {
                                 DatePicker(
                                     "Fecha de elaboración",
                                     selection: $vm.selectedDate,
                                     displayedComponents: [.date]
                                 )
-                                .labelsHidden()
+                                .datePickerStyle(.graphical)
+                                .onChange(of: vm.selectedDate) {
+                                    withAnimation { showDatePicker = false }
+                                }
                             }
-                            Spacer(minLength: 12)
-                            Button {
-//                                showSaveAlert = true
-                                showSaveAlert.toggle()
-                            } label: {
-                                Label("Guardar", systemImage: "square.and.arrow.down")
-                                    .font(.headline)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.capsule)
                         }
                         .padding(.vertical, 8)
                     }
