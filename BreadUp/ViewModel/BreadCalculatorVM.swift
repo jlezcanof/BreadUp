@@ -136,8 +136,9 @@ final class BreadCalculatorVM {
                 
         let calculateBread = BreadUpCalculate(recipe: recipeTitle)
         
-        recipeSteps.forEach { recipeStep in
+        recipeSteps.enumerated().forEach { index, recipeStep in
             calculateBread.steps.append(BreadUpStepRecipe(
+                                                          order: index,
                                                           title: recipeStep.titulo,
                                                           descripcion: recipeStep.descripcion))
         }
@@ -151,10 +152,12 @@ final class BreadCalculatorVM {
         
         print("vemos si tenemos info de la receta")
         
-        print("\(self.recipeTitle)")
-        self.recipeSteps.forEach { recipeStep in
-            print(" Título: \(recipeStep.titulo), descripción: \(recipeStep.descripcion)")
+        print (" \(String(describing: ingredients.calculateBread?.recipe))")
+        
+        ingredients.calculateBread?.steps.forEach { step in
+            print("Titulo: \(step.title), descripcion: \(step.descripcion)")
         }
+        
     }
         
     private func calculateRecipe() async {

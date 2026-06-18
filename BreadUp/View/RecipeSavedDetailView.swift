@@ -8,42 +8,191 @@
 import SwiftUI
 
 struct RecipeSavedDetailView: View {
-    
+
     let recipe: BreadUpIngredients
 
+    /// Título guardado (en `calculateBread.recipe`); si faltara, un texto por defecto.
+    private var title: String {
+        let stored = recipe.calculateBread?.recipe?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return stored.isEmpty ? "Receta de pan" : stored
+    }
+
+    private var steps: [BreadUpStepRecipe] {
+        (recipe.calculateBread?.steps ?? []).sorted { $0.order < $1.order }
+    }
+
     var body: some View {
-        Form {
-            Section("Harina") {
-                LabeledContent("Tipo", value: recipe.flourType.displayName)
-                LabeledContent("Cantidad", value: "\(recipe.flourQuantity) ml")
+        ScrollView {
+            VStack(spacing: 24) {
+                header
+                ingredientsCard
+                if !steps.isEmpty {
+                    stepsSection
+                }
             }
+            .padding(.horizontal)
+            .padding(.bottom, 32)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
 
-            Section("Levadura") {
-                LabeledContent("Cantidad", value: "\(recipe.yeast) gramos")
-            }
+    // MARK: - Hero header
 
-            Section("Agua") {
-                LabeledContent("Cantidad", value: "\(recipe.water) ml")
-            }
-            
+    private var header: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "fork.knife")
+                .font(.system(size: 32, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 76, height: 76)
+                .background { Circle().fill(.white.opacity(0.22)) }
+
+            Text(title)
+                .font(.largeTitle.bold())
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
+
             if let created = recipe.created {
-                Section("Fecha de elaboración") {
-                    HStack {
-                            Text(created, format: .dateTime.day().month().year())
-                                .foregroundStyle(.secondary)
-                    }
+                Label {
+                    Text(created, format: .dateTime.day().month(.wide).year())
+                } icon: {
+                    Image(systemName: "calendar")
                 }
-            }
-            if let result = recipe.calculateBread, let recipe = result.recipe {
-                Section("Receta") {
-                    LabeledContent("Receta", value: "\(recipe)")
-                }
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.92))
             }
         }
-        .navigationTitle(recipe.flourType.displayName)// TODO incluir tb. la fecha
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 36)
+        .padding(.horizontal, 20)
+        .background {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.96, green: 0.56, blue: 0.20),
+                                 Color(red: 0.86, green: 0.32, blue: 0.16)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: Color(red: 0.86, green: 0.32, blue: 0.16).opacity(0.35),
+                        radius: 14, x: 0, y: 8)
+        }
+        .padding(.top, 8)
+    }
+
+    // MARK: - Ingredientes
+
+    private var ingredientsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Ingredientes", systemImage: "list.bullet")
+
+            VStack(spacing: 0) {
+                ingredientRow(icon: "leaf.fill",
+                              tint: Color(red: 0.80, green: 0.62, blue: 0.30),
+                              title: "Harina",
+                              detail: recipe.flourType.displayName,
+                              value: "\(recipe.flourQuantity) ml")
+                Divider().padding(.leading, 60)
+                ingredientRow(icon: "bubbles.and.sparkles.fill",
+                              tint: .yellow,
+                              title: "Levadura",
+                              detail: nil,
+                              value: "\(recipe.yeast) g")
+                Divider().padding(.leading, 60)
+                ingredientRow(icon: "drop.fill",
+                              tint: .blue,
+                              title: "Agua",
+                              detail: nil,
+                              value: "\(recipe.water) ml")
+            }
+            .padding(.vertical, 4)
+            .background {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color(.secondarySystemGroupedBackground))
+            }
+        }
+    }
+
+    private func ingredientRow(icon: String,
+                               tint: Color,
+                               title: String,
+                               detail: String?,
+                               value: String) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 32, height: 32)
+                .background {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous).fill(tint)
+                }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.body.weight(.medium))
+                if let detail {
+                    Text(detail).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer(minLength: 12)
+
+            Text(value)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - Pasos
+
+    private var stepsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionTitle("Elaboración", systemImage: "list.number")
+
+            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                StepCard(number: index + 1,
+                         titulo: step.title,
+                         descripcion: step.descripcion)
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func sectionTitle(_ text: String, systemImage: String) -> some View {
+        Label(text, systemImage: systemImage)
+            .font(.title2.bold())
+            .padding(.leading, 4)
     }
 }
 
 #Preview {
-    RecipeSavedDetailView(recipe: BreadUpIngredients.example)
+    let ingredients = BreadUpIngredients(
+        id: UUID(),
+        water: 320,
+        flourType: .wheat,
+        flourQuantity: 500,
+        yeast: 15,
+        createdAt: .now
+    )
+    let calc = BreadUpCalculate(recipe: "Pan rústico de masa madre")
+    calc.steps = [
+        BreadUpStepRecipe(order: 0, title: "Mezcla inicial",
+                          descripcion: "Combina la harina con el agua tibia y la levadura. Mezcla hasta integrar y deja reposar 15 minutos."),
+        BreadUpStepRecipe(order: 1, title: "Amasado",
+                          descripcion: "Amasa 10 minutos hasta obtener una masa lisa y elástica que se despegue de las paredes del bol."),
+        BreadUpStepRecipe(order: 2, title: "Primera fermentación",
+                          descripcion: "Cubre y deja levar 1 hora en un lugar cálido, hasta que doble su volumen."),
+        BreadUpStepRecipe(order: 3, title: "Horneado",
+                          descripcion: "Precalienta a 230 °C y hornea 25-30 minutos hasta que la corteza esté dorada y suene hueca al golpearla.")
+    ]
+    ingredients.calculateBread = calc
+
+    return NavigationStack {
+        RecipeSavedDetailView(recipe: ingredients)
+    }
 }

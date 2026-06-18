@@ -70,6 +70,7 @@ enum BreadUpSchemaV3: VersionedSchema {
     @Model
     final class StepRecipe {
         @Attribute(.unique) var id : UUID
+        var order: Int
         var title: String
         var descripcion: String
 
@@ -77,8 +78,9 @@ enum BreadUpSchemaV3: VersionedSchema {
         var calculateBread: CalculateBread?
 
         init(//id: UUID,
-             title: String, descripcion: String) {
+             order: Int, title: String, descripcion: String) {
             self.id = UUID()
+            self.order = order
             self.title = title
             self.descripcion = descripcion
         }
