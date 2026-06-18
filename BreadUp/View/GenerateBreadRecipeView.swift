@@ -60,7 +60,6 @@ struct GenerateBreadRecipeView: View {
                                 .buttonStyle(.borderedProminent)
                                 .buttonBorderShape(.capsule)
                             }
-
                             if showDatePicker {
                                 DatePicker(
                                     "Fecha de elaboración",
