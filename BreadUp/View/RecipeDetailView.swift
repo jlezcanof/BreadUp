@@ -11,8 +11,6 @@ import FoundationModels
 
 struct RecipeDetailView: View {
     
-//    @Environment(\.modelContext) private var modelContext
-//    @Environment(\.dismiss) private var dismiss
     @Environment(BreadCalculatorVM.self) private var vm
     
     @State private var resultID = "resultado"
@@ -88,7 +86,7 @@ struct RecipeDetailView: View {
                             .frame(maxWidth: .infinity)
                             .font(.headline)
                     }
-                    //.buttonStyle(.borderedProminent)
+                    //.buttonStyle(.borderedProminent)//prueba
                     .disabled(!isModelAvailable)
                 } footer: {
                     if let unavailableNote {
