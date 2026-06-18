@@ -114,9 +114,7 @@ struct GenerateBreadRecipeView: View {
             }
         }
         .alert("Guardar receta", isPresented: $showSaveAlert) {
-            Button("Cancelar", role: .cancel) {
-                dismiss()
-            }
+            Button("Cancelar", role: .cancel) { }
             Button("Guardar") {
                 vm.save(context: modelContext)
                 vm.backToRecipeList()
