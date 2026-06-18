@@ -8,19 +8,22 @@ import FoundationModels
 import SwiftData
 
 struct GenerateBreadRecipeView: View {
-    
+
     @Environment(BreadCalculatorVM.self) private var vm
-    
+
     // provisional, deberiamos meterlo directamente en el VM
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var showDatePicker = false
     @State private var showSaveAlert = false
 
+    private static let bottomID = "recipeBottomAnchor"
+
     var body: some View {
         @Bindable var vm = vm
-        return ScrollView {
+        return ScrollViewReader { proxy in
+            ScrollView {
                 VStack(spacing: 16) {
                     if let breadRecipe = vm.recipeBreadSequence,
                        let titleBreadRecipe = breadRecipe.content.title,
@@ -74,11 +77,27 @@ struct GenerateBreadRecipeView: View {
                         }
                         .padding(.vertical, 8)
                     }
+                    // Ancla invisible al final del contenido: el auto-scroll apunta aquí.
+                    Color.clear
+                        .frame(height: 1)
+                        .id(Self.bottomID)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
             }
-            .defaultScrollAnchor(.bottom, for: .sizeChanges)
+            // Sigue al último paso mientras se va generando (cada token cambia
+            // la descripción del último paso), al aparecer un paso nuevo (count)
+            // y al completarse la receta.
+            .onChange(of: vm.recipeBreadSequence?.content.pasos?.last?.descripcion) {
+                scrollToBottom(proxy)
+            }
+            .onChange(of: vm.recipeBreadSequence?.content.pasos?.count) {
+                scrollToBottom(proxy)
+            }
+            .onChange(of: vm.receivedTotalInformationAboutRecipe) {
+                scrollToBottom(proxy)
+            }
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             if vm.isLoading {
@@ -122,19 +141,23 @@ struct GenerateBreadRecipeView: View {
             Text("¿Quieres guardar esta receta en tu recetario?")
         }
     }
-    
+
+    private func scrollToBottom(_ proxy: ScrollViewProxy) {
+        proxy.scrollTo(Self.bottomID, anchor: .bottom)
+    }
+
     private struct StepRow: View {
-        
+
         let step: RecipeStep.PartiallyGenerated
         let number: Int
-        
+
         var body: some View {
             if let titulo = step.titulo, let descripcion = step.descripcion {
                 StepCard(number: number, titulo: titulo, descripcion: descripcion)
             }
         }
     }
- 
+
 }
 
 #Preview {
