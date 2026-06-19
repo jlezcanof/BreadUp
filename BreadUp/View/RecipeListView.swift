@@ -11,7 +11,10 @@ import SwiftUI
 struct RecipeListView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(BreadCalculatorVM.self) private var vm
-  @Query private var recipes: [BreadUpIngredients]
+  // Más recientes primero. `created` es opcional: SwiftData coloca los nil al
+  // final con orden inverso (las recetas guardadas siempre llevan fecha).
+  @Query(sort: \BreadUpIngredients.created, order: .reverse)
+  private var recipes: [BreadUpIngredients]
 
   var body: some View {
     List {
