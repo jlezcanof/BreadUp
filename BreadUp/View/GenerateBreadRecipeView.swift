@@ -60,7 +60,7 @@ struct GenerateBreadRecipeView: View {
                                     }
                                     .font(.subheadline)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(.glass)
                                 .buttonBorderShape(.capsule)
                                 .accessibilityLabel("Fecha de elaboración")
                                 .accessibilityValue(
@@ -81,7 +81,7 @@ struct GenerateBreadRecipeView: View {
                                     )
                                     .font(.headline)
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .buttonStyle(.glassProminent)
                                 .buttonBorderShape(.capsule)
                             }
                             if showDatePicker {
