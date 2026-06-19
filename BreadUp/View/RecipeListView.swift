@@ -18,7 +18,7 @@ struct RecipeListView: View {
             ForEach(recipes) { recipe in
                 NavigationLink(value: Route.saved(recipe)) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(recipe.calculateBread?.recipe ?? "no hay titulo")
+                        Text(recipe.calculateBread?.recipe ?? "Receta sin título")
                             .font(.headline)
                         HStack {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
@@ -43,6 +43,7 @@ struct RecipeListView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    .accessibilityElement(children: .combine)
                 }
             }
             .onDelete(perform: deleteRecipes)
@@ -57,14 +58,15 @@ struct RecipeListView: View {
             }
         }
         .navigationTitle("Mis Recetas de pan")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigation) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     vm.path.append(.detail)
                 } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel("Nueva receta")
             }
         }
     }

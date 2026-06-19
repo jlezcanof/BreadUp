@@ -144,7 +144,7 @@ struct GenerateBreadRecipeView: View {
             }
         }
         .allowsHitTesting(!vm.isLoading)
-        .navigationTitle("Receta")
+        .navigationTitle("Nueva receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .alert(vm.alert, isPresented: $vm.hasGenerationError) {
