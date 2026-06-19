@@ -152,18 +152,16 @@ final class BreadCalculatorVM {
         
         print("vemos si tenemos info de la receta")
         
-        print (" \(String(describing: ingredients.calculateBread?.recipe))")
+//        print (" \(String(describing: ingredients.calculateBread?.recipe))")
         
-        ingredients.calculateBread?.steps.forEach { step in
-            print("Titulo: \(step.title), descripcion: \(step.descripcion)")
-        }
+//        ingredients.calculateBread?.steps.forEach { step in
+//            print("Titulo: \(step.title), descripcion: \(step.descripcion)")
+//        }
         
     }
         
     private func calculateRecipe() async {
-        try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo
-//        try? await self.generateArevaloChiste()
-        
+        try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo        
         print("end of calculateREcipe")
     }
     

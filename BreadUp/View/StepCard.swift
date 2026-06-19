@@ -18,6 +18,8 @@ struct StepCard: View {
     let titulo: String
     let descripcion: String
 
+    @ScaledMetric(relativeTo: .title2) private var badgeSize: CGFloat = 46
+
     private var theme: (top: Color, bottom: Color) {
         Self.palette[(max(number, 1) - 1) % Self.palette.count]
     }
@@ -43,6 +45,7 @@ struct StepCard: View {
         }
         .padding(18)
         .background(cardBackground)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Subvistas
@@ -51,7 +54,7 @@ struct StepCard: View {
         Text("\(number)")
             .font(.title2.weight(.heavy))
             .foregroundStyle(.white)
-            .frame(width: 46, height: 46)
+            .frame(width: badgeSize, height: badgeSize)
             .background {
                 Circle().fill(gradient)
             }
@@ -59,6 +62,7 @@ struct StepCard: View {
                 Circle().strokeBorder(.white.opacity(0.35), lineWidth: 1)
             }
             .shadow(color: theme.bottom.opacity(0.5), radius: 5, x: 0, y: 3)
+            .accessibilityHidden(true)
     }
 
     private var cardBackground: some View {
