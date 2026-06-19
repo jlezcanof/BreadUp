@@ -103,6 +103,21 @@ struct GenerateBreadRecipeView: View {
     .loadingOverlay(vm.isLoading, message: "Generando receta…")
     .navigationTitle("Nueva receta")
     .navigationBarTitleDisplayMode(.inline)
+    // Control del usuario (HIG de Machine Learning): regenerar otra versión.
+    // Solo cuando ya hay un resultado; oculta el item entero, no su contenido.
+    .toolbar {
+      if vm.receivedTotalInformationAboutRecipe {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button {
+            Task { await vm.retryGeneration() }
+          } label: {
+            Image(systemName: "arrow.clockwise")
+          }
+          .accessibilityLabel("Regenerar receta")
+          .accessibilityHint("Genera otra versión con los mismos ingredientes")
+        }
+      }
+    }
     .alert("No se pudo generar la receta", isPresented: $vm.hasGenerationError) {
       Button("Reintentar") {
         vm.hasGenerationError = false
