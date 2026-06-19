@@ -83,7 +83,8 @@ struct GenerateBreadRecipeView: View {
                                 }
                             }
                         }
-                        .padding(.vertical, 8)
+                        .padding(.top, 8)
+                        .padding(.horizontal, 4)
                     }
                     // Ancla invisible al final del contenido: el auto-scroll apunta aquí.
                     Color.clear
@@ -93,6 +94,10 @@ struct GenerateBreadRecipeView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
             }
+            // Separa el contenido del borde inferior del scroll (incluida la
+            // home indicator), de modo que el auto-scroll no pegue el último
+            // elemento — la fila de acciones — al fondo del dispositivo.
+            .contentMargins(.bottom, 28, for: .scrollContent)
             // Sigue al último paso mientras se va generando (cada token cambia
             // la descripción del último paso), al aparecer un paso nuevo (count)
             // y al completarse la receta.
