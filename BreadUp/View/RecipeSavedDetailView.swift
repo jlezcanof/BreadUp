@@ -147,6 +147,9 @@ struct RecipeSavedDetailView: View {
         RoundedRectangle(cornerRadius: 20, style: .continuous)
           .fill(Color(.secondarySystemGroupedBackground))
       }
+      // Declara la forma del contenedor (radio 20) para que cualquier
+      // ConcentricRectangle descendiente calcule su radio de forma concéntrica.
+      .containerShape(.rect(cornerRadius: 20))
     }
   }
 
@@ -163,7 +166,10 @@ struct RecipeSavedDetailView: View {
         .foregroundStyle(.white)
         .frame(width: rowBadgeSize, height: rowBadgeSize)
         .background {
-          RoundedRectangle(cornerRadius: 9, style: .continuous).fill(tint)
+          // Concéntrico al contenedor (radio 20); no baja de 9 para que el
+          // badge mantenga su redondeo al estar lejos de las esquinas.
+          ConcentricRectangle.rect(corners: .concentric(minimum: 9), isUniform: true)
+            .fill(tint)
         }
         .accessibilityHidden(true)
 
