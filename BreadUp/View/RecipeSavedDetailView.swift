@@ -11,6 +11,14 @@ struct RecipeSavedDetailView: View {
 
     let recipe: BreadUpIngredients
 
+    /// Muestra el título en la barra solo cuando el hero sale de vista.
+    @State private var showNavTitle = false
+
+    @ScaledMetric(relativeTo: .largeTitle) private var heroIconSize: CGFloat = 32
+    @ScaledMetric(relativeTo: .largeTitle) private var heroBadgeSize: CGFloat = 76
+    @ScaledMetric(relativeTo: .body) private var rowIconSize: CGFloat = 15
+    @ScaledMetric(relativeTo: .body) private var rowBadgeSize: CGFloat = 32
+
     /// Título guardado (en `calculateBread.recipe`); si faltara, un texto por defecto.
     private var title: String {
         let stored = recipe.calculateBread?.recipe?
@@ -26,6 +34,15 @@ struct RecipeSavedDetailView: View {
         ScrollView {
             VStack(spacing: 24) {
                 header
+                    .onGeometryChange(for: Bool.self) { proxy in
+                        // El hero deja de verse cuando su borde inferior
+                        // sube por encima del top del scroll.
+                        proxy.frame(in: .scrollView).maxY < 10
+                    } action: { isHidden in
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showNavTitle = isHidden
+                        }
+                    }
                 ingredientsCard
                 if !steps.isEmpty {
                     stepsSection
@@ -35,8 +52,14 @@ struct RecipeSavedDetailView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(title)
+                    .font(.headline)
+                    .opacity(showNavTitle ? 1 : 0)
+            }
+        }
     }
 
     // MARK: - Hero header
@@ -44,9 +67,9 @@ struct RecipeSavedDetailView: View {
     private var header: some View {
         VStack(spacing: 14) {
             Image(systemName: "fork.knife")
-                .font(.system(size: 32, weight: .semibold))
+                .font(.system(size: heroIconSize, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 76, height: 76)
+                .frame(width: heroBadgeSize, height: heroBadgeSize)
                 .background { Circle().fill(.white.opacity(0.22)) }
 
             Text(title)
@@ -123,9 +146,9 @@ struct RecipeSavedDetailView: View {
                                value: String) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: rowIconSize, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 32, height: 32)
+                .frame(width: rowBadgeSize, height: rowBadgeSize)
                 .background {
                     RoundedRectangle(cornerRadius: 9, style: .continuous).fill(tint)
                 }
