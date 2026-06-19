@@ -26,13 +26,14 @@ struct GenerateBreadRecipeView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if let breadRecipe = vm.recipeBreadSequence,
-                       let titleBreadRecipe = breadRecipe.content.title,
-                       let steps = breadRecipe.content.pasos
+                        let titleBreadRecipe = breadRecipe.content.title,
+                        let steps = breadRecipe.content.pasos
                     {
                         Text(titleBreadRecipe)
                             .font(.title2.bold())
                         LazyVStack(spacing: 16) {
-                            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                            ForEach(Array(steps.enumerated()), id: \.element.id)
+                            { index, step in
                                 StepRow(step: step, number: index + 1)
                             }
                         }
@@ -45,7 +46,11 @@ struct GenerateBreadRecipeView: View {
                                 } label: {
                                     HStack(spacing: 8) {
                                         Image(systemName: "calendar")
-                                        Text(vm.selectedDate, format: .dateTime.day().month().year())
+                                        Text(
+                                            vm.selectedDate,
+                                            format: .dateTime.day().month()
+                                                .year()
+                                        )
                                     }
                                     .font(.subheadline)
                                 }
@@ -57,8 +62,11 @@ struct GenerateBreadRecipeView: View {
                                 Button {
                                     showSaveDialog.toggle()
                                 } label: {
-                                    Label("Guardar", systemImage: "square.and.arrow.down")
-                                        .font(.headline)
+                                    Label(
+                                        "Guardar",
+                                        systemImage: "square.and.arrow.down"
+                                    )
+                                    .font(.headline)
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .buttonBorderShape(.capsule)
@@ -88,7 +96,9 @@ struct GenerateBreadRecipeView: View {
             // Sigue al último paso mientras se va generando (cada token cambia
             // la descripción del último paso), al aparecer un paso nuevo (count)
             // y al completarse la receta.
-            .onChange(of: vm.recipeBreadSequence?.content.pasos?.last?.descripcion) {
+            .onChange(
+                of: vm.recipeBreadSequence?.content.pasos?.last?.descripcion
+            ) {
                 scrollToBottom(proxy)
             }
             .onChange(of: vm.recipeBreadSequence?.content.pasos?.count) {
@@ -143,19 +153,28 @@ struct GenerateBreadRecipeView: View {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            "¿Guardar esta receta?",
-            isPresented: $showSaveDialog,
-            titleVisibility: .visible
-        ) {
+        .alert("Guardar receta", isPresented: $showSaveDialog) {
+            Button("Cancelar", role: .cancel) { }
             Button("Guardar") {
                 vm.save(context: modelContext)
                 vm.backToRecipeList()
             }
-            Button("Cancelar", role: .cancel) { }
         } message: {
             Text("¿Quieres guardar esta receta en tu recetario?")
         }
+        //        .confirmationDialog(
+        //            "¿Guardar esta receta?",
+        //            isPresented: $showSaveDialog,
+        //            titleVisibility: .visible
+        //        ) {
+        //            Button("Guardar") {
+        //                vm.save(context: modelContext)
+        //                vm.backToRecipeList()
+        //            }
+        //            Button("Cancelar", role: .cancel) { }
+        //        } message: {
+        //            Text("¿Quieres guardar esta receta en tu recetario?")
+        //        }
     }
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
@@ -169,7 +188,11 @@ struct GenerateBreadRecipeView: View {
 
         var body: some View {
             if let titulo = step.titulo, let descripcion = step.descripcion {
-                StepCard(number: number, titulo: titulo, descripcion: descripcion)
+                StepCard(
+                    number: number,
+                    titulo: titulo,
+                    descripcion: descripcion
+                )
             }
         }
     }
