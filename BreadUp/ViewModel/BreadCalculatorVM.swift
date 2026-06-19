@@ -41,9 +41,7 @@ final class BreadCalculatorVM {
         
     init() {
         model = SystemLanguageModel.default
-        print("INIT: BEFORE SELF.SESSION")
         session = LanguageModelSession()
-        print("INIT")
     }
     
     func initVM(modelContext: ModelContext) {
@@ -76,7 +74,6 @@ final class BreadCalculatorVM {
         session = LanguageModelSession(model: model, instructions: instructions)
         // TODO prueba
         session.prewarm()
-        print("initVM")
 //        self.context = modelContext
     }
     
@@ -85,7 +82,7 @@ final class BreadCalculatorVM {
             case .available:
                 return true
             case .unavailable(let reason):
-                print("reason: \(reason)")
+                Self.log.notice("Modelo no disponible: \(String(describing: reason), privacy: .public)")
                 return false
         }
     }
@@ -149,20 +146,10 @@ final class BreadCalculatorVM {
         if context.hasChanges {
             try? context.save()
         }
-        
-        print("vemos si tenemos info de la receta")
-        
-//        print (" \(String(describing: ingredients.calculateBread?.recipe))")
-        
-//        ingredients.calculateBread?.steps.forEach { step in
-//            print("Titulo: \(step.title), descripcion: \(step.descripcion)")
-//        }
-        
     }
         
     private func calculateRecipe() async {
-        try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo        
-        print("end of calculateREcipe")
+        try? await self.generateRecipeBread()// se traga cualquier throw, prevenirlo
     }
     
     func navigateToGenerateView() async {
@@ -177,7 +164,7 @@ final class BreadCalculatorVM {
     private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
             self.alert = "No está disponible el modelo del lenguaje"
-            print("Language model not available")
+            Self.log.notice("Modelo de lenguaje no disponible")
             return
         }
         
@@ -210,9 +197,7 @@ final class BreadCalculatorVM {
                 - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                 - Levadura fresca de panaderia: \(yeast) gramos.
             """
-            
-        print("Agua \(water) harina \(flourType.rawValue) \(flourQuantity) y levadura \(yeast)")
-            
+
         let stream = session.streamResponse(to: prompt, generating: BreadRecipe.self
                                                 , options: options)
         for try await partial in stream {
@@ -226,30 +211,27 @@ final class BreadCalculatorVM {
         receivedTotalInformationAboutRecipe = true
             
         } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
-            print("exeeded content windows size")
-            print("\(content.debugDescription)")
+            Self.log.error("Context window excedido: \(content.debugDescription, privacy: .public)")
             self.alert = "Se ha excedido el contexto del tamaño de la ventana"
             hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.guardrailViolation(let content) {
-            print("blocked by GUARDRAILS.")
-            print("\(content.debugDescription)")
+            Self.log.error("Bloqueado por guardrails: \(content.debugDescription, privacy: .public)")
             self.alert = "No podemos responder a dicha petición de receta"
             hasGenerationError = true
         }
         catch LanguageModelSession.GenerationError.assetsUnavailable(let content) {
-            print("Assets unavailable")
-            print("\(content.debugDescription)")
+            Self.log.error("Assets del modelo no disponibles: \(content.debugDescription, privacy: .public)")
             self.alert = "Los assets del modelo no están disponible"
             hasGenerationError = true
         }
         catch {
             if containsSafetyAssetFailure(error) {
-                print("Safety classifier assets missing/corrupt")
+                Self.log.error("Assets del clasificador de seguridad ausentes o corruptos")
 //                self.recipe = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
                 self.alert  = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
             } else {
-                print(error)
+                Self.log.error("Error de generación: \(String(describing: error), privacy: .public)")
 //                self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
                 self.alert = "Por algún motivo desconocido, no podemos atender su petición."
             }

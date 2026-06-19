@@ -49,12 +49,7 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
 //            for ingredient in ingredients {
 //                identifierIngredients.append(ingredient.id.uuidString)
 //            }
-            print("Estoy haciendo el willMigrate")
-            
-            
         } didMigrate: { modelContext in
-            print("Estoy haciendo el didMigrate")
-            
             let descriptor = FetchDescriptor<BreadUpSchemaV2.Ingredients>()
             let ingredients = try modelContext.fetch(descriptor)
             
