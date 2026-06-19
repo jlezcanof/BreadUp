@@ -121,29 +121,7 @@ struct GenerateBreadRecipeView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay {
-            if vm.isLoading {
-                ZStack {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.white)
-                        Text("Generando receta...")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                    }
-                    .padding(32)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
-                .transition(.opacity)
-                .animation(.easeInOut, value: vm.isLoading)
-            }
-        }
-        .allowsHitTesting(!vm.isLoading)
+        .loadingOverlay(vm.isLoading, message: "Generando receta…")
         .navigationTitle("Nueva receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
