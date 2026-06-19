@@ -143,7 +143,6 @@ struct GenerateBreadRecipeView: View {
         .loadingOverlay(vm.isLoading, message: "Generando receta…")
         .navigationTitle("Nueva receta")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.visible, for: .navigationBar)
         .alert("No se pudo generar la receta", isPresented: $vm.hasGenerationError) {
             Button("Reintentar") {
                 vm.hasGenerationError = false
