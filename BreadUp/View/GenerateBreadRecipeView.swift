@@ -33,7 +33,16 @@ struct GenerateBreadRecipeView: View {
             let titleBreadRecipe = breadRecipe.content.title,
             let steps = breadRecipe.content.pasos
           {
-            summaryHeader(title: titleBreadRecipe)
+            VStack(alignment: .leading, spacing: 8) {
+              summaryHeader(title: titleBreadRecipe)
+              // Nota de transparencia (principio HIG de Machine Learning):
+              // el contenido es generado y puede no ser exacto. Texto neutro,
+              // sin marca "Apple Intelligence".
+              Text("Las recetas se generan automáticamente en tu dispositivo y pueden variar.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+            }
 
             if !steps.isEmpty {
               VStack(alignment: .leading, spacing: 16) {
