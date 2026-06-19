@@ -97,12 +97,12 @@ struct StepCard: View {
     // MARK: - Paleta cálida tipo panadería/horno
 
     private static let palette: [(top: Color, bottom: Color)] = [
-        (Color(red: 0.99, green: 0.66, blue: 0.24), Color(red: 0.95, green: 0.40, blue: 0.15)), // ámbar → naranja tostado
-        (Color(red: 0.96, green: 0.49, blue: 0.46), Color(red: 0.83, green: 0.25, blue: 0.36)), // coral → rojo corteza
-        (Color(red: 0.92, green: 0.72, blue: 0.34), Color(red: 0.76, green: 0.50, blue: 0.18)), // dorado → bronce
-        (Color(red: 0.56, green: 0.75, blue: 0.52), Color(red: 0.28, green: 0.56, blue: 0.36)), // verde masa madre
-        (Color(red: 0.64, green: 0.57, blue: 0.88), Color(red: 0.42, green: 0.35, blue: 0.76)), // lavanda especiada
-        (Color(red: 0.42, green: 0.70, blue: 0.84), Color(red: 0.20, green: 0.50, blue: 0.72)), // azul cerámica
+        (Color("Step1Top"), Color("Step1Bottom")), // ámbar → naranja tostado
+        (Color("Step2Top"), Color("Step2Bottom")), // coral → rojo corteza
+        (Color("Step3Top"), Color("Step3Bottom")), // dorado → bronce
+        (Color("Step4Top"), Color("Step4Bottom")), // verde masa madre
+        (Color("Step5Top"), Color("Step5Bottom")), // lavanda especiada
+        (Color("Step6Top"), Color("Step6Bottom")), // azul cerámica
     ]
 }
 

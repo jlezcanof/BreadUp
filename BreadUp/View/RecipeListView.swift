@@ -22,20 +22,20 @@ struct RecipeListView: View {
                             .font(.headline)
                         HStack {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Color("BreadWater"))
                             Spacer()
                             Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
-                                .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
+                                .foregroundStyle(Color("BreadFlour"))
                             Spacer()
                             Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
-                                .foregroundStyle(.yellow)
+                                .foregroundStyle(Color("BreadYeast"))
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         if let created = recipe.created {
                             HStack {
                                 Image(systemName: "calendar.circle")
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Color("BreadDate"))
                                 Text(created, format: .dateTime.day().month().year())
                             }
                             .font(.subheadline)

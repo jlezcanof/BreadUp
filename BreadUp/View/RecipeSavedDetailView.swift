@@ -94,13 +94,13 @@ struct RecipeSavedDetailView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [Color(red: 0.96, green: 0.56, blue: 0.20),
-                                 Color(red: 0.86, green: 0.32, blue: 0.16)],
+                        colors: [Color("HeroTop"),
+                                 Color("HeroBottom")],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .shadow(color: Color(red: 0.86, green: 0.32, blue: 0.16).opacity(0.35),
+                .shadow(color: Color("HeroBottom").opacity(0.35),
                         radius: 14, x: 0, y: 8)
         }
         .padding(.top, 8)
@@ -114,19 +114,19 @@ struct RecipeSavedDetailView: View {
 
             VStack(spacing: 0) {
                 ingredientRow(icon: "leaf.fill",
-                              tint: Color(red: 0.80, green: 0.62, blue: 0.30),
+                              tint: Color("BreadFlour"),
                               title: "Harina",
                               detail: recipe.flourType.displayName,
                               value: "\(recipe.flourQuantity) g")
                 Divider().padding(.leading, 60)
                 ingredientRow(icon: "bubbles.and.sparkles.fill",
-                              tint: .yellow,
+                              tint: Color("BreadYeast"),
                               title: "Levadura",
                               detail: nil,
                               value: "\(recipe.yeast) g")
                 Divider().padding(.leading, 60)
                 ingredientRow(icon: "drop.fill",
-                              tint: .blue,
+                              tint: Color("BreadWater"),
                               title: "Agua",
                               detail: nil,
                               value: "\(recipe.water) ml")

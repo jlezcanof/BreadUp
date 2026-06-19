@@ -19,7 +19,6 @@ final class BreadCalculatorVM {
     
     private let model: SystemLanguageModel
     private var session: LanguageModelSession
-//    private var context: ModelContext = nil
     
     var recipe : String?
     var recipeTitle: String = ""
@@ -62,19 +61,12 @@ final class BreadCalculatorVM {
                        solo ayudas con recetas de pan.
         """
         
-//        let instructions = """
-//            Eres un humorista reputado con más de 30 años de reputación en las televisiones españolas, 
-//        conociendo a todos los humoristas que existen en ese país.
-//        """
-        
         //        self.session = LanguageModelSession(
         //                    tools:  [GetBreadRecipeTool()],
         //                    instructions: instructions)
         
         session = LanguageModelSession(model: model, instructions: instructions)
-        // TODO prueba
         session.prewarm()
-//        self.context = modelContext
     }
     
     private func availableLanguageModel() -> Bool {
@@ -168,6 +160,8 @@ final class BreadCalculatorVM {
             return
         }
         
+        //TODO no debemos generar recetas si las condiciones de entrada de la receta + la fecha ya están persistidas en la bb.dd del dispositivo
+        
         isLoading = true
         hasGenerationError = false
         receivedTotalInformationAboutRecipe = false
@@ -177,19 +171,6 @@ final class BreadCalculatorVM {
         defer { isLoading = false }
         
         do {
-//            let stream = session.streamResponse(generating: BreadRecipe.self, includeSchemaInPrompt: false) {
-//                    """
-//                        Me vas a dar una receta para hacer pan. Lo más importante de todo son las especificaciones que me vas a dar para el tiempo de coción y su temperatura. Si en algún caso, no es un valor uniforme sino que se hace en varios intervalos de temperatura y tiempo, indícalo. Dámelo en 8 párrafos/pasos. Ingredientes/cantidades:
-//                        - Agua: \(water) ml
-//                        - Harina: \(flourType.rawValue), \(flourQuantity) ml
-//                        - Levadura: \(yeast) g
-//                    """
-            
-            
-            // \(water)
-            // Harina de \(flourType.rawValue): \(flourQuantity) gramos
-            // Levadura fresca de panaderia: \(yeast) gramos.
-            
             let prompt =
             """
                 Crea una receta de pan casero usando estos ingredientes/cantidades:
@@ -228,11 +209,9 @@ final class BreadCalculatorVM {
         catch {
             if containsSafetyAssetFailure(error) {
                 Self.log.error("Assets del clasificador de seguridad ausentes o corruptos")
-//                self.recipe = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
                 self.alert  = "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
             } else {
                 Self.log.error("Error de generación: \(String(describing: error), privacy: .public)")
-//                self.recipe = "Por algún motivo desconocido, no podemos atender su petición."
                 self.alert = "Por algún motivo desconocido, no podemos atender su petición."
             }
             hasGenerationError = true
@@ -270,27 +249,6 @@ final class BreadCalculatorVM {
                 level += 1
             }
         }
-    
-    private func makeStep() async throws -> RecipeStep {
-        let prompt2 = """
-            Genera un paso para la receta de un pan.
-            
-            La salida debe ser en un JSON, con la siguiente estructura:
-            {
-              "nameStep",
-              "descriptionStep"
-            }
-            
-            SOLO salida JSON, sin ’’’,
-            """
-        let response = try await session.respond(generating: RecipeStep.self) {
-            prompt2
-        }
-                                                 
-        return response.content
-    }
-    
- 
     
 //    private func newSession(previousSession: LanguageModelSession) -> LanguageModelSession {
 //        
