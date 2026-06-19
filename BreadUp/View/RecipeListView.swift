@@ -24,7 +24,7 @@ struct RecipeListView: View {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
                                 .foregroundStyle(.blue)
                             Spacer()
-                            Label("\(recipe.flourQuantity) ml", systemImage: "leaf.fill")
+                            Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
                                 .foregroundStyle(Color(red: 0.96, green: 0.87, blue: 0.70))
                             Spacer()
                             Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")

@@ -117,7 +117,7 @@ struct RecipeSavedDetailView: View {
                               tint: Color(red: 0.80, green: 0.62, blue: 0.30),
                               title: "Harina",
                               detail: recipe.flourType.displayName,
-                              value: "\(recipe.flourQuantity) ml")
+                              value: "\(recipe.flourQuantity) g")
                 Divider().padding(.leading, 60)
                 ingredientRow(icon: "bubbles.and.sparkles.fill",
                               tint: .yellow,

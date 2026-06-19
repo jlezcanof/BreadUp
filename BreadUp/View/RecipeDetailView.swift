@@ -26,7 +26,7 @@ struct RecipeDetailView: View {
                         }
                     }
                     VStack(alignment: .leading) {
-                        Text("\(vm.flourQuantity) ml")
+                        Text("\(vm.flourQuantity) g")
                             .font(.headline)
                         Slider(
                             value: Binding(
@@ -37,9 +37,9 @@ struct RecipeDetailView: View {
                             step: 25
                         )
                         HStack {
-                            Text("125 ml")
+                            Text("125 g")
                             Spacer()
-                            Text("400 ml")
+                            Text("400 g")
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
