@@ -18,6 +18,10 @@ struct GenerateBreadRecipeView: View {
     @State private var showDatePicker = false
     @State private var showSaveDialog = false
 
+    /// Al terminar la generación, lleva el foco de VoiceOver al título del
+    /// resultado para anunciar que la receta está lista.
+    @AccessibilityFocusState private var recipeTitleFocused: Bool
+
     private static let bottomID = "recipeBottomAnchor"
 
     var body: some View {
@@ -31,6 +35,8 @@ struct GenerateBreadRecipeView: View {
                     {
                         Text(titleBreadRecipe)
                             .font(.title2.bold())
+                            .accessibilityAddTraits(.isHeader)
+                            .accessibilityFocused($recipeTitleFocused)
                         LazyVStack(spacing: 16) {
                             ForEach(Array(steps.enumerated()), id: \.element.id)
                             { index, step in
@@ -56,6 +62,13 @@ struct GenerateBreadRecipeView: View {
                                 }
                                 .buttonStyle(.bordered)
                                 .buttonBorderShape(.capsule)
+                                .accessibilityLabel("Fecha de elaboración")
+                                .accessibilityValue(
+                                    vm.selectedDate.formatted(
+                                        .dateTime.day().month().year()
+                                    )
+                                )
+                                .accessibilityHint("Cambia la fecha de la receta")
 
                                 Spacer(minLength: 12)
 
@@ -109,8 +122,9 @@ struct GenerateBreadRecipeView: View {
             .onChange(of: vm.recipeBreadSequence?.content.pasos?.count) {
                 scrollToBottom(proxy)
             }
-            .onChange(of: vm.receivedTotalInformationAboutRecipe) {
+            .onChange(of: vm.receivedTotalInformationAboutRecipe) { _, done in
                 scrollToBottom(proxy)
+                if done { recipeTitleFocused = true }
             }
             // Al desplegar el calendario, baja para que quede a la vista.
             // Se retrasa el scroll para dar tiempo a que el calendario se

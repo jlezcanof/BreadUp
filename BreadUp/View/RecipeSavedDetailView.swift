@@ -58,6 +58,9 @@ struct RecipeSavedDetailView: View {
                 Text(title)
                     .font(.headline)
                     .opacity(showNavTitle ? 1 : 0)
+                    // Evita que el título suene dos veces (hero + barra) cuando
+                    // está oculto; opacity(0) no garantiza excluirlo de VoiceOver.
+                    .accessibilityHidden(!showNavTitle)
             }
         }
     }
@@ -71,6 +74,7 @@ struct RecipeSavedDetailView: View {
                 .foregroundStyle(.white)
                 .frame(width: heroBadgeSize, height: heroBadgeSize)
                 .background { Circle().fill(.white.opacity(0.22)) }
+                .accessibilityHidden(true)
 
             Text(title)
                 .font(.largeTitle.bold())
@@ -152,6 +156,7 @@ struct RecipeSavedDetailView: View {
                 .background {
                     RoundedRectangle(cornerRadius: 9, style: .continuous).fill(tint)
                 }
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.body.weight(.medium))
@@ -168,6 +173,7 @@ struct RecipeSavedDetailView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Pasos
@@ -190,6 +196,7 @@ struct RecipeSavedDetailView: View {
         Label(text, systemImage: systemImage)
             .font(.title2.bold())
             .padding(.leading, 4)
+            .accessibilityAddTraits(.isHeader)
     }
 }
 

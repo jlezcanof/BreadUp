@@ -23,12 +23,15 @@ struct RecipeListView: View {
                         HStack {
                             Label("\(recipe.water) ml", systemImage: "drop.fill")
                                 .foregroundStyle(Color("BreadWater"))
+                                .accessibilityLabel("Agua, \(recipe.water) mililitros")
                             Spacer()
                             Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
                                 .foregroundStyle(Color("BreadFlour"))
+                                .accessibilityLabel("Harina, \(recipe.flourQuantity) gramos")
                             Spacer()
                             Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
                                 .foregroundStyle(Color("BreadYeast"))
+                                .accessibilityLabel("Levadura, \(recipe.yeast) gramos")
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -36,6 +39,7 @@ struct RecipeListView: View {
                             HStack {
                                 Image(systemName: "calendar.circle")
                                     .foregroundStyle(Color("BreadDate"))
+                                    .accessibilityHidden(true)
                                 Text(created, format: .dateTime.day().month().year())
                             }
                             .font(.subheadline)

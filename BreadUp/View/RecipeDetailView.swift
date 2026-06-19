@@ -36,6 +36,8 @@ struct RecipeDetailView: View {
                             in: 125...400,
                             step: 25
                         )
+                        .accessibilityLabel("Cantidad de harina")
+                        .accessibilityValue("\(vm.flourQuantity) gramos")
                         HStack {
                             Text("125 g")
                             Spacer()
@@ -43,6 +45,7 @@ struct RecipeDetailView: View {
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     }
                 }
                 Section("Levadura") {
@@ -55,6 +58,7 @@ struct RecipeDetailView: View {
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 }
                 Section("Agua") {
                     VStack(alignment: .leading) {
@@ -67,6 +71,8 @@ struct RecipeDetailView: View {
                             in: 125...500,
                             step: 25
                         )
+                        .accessibilityLabel("Cantidad de agua")
+                        .accessibilityValue("\(vm.water) mililitros")
                         HStack {
                             Text("125 ml")
                             Spacer()
@@ -74,6 +80,7 @@ struct RecipeDetailView: View {
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     }
                 }
                 Section {
@@ -152,6 +159,8 @@ struct RecipeDetailView: View {
 //                                }
             }
         )
+        .accessibilityLabel("Cantidad de levadura")
+        .accessibilityValue("\(vm.yeast) gramos")
     }
     
     private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)

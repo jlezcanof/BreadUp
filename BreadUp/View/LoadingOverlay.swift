@@ -6,7 +6,8 @@
 import SwiftUI
 
 /// Velo de carga reutilizable: atenúa el contenido subyacente, bloquea la
-/// interacción y muestra un indicador con un mensaje sobre material del sistema.
+/// interacción (toque y VoiceOver) y muestra un indicador con un mensaje
+/// sobre material del sistema.
 ///
 /// Usa colores semánticos (`.primary`, tint del sistema) en lugar de blanco
 /// fijo, de modo que el contenido sea legible tanto en claro como en oscuro.
@@ -17,6 +18,10 @@ struct LoadingOverlayModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            // Mientras carga, el contenido de fondo queda fuera del alcance de
+            // VoiceOver (el velo solo tapa visualmente; allowsHitTesting solo
+            // frena el toque).
+            .accessibilityHidden(isLoading)
             .overlay {
                 if isLoading {
                     ZStack {
@@ -35,6 +40,9 @@ struct LoadingOverlayModifier: ViewModifier {
                             .ultraThinMaterial,
                             in: RoundedRectangle(cornerRadius: 16, style: .continuous)
                         )
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(message)
+                        .accessibilityAddTraits(.updatesFrequently)
                     }
                     .transition(.opacity)
                 }
