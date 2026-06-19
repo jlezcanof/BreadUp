@@ -49,9 +49,9 @@ struct RecipeDetailView: View {
                     yeast
                     sliderYeast
                     HStack {
-                        Text("5 gr")
+                        Text("5 g")
                         Spacer()
-                        Text("50 gr")
+                        Text("50 g")
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -130,7 +130,7 @@ struct RecipeDetailView: View {
     }
     
     private var yeast: some View {
-        Text("\(vm.yeast) gramos")
+        Text("\(vm.yeast) g")
             .font(.headline)
     }
     

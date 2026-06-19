@@ -152,7 +152,12 @@ final class BreadCalculatorVM {
     func backToRecipeList() {
         path.removeAll()
     }
-        
+
+    /// Reintenta la generación sin volver a navegar (ya estamos en la vista de generación).
+    func retryGeneration() async {
+        await calculateRecipe()
+    }
+
     private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
             self.alert = "No está disponible el modelo del lenguaje"

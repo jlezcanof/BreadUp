@@ -64,7 +64,7 @@ struct GenerateBreadRecipeView: View {
                                 } label: {
                                     Label(
                                         "Guardar",
-                                        systemImage: "square.and.arrow.down"
+                                        systemImage: "tray.and.arrow.down"
                                     )
                                     .font(.headline)
                                 }
@@ -125,11 +125,17 @@ struct GenerateBreadRecipeView: View {
         .navigationTitle("Nueva receta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .alert(vm.alert, isPresented: $vm.hasGenerationError) {
-            Button("Cerrar") {
+        .alert("No se pudo generar la receta", isPresented: $vm.hasGenerationError) {
+            Button("Reintentar") {
+                vm.hasGenerationError = false
+                Task { await vm.retryGeneration() }
+            }
+            Button("Cerrar", role: .cancel) {
                 vm.hasGenerationError = false
                 dismiss()
             }
+        } message: {
+            Text(vm.alert)
         }
         .alert("Guardar receta", isPresented: $showSaveDialog) {
             Button("Cancelar", role: .cancel) { }

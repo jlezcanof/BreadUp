@@ -56,7 +56,6 @@ enum BreadUpSchemaV2: VersionedSchema {
         
         var recipe: String?
 
-
         init(id: UUID, recipe: String?) {
             self.id = id
             self.recipe = recipe
