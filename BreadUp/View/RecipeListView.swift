@@ -16,41 +16,22 @@ struct RecipeListView: View {
   @Query(sort: \BreadUpIngredients.created, order: .reverse)
   private var recipes: [BreadUpIngredients]
 
+  // Búsqueda por texto (título de la receta).
+  @State private var searchText = ""
+
+  // Filtros por atributo.
+  @State private var showFilters = false
+  @State private var flourFilter: FlourType?
+  @State private var useDateRange = false
+  @State private var dateFrom: Date =
+    Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
+  @State private var dateTo: Date = .now
+
   var body: some View {
     List {
-      ForEach(recipes) { recipe in
+      ForEach(filteredRecipes) { recipe in
         NavigationLink(value: Route.saved(recipe)) {
-          VStack(alignment: .leading, spacing: 6) {
-            Text(recipe.calculateBread?.recipe ?? "Receta sin título")
-              .font(.headline)
-            HStack {
-              Label("\(recipe.water) ml", systemImage: "drop.fill")
-                .foregroundStyle(Color("BreadWater"))
-                .accessibilityLabel("Agua, \(recipe.water) mililitros")
-              Spacer()
-              Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
-                .foregroundStyle(Color("BreadFlour"))
-                .accessibilityLabel("Harina, \(recipe.flourQuantity) gramos")
-              Spacer()
-              Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
-                .foregroundStyle(Color("BreadYeast"))
-                .accessibilityLabel("Levadura, \(recipe.yeast) gramos")
-            }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            if let created = recipe.created {
-              HStack {
-                Image(systemName: "calendar.circle")
-                  .foregroundStyle(Color("BreadDate"))
-                  .accessibilityHidden(true)
-                Text(created, format: .dateTime.day().month().year())
-              }
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            }
-          }
-          .padding(.vertical, 4)
-          .accessibilityElement(children: .combine)
+          RecipeRow(recipe: recipe)
         }
       }
       .onDelete(perform: deleteRecipes)
@@ -62,11 +43,30 @@ struct RecipeListView: View {
           systemImage: "cooktop",
           description: Text("Pulsa + para crear tu primera receta")
         )
+      } else if filteredRecipes.isEmpty {
+        ContentUnavailableView(
+          "Sin resultados",
+          systemImage: "line.3.horizontal.decrease.circle",
+          description: Text("Prueba a ajustar la búsqueda o los filtros")
+        )
       }
     }
     .navigationTitle("Mis Recetas de pan")
     .navigationBarTitleDisplayMode(.large)
+    .searchable(text: $searchText, prompt: "Buscar receta")
     .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          showFilters = true
+        } label: {
+          Image(
+            systemName: hasActiveFilters
+              ? "line.3.horizontal.decrease.circle.fill"
+              : "line.3.horizontal.decrease.circle")
+        }
+        .accessibilityLabel("Filtros")
+        .accessibilityValue(hasActiveFilters ? "Activos" : "Ninguno")
+      }
       ToolbarItem(placement: .primaryAction) {
         Button {
           vm.path.append(.detail)
@@ -76,14 +76,138 @@ struct RecipeListView: View {
         .accessibilityLabel("Nueva receta")
       }
     }
+    .sheet(isPresented: $showFilters) {
+      filtersSheet
+    }
+  }
+
+  // MARK: - Filtrado
+
+  /// Hay filtros de atributo activos (la búsqueda de texto no cuenta como tal).
+  private var hasActiveFilters: Bool {
+    flourFilter != nil || useDateRange
+  }
+
+  /// Recetas tras aplicar búsqueda de título + filtros de harina y fecha.
+  private var filteredRecipes: [BreadUpIngredients] {
+    recipes.filter { recipe in
+      let matchesText =
+        searchText.isEmpty
+        || (recipe.calculateBread?.recipe ?? "")
+          .localizedCaseInsensitiveContains(searchText)
+      let matchesFlour = flourFilter == nil || recipe.flourType == flourFilter
+      let matchesDate = !useDateRange || dateInRange(recipe.created)
+      return matchesText && matchesFlour && matchesDate
+    }
+  }
+
+  /// `true` si `date` cae dentro del rango [inicio de `dateFrom`, fin de `dateTo`].
+  private func dateInRange(_ date: Date?) -> Bool {
+    guard let date else { return false }
+    let calendar = Calendar.current
+    let start = calendar.startOfDay(for: dateFrom)
+    let startOfLastDay = calendar.startOfDay(for: dateTo)
+    guard let end = calendar.date(byAdding: .day, value: 1, to: startOfLastDay)
+    else { return false }
+    return date >= start && date < end
+  }
+
+  // MARK: - Hoja de filtros
+
+  private var filtersSheet: some View {
+    NavigationStack {
+      Form {
+        Section("Tipo de harina") {
+          Picker("Harina", selection: $flourFilter) {
+            Text("Todas").tag(FlourType?.none)
+            ForEach(FlourType.allCases) { type in
+              Text(type.displayName).tag(FlourType?.some(type))
+            }
+          }
+        }
+        Section("Fecha de elaboración") {
+          Toggle("Filtrar por fecha", isOn: $useDateRange)
+          if useDateRange {
+            DatePicker(
+              "Desde", selection: $dateFrom, displayedComponents: .date)
+            DatePicker(
+              "Hasta", selection: $dateTo, in: dateFrom...,
+              displayedComponents: .date)
+          }
+        }
+      }
+      .navigationTitle("Filtros")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        // "Limpiar" vive en la barra del sheet (no en el Form), así no queda
+        // pegado a la home indicator y está siempre accesible sin hacer scroll.
+        ToolbarItem(placement: .topBarLeading) {
+          Button("Limpiar", action: clearFilters)
+            .disabled(!hasActiveFilters)
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Listo") { showFilters = false }
+        }
+      }
+    }
+    .presentationDetents([.medium, .large])
+  }
+
+  // MARK: - Acciones
+
+  private func clearFilters() {
+    withAnimation {
+      flourFilter = nil
+      useDateRange = false
+    }
   }
 
   private func deleteRecipes(offsets: IndexSet) {
     withAnimation {
       for index in offsets {
-        modelContext.delete(recipes[index])
+        modelContext.delete(filteredRecipes[index])
       }
     }
+  }
+}
+
+// MARK: - Fila de receta
+
+private struct RecipeRow: View {
+  let recipe: BreadUpIngredients
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Text(recipe.calculateBread?.recipe ?? "Receta sin título")
+        .font(.headline)
+      HStack {
+        Label("\(recipe.water) ml", systemImage: "drop.fill")
+          .foregroundStyle(Color("BreadWater"))
+          .accessibilityLabel("Agua, \(recipe.water) mililitros")
+        Spacer()
+        Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
+          .foregroundStyle(Color("BreadFlour"))
+          .accessibilityLabel("Harina, \(recipe.flourQuantity) gramos")
+        Spacer()
+        Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
+          .foregroundStyle(Color("BreadYeast"))
+          .accessibilityLabel("Levadura, \(recipe.yeast) gramos")
+      }
+      .font(.subheadline)
+      .foregroundStyle(.secondary)
+      if let created = recipe.created {
+        HStack {
+          Image(systemName: "calendar.circle")
+            .foregroundStyle(Color("BreadDate"))
+            .accessibilityHidden(true)
+          Text(created, format: .dateTime.day().month().year())
+        }
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+      }
+    }
+    .padding(.vertical, 4)
+    .accessibilityElement(children: .combine)
   }
 }
 
