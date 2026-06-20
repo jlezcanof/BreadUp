@@ -262,22 +262,6 @@ struct GenerateBreadRecipeView: View {
     proxy.scrollTo(Self.bottomID, anchor: .bottom)
   }
 
-  private struct StepRow: View {
-
-    let step: RecipeStep.PartiallyGenerated
-    let number: Int
-
-    var body: some View {
-      if let titulo = step.titulo, let descripcion = step.descripcion {
-        StepCard(
-          number: number,
-          titulo: titulo,
-          descripcion: descripcion
-        )
-      }
-    }
-  }
-
 }
 
 #Preview {
