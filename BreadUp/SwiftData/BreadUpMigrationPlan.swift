@@ -8,7 +8,6 @@
 import Foundation
 import SwiftData
 
-// pending migrate to v2
 typealias BreadUpIngredients = BreadUpSchemaV3.Ingredients
 typealias BreadUpCalculate   = BreadUpSchemaV3.CalculateBread
 typealias BreadUpStepRecipe  = BreadUpSchemaV3.StepRecipe
@@ -23,6 +22,7 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
     [
       //            .lightweight(fromVersion: BreadUpSchemaV1.self, toVersion: BreadUpSchemaV2.self)
       migrationV1toV2,
+      // pending migrate to v2
       migrationV2toV3,
     ]
   }
@@ -57,17 +57,6 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
     }
   }
 }
-
-//enum TypeFlour: String, Identifiable, Codable, CaseIterable {
-//
-//  case wheat
-//  case wholewheat
-//  case rye
-//  case spelt
-//  case corn
-//
-//  var id: Self { self }
-//}
 
 enum FlourType: String, CaseIterable, Identifiable, Codable {
   case wheat = "Harina de trigo"
@@ -108,18 +97,6 @@ extension FlourType {
       return "spelt"
     case .corn:
       return "corn"
-    }
-  }
-}
-
-extension FlourType {
-  var toSchemaType: FlourType {
-    switch self {
-    case .wheat: .wheat
-    case .wholewheat: .wholewheat
-    case .rye: .rye
-    case .spelt: .spelt
-    case .corn: .corn
     }
   }
 }

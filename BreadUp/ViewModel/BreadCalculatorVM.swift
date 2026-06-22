@@ -123,6 +123,7 @@ final class BreadCalculatorVM {
 //      self.flourType = .wheat
 //      self.flourQuantity = 250
 //      self.yeast = 10
+//      self.yeast = 10
       print("reset result")
   }
 
@@ -131,7 +132,6 @@ final class BreadCalculatorVM {
     let ingredients = BreadUpIngredients(
       id: UUID(),
       water: water,
-      //flourType: flourType.toSchemaType,
       flourTypeString: flourType.name,
       flourQuantity: flourQuantity,
       yeast: yeast,
