@@ -10,9 +10,6 @@ import SwiftUI
 struct GenerateBreadRecipeView: View {
 
   @Environment(BreadCalculatorVM.self) private var vm
-
-  // provisional, deberiamos meterlo directamente en el VM
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
 
   @State private var showDatePicker = false
@@ -119,10 +116,10 @@ struct GenerateBreadRecipeView: View {
       }
     }
     .alert("No se pudo generar la receta", isPresented: $vm.hasGenerationError) {
-      Button("Reintentar") {
-        vm.hasGenerationError = false
-        Task { await vm.retryGeneration() }
-      }
+//      Button("Reintentar") {
+//        vm.hasGenerationError = false
+//        Task { await vm.retryGeneration() }
+//      }
       Button("Cerrar", role: .cancel) {
         vm.hasGenerationError = false
         dismiss()
@@ -133,7 +130,7 @@ struct GenerateBreadRecipeView: View {
     .alert("Guardar receta", isPresented: $showSaveDialog) {
       Button("Cancelar", role: .cancel) {}
       Button("Guardar") {
-        vm.save(context: modelContext)
+        vm.save()// TODO context: modelContext
         vm.backToRecipeList()
       }
     } message: {

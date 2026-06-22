@@ -19,6 +19,7 @@ final class BreadCalculatorVM {
 
   private let model: SystemLanguageModel
   private var session: LanguageModelSession
+  private var modelContext: ModelContext?
 
   var recipe: String?
   var recipeTitle: String = ""
@@ -45,6 +46,8 @@ final class BreadCalculatorVM {
   }
 
   func initVM(modelContext: ModelContext) {
+    self.modelContext = modelContext
+      
     // TODO "Actúa??
     let instructions = """
                   Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
@@ -115,7 +118,8 @@ final class BreadCalculatorVM {
   func resetResult() {
   }
 
-  func save(context: ModelContext) {
+  func save() {
+    guard let modelContext else { return }
     let ingredients = BreadUpIngredients(
       id: UUID(),
       water: water,
@@ -135,10 +139,10 @@ final class BreadCalculatorVM {
     }
     ingredients.calculateBread = calculateBread
 
-    context.insert(ingredients)
+    modelContext.insert(ingredients)
 
-    if context.hasChanges {
-      try? context.save()
+    if modelContext.hasChanges {
+      try? modelContext.save()
     }
   }
 
@@ -160,69 +164,137 @@ final class BreadCalculatorVM {
     await calculateRecipe()
   }
 
-  private func generateRecipeBread() async throws {
-    guard availableLanguageModel() else {
-      self.alert = "No está disponible el modelo del lenguaje"
-      Self.log.notice("Modelo de lenguaje no disponible")
-      return
+    private func generateRecipeBread() async throws {
+        guard availableLanguageModel() else {
+            self.alert = "No está disponible el modelo del lenguaje"
+            Self.log.notice("Modelo de lenguaje no disponible")
+            return
+        }
+
+        if recipeAlreadyExists() {
+            Self.log.notice("Generación cancelada: la receta ya existe")
+            self.alert = "Esa receta ya existe"
+            hasGenerationError = true
+            return
+        }
+
+        isLoading = true
+        hasGenerationError = false
+        receivedTotalInformationAboutRecipe = false
+        recipeBreadSequence = nil
+        recipeTitle = ""
+        recipeSteps = []
+        defer { isLoading = false }
+
+        do {
+            let prompt =
+                """
+                    Crea una receta de pan casero usando estos ingredientes/cantidades:
+                    - Agua: \(water) mililitros
+                    - Harina de \(flourType.rawValue): \(flourQuantity) gramos
+                    - Levadura fresca de panaderia: \(yeast) gramos.
+                """
+
+            let stream = session.streamResponse(
+                to: prompt,
+                generating: BreadRecipe.self,
+                options: options
+            )
+            for try await partial in stream {
+                self.recipeBreadSequence = partial
+            }
+            self.recipeTitle = recipeBreadSequence?.content.title ?? ""
+            self.recipeSteps = (recipeBreadSequence?.content.pasos ?? [])
+                .compactMap { step in
+                    guard let titulo = step.titulo,
+                        let descripcion = step.descripcion
+                    else { return nil }
+                    return RecipeStep(titulo: titulo, descripcion: descripcion)
+                }
+            receivedTotalInformationAboutRecipe = true
+
+        } catch LanguageModelSession.GenerationError.exceededContextWindowSize(
+            let content
+        ) {
+            Self.log.error(
+                "Context window excedido: \(content.debugDescription, privacy: .public)"
+            )
+            self.alert = "Se ha excedido el contexto del tamaño de la ventana"
+            hasGenerationError = true
+        } catch LanguageModelSession.GenerationError.guardrailViolation(
+            let content
+        ) {
+            Self.log.error(
+                "Bloqueado por guardrails: \(content.debugDescription, privacy: .public)"
+            )
+            self.alert = "No podemos responder a dicha petición de receta"
+            hasGenerationError = true
+        } catch LanguageModelSession.GenerationError.assetsUnavailable(
+            let content
+        ) {
+            Self.log.error(
+                "Assets del modelo no disponibles: \(content.debugDescription, privacy: .public)"
+            )
+            self.alert = "Los assets del modelo no están disponible"
+            hasGenerationError = true
+        } catch {
+            if containsSafetyAssetFailure(error) {
+                Self.log.error(
+                    "Assets del clasificador de seguridad ausentes o corruptos"
+                )
+                self.alert =
+                    "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
+            } else {
+                Self.log.error(
+                    "Error de generación: \(String(describing: error), privacy: .public)"
+                )
+                self.alert =
+                    "Por algún motivo desconocido, no podemos atender su petición."
+            }
+            hasGenerationError = true
+        }
     }
 
-    //TODO no debemos generar recetas si las condiciones de entrada de la receta + la fecha ya están persistidas en la bb.dd del dispositivo
+    /// `true` si ya hay una receta persistida con los mismos ingredientes de
+    /// entrada (tipo y cantidad de harina, levadura) y el mismo día de elaboración.
+    /// El título no entra en la comparación porque aún no se ha generado.
+    ///
+    /// Filtramos en la base de datos por los enteros (que son queryables) y
+    /// afinamos en memoria el tipo de harina (enum `Codable`) y el día, porque
+    /// esos no se comparan de forma fiable dentro de un `#Predicate`.
+    private func recipeAlreadyExists() -> Bool {
+        guard let modelContext else { return false }
 
-    isLoading = true
-    hasGenerationError = false
-    receivedTotalInformationAboutRecipe = false
-    recipeBreadSequence = nil
-    recipeTitle = ""
-    recipeSteps = []
-    defer { isLoading = false }
-
-    do {
-      let prompt =
-        """
-            Crea una receta de pan casero usando estos ingredientes/cantidades:
-            - Agua: \(water) mililitros
-            - Harina de \(flourType.rawValue): \(flourQuantity) gramos
-            - Levadura fresca de panaderia: \(yeast) gramos.
-        """
-
-      let stream = session.streamResponse(
-        to: prompt, generating: BreadRecipe.self, options: options)
-      for try await partial in stream {
-        self.recipeBreadSequence = partial
-      }
-      self.recipeTitle = recipeBreadSequence?.content.title ?? ""
-      self.recipeSteps = (recipeBreadSequence?.content.pasos ?? []).compactMap { step in
-        guard let titulo = step.titulo, let descripcion = step.descripcion else { return nil }
-        return RecipeStep(titulo: titulo, descripcion: descripcion)
-      }
-      receivedTotalInformationAboutRecipe = true
-
-    } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let content) {
-      Self.log.error("Context window excedido: \(content.debugDescription, privacy: .public)")
-      self.alert = "Se ha excedido el contexto del tamaño de la ventana"
-      hasGenerationError = true
-    } catch LanguageModelSession.GenerationError.guardrailViolation(let content) {
-      Self.log.error("Bloqueado por guardrails: \(content.debugDescription, privacy: .public)")
-      self.alert = "No podemos responder a dicha petición de receta"
-      hasGenerationError = true
-    } catch LanguageModelSession.GenerationError.assetsUnavailable(let content) {
-      Self.log.error(
-        "Assets del modelo no disponibles: \(content.debugDescription, privacy: .public)")
-      self.alert = "Los assets del modelo no están disponible"
-      hasGenerationError = true
-    } catch {
-      if containsSafetyAssetFailure(error) {
-        Self.log.error("Assets del clasificador de seguridad ausentes o corruptos")
-        self.alert =
-          "Los modelos de Apple Intelligence están actualizándose en tu dispositivo. Reintenta en unos minutos."
-      } else {
-        Self.log.error("Error de generación: \(String(describing: error), privacy: .public)")
-        self.alert = "Por algún motivo desconocido, no podemos atender su petición."
-      }
-      hasGenerationError = true
+        let descriptor = FetchDescriptor<BreadUpIngredients>(
+            predicate: #Predicate {
+                $0.flourQuantity == flourQuantity
+                && $0.yeast == yeast
+                && $0.water == water
+                // && $0.flourType == flourType esto esta fallando
+                // búsqueda por fecha y título
+                
+                // El enum se compara directamente (FlourType es String + Codable, así
+               //      // que SwiftData lo traduce); nada de .id / .rawValue / .displayName.
+               ////        ingredient.flourType == targetFlour
+            }
+        )
+        
+        let candidates = try? modelContext.fetch(descriptor)
+        
+        if (candidates?.count != 0) {
+            return true
+        }
+        return false
+        
+//        let calendar = Calendar.current
+//        let targetDay = calendar.startOfDay(for: selectedDate)
+//
+//        return candidates.contains { candidate in
+//            guard let created = candidate.created else { return false }
+//            return candidate.flourType == flourType
+//                && calendar.startOfDay(for: created) == targetDay
+//        }
     }
-  }
 
   private func containsSafetyAssetFailure(_ error: Error) -> Bool {
     let ns = error as NSError

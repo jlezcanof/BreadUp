@@ -32,7 +32,7 @@ enum BreadUpSchemaV3: VersionedSchema {
     init(
       id: UUID,
       water: Int,
-      flourType: FlourType,
+      flourType: FlourType = .wheat,
       flourQuantity: Int,
       //            saltQuantity: Int,
       yeast: Int,
