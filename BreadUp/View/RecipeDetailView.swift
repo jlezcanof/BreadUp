@@ -108,6 +108,11 @@ struct RecipeDetailView: View {
       .navigationTitle("Nueva receta")
     }
     .loadingOverlay(vm.isLoading, message: "Generando receta…")
+    .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
+      Button("De acuerdo", role: .cancel) {}
+    } message: {
+      Text("Ya tienes guardada una receta con estos ingredientes y fecha.")
+    }
   }
 
   /// El modelo está disponible para generar.

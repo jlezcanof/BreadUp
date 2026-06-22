@@ -26,6 +26,9 @@ final class BreadCalculatorVM {
   var recipeSteps: [RecipeStep] = []
   var isLoading = false
   var hasGenerationError = false
+  /// La receta que se intenta generar ya existe (mismos ingredientes y fecha).
+  /// La pantalla de ingredientes observa este flag para avisar sin navegar.
+  var hasDuplicateError = false
   var path: [Route] = []
   var receivedTotalInformationAboutRecipe = false
   var alert =
@@ -151,6 +154,13 @@ final class BreadCalculatorVM {
   }
 
   func navigateToGenerateView() async {
+    // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
+    // entrar en la pantalla de generación (evita mostrarla vacía).
+    if recipeAlreadyExists() {
+      Self.log.notice("Generación cancelada: la receta ya existe")
+      hasDuplicateError = true
+      return
+    }
     path.append(.generate)
     await calculateRecipe()
   }
@@ -168,13 +178,6 @@ final class BreadCalculatorVM {
         guard availableLanguageModel() else {
             self.alert = "No está disponible el modelo del lenguaje"
             Self.log.notice("Modelo de lenguaje no disponible")
-            return
-        }
-
-        if recipeAlreadyExists() {
-            Self.log.notice("Generación cancelada: la receta ya existe")
-            self.alert = "Esa receta ya existe"
-            hasGenerationError = true
             return
         }
 
