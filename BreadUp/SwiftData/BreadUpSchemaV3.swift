@@ -20,7 +20,7 @@ enum BreadUpSchemaV3: VersionedSchema {
   final class Ingredients {
     @Attribute(.unique) var id: UUID
     var water: Int
-    var flourType: FlourType
+    var flourTypeString: String
     var flourQuantity: Int
     //        var saltQuantity: Int
     var yeast: Int
@@ -32,7 +32,7 @@ enum BreadUpSchemaV3: VersionedSchema {
     init(
       id: UUID,
       water: Int,
-      flourType: FlourType = .wheat,
+      flourTypeString: String = "wheat",
       flourQuantity: Int,
       //            saltQuantity: Int,
       yeast: Int,
@@ -40,11 +40,46 @@ enum BreadUpSchemaV3: VersionedSchema {
     ) {
       self.id = id
       self.water = water
-      self.flourType = flourType
+      // Store the canonical flour type identifier in `flourTypeString`.
       self.flourQuantity = flourQuantity
+      self.flourTypeString = flourTypeString
       //            self.saltQuantity  = saltQuantity
       self.yeast = yeast
       self.created = createdAt
+    }
+
+    // Backwards-compatible computed property to expose the FlourType
+    // enum used across the UI. The persistent model stores the compact
+    // identifier in `flourTypeString` (e.g. "wheat"). The computed
+    // property maps to/from that string so existing call sites that
+    // use `flourType` continue to work.
+    var flourType: FlourType {
+      get {
+        FlourType.allCases.first(where: { $0.name == flourTypeString }) ?? .wheat
+      }
+      set {
+        flourTypeString = newValue.name
+      }
+    }
+
+    // Convenience initializer that matches older call sites that passed
+    // a `FlourType` value directly.
+    convenience init(
+      id: UUID,
+      water: Int,
+      flourType: FlourType = .wheat,
+      flourQuantity: Int,
+      yeast: Int,
+      createdAt: Date? = nil
+    ) {
+      self.init(
+        id: id,
+        water: water,
+        flourTypeString: flourType.name,
+        flourQuantity: flourQuantity,
+        yeast: yeast,
+        createdAt: createdAt
+      )
     }
   }
 

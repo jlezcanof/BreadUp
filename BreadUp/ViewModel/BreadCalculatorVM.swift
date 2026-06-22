@@ -119,6 +119,11 @@ final class BreadCalculatorVM {
   }
 
   func resetResult() {
+//      self.water = 250
+//      self.flourType = .wheat
+//      self.flourQuantity = 250
+//      self.yeast = 10
+      print("reset result")
   }
 
   func save() {
@@ -126,7 +131,8 @@ final class BreadCalculatorVM {
     let ingredients = BreadUpIngredients(
       id: UUID(),
       water: water,
-      flourType: flourType.toSchemaType,
+      //flourType: flourType.toSchemaType,
+      flourTypeString: flourType.name,
       flourQuantity: flourQuantity,
       yeast: yeast,
       createdAt: selectedDate)
@@ -267,20 +273,18 @@ final class BreadCalculatorVM {
     private func recipeAlreadyExists() -> Bool {
         guard let modelContext else { return false }
 
-        print("tipo de harina \(flourType)  \(flourType.rawValue) \(flourType.displayName)")
+//        print("tipo de harina \(flourType)  \(flourType.rawValue) \(flourType.displayName)")
+        
+        let flourTypeName = flourType.name
+        
+        // Swift DAta NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
         let descriptor = FetchDescriptor<BreadUpIngredients>(
             predicate: #Predicate {
-//                $0.flourQuantity == flourQuantity
-//                && $0.yeast == yeast
-//                && $0.water == water
-//                &&
-                $0.flourType == flourType
-                // && $0.flourType == flourType esto esta fallando
-                // búsqueda por fecha y título
-                
-                // El enum se compara directamente (FlourType es String + Codable, así
-               //      // que SwiftData lo traduce); nada de .id / .rawValue / .displayName.
-               ////        ingredient.flourType == targetFlour
+                $0.flourQuantity == flourQuantity
+                && $0.yeast == yeast
+                && $0.water == water
+                && $0.flourTypeString == flourTypeName
+                // TODO búsqueda por fecha y título
             }
         )
         

@@ -45,8 +45,11 @@ func getStepsInResponse(pasos: [RecipeStep.PartiallyGenerated]) {
     }
 }
 
-func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
-    for paso in pasos {
+func steps(pasos: [RecipeStep.PartiallyGenerated]?) {
+    // `pasos` may be partially generated (optional). Normalize to an
+    // empty array to safely iterate.
+    let list = pasos ?? []
+    for paso in list {
         var linea = "> "
         if let titulo = paso.titulo {
             linea += titulo
@@ -54,7 +57,7 @@ func steps(pasos: Array<RecipeStep>.PartiallyGenerated) {
         if let descripcion = paso.descripcion {
             linea += descripcion
         }
-        
+
         print(linea)
     }
 }

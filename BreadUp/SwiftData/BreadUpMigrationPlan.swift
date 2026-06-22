@@ -10,15 +10,8 @@ import SwiftData
 
 // pending migrate to v2
 typealias BreadUpIngredients = BreadUpSchemaV3.Ingredients
-typealias BreadUpCalculate = BreadUpSchemaV3.CalculateBread
-typealias BreadUpStepRecipe = BreadUpSchemaV3.StepRecipe
-
-//actor BreadUpSchema {
-//
-//}
-//
-//@BreadUpSchema
-//var identifierIngredients : [String] = []
+typealias BreadUpCalculate   = BreadUpSchemaV3.CalculateBread
+typealias BreadUpStepRecipe  = BreadUpSchemaV3.StepRecipe
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
 
@@ -65,16 +58,16 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
   }
 }
 
-enum TypeFlour: String, Identifiable, Codable, CaseIterable {
-
-  case wheat
-  case wholewheat
-  case rye
-  case spelt
-  case corn
-
-  var id: Self { self }
-}
+//enum TypeFlour: String, Identifiable, Codable, CaseIterable {
+//
+//  case wheat
+//  case wholewheat
+//  case rye
+//  case spelt
+//  case corn
+//
+//  var id: Self { self }
+//}
 
 enum FlourType: String, CaseIterable, Identifiable, Codable {
   case wheat = "Harina de trigo"
@@ -90,11 +83,31 @@ extension FlourType {
 
   var displayName: String {
     switch self {
-    case .wheat: "Harina de trigo"
-    case .wholewheat: "Harina de trigo integral"
-    case .rye: "Harina de Centeno"
-    case .spelt: "Harina de espelta"
-    case .corn: "Harina de maíz"
+    case .wheat:
+      return "Harina de trigo"
+    case .wholewheat:
+      return "Harina de trigo integral"
+    case .rye:
+      return "Harina de Centeno"
+    case .spelt:
+      return "Harina de espelta"
+    case .corn:
+      return "Harina de maíz"
+    }
+  }
+    
+  var name: String {
+    switch self {
+    case .wheat:
+      return "wheat"
+    case .wholewheat:
+      return "wholewheat"
+    case .rye:
+      return "rye"
+    case .spelt:
+      return "spelt"
+    case .corn:
+      return "corn"
     }
   }
 }
@@ -111,21 +124,11 @@ extension FlourType {
   }
 }
 
-// BreadUpIngredients
-//extension BreadUpSchemaV1.Ingredients  {
-//
-//    @MainActor static let example = BreadUpIngredients(id: UUID(),
-//                                            water: 250,
-//                                            flourType: .corn,
-//                                            flourQuantity: 300,
-//                                            yeast: 150)
-//}
-
 extension BreadUpSchemaV3.Ingredients {
   @MainActor static let example = BreadUpSchemaV3.Ingredients(
     id: UUID(),
     water: 250,
-    flourType: .corn,
+    flourTypeString: "corn",
     flourQuantity: 300,
     //                                            saltQuantity: 5,
     yeast: 150,
