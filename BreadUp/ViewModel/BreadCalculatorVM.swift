@@ -118,13 +118,12 @@ final class BreadCalculatorVM {
     //        temperature = Int((baseTemp - tempAdjustment).rounded())
   }
 
-  func resetResult() {
-//      self.water = 250
-//      self.flourType = .wheat
-//      self.flourQuantity = 250
-//      self.yeast = 10
-//      self.yeast = 10
-      print("reset result")
+   private func resetIngredients() {
+      self.water = 0
+      self.flourType = .wheat
+      self.flourQuantity = 0
+      self.yeast = 0
+      self.yeast = 0
   }
 
   func save() {
@@ -153,6 +152,8 @@ final class BreadCalculatorVM {
     if modelContext.hasChanges {
       try? modelContext.save()
     }
+      
+    resetIngredients()
   }
 
   private func calculateRecipe() async {

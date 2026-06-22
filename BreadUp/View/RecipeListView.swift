@@ -69,7 +69,6 @@ struct RecipeListView: View {
       }
       ToolbarItem(placement: .primaryAction) {
         Button {
-          vm.resetResult()//TODO
           vm.path.append(.detail)
         } label: {
           Image(systemName: "plus")

@@ -101,10 +101,6 @@ struct RecipeDetailView: View {
           }
         }
       }
-      .onChange(of: vm.water) { vm.resetResult() }
-      .onChange(of: vm.flourType) { vm.resetResult() }
-      .onChange(of: vm.flourQuantity) { vm.resetResult() }
-      .onChange(of: vm.yeast) { vm.resetResult() }
       .navigationTitle("Nueva receta")
     }
     .loadingOverlay(vm.isLoading, message: "Generando receta…")

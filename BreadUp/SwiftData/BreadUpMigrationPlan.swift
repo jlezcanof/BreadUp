@@ -107,7 +107,7 @@ extension BreadUpSchemaV3.Ingredients {
     water: 250,
     flourTypeString: "corn",
     flourQuantity: 300,
-    //                                            saltQuantity: 5,
+    // saltQuantity: 5,
     yeast: 150,
     createdAt: Date())
 }
