@@ -34,7 +34,8 @@ struct RecipeListView: View {
       } else {
         // La barra de búsqueda solo se muestra cuando hay recetas que buscar.
         recipeList
-          .searchable(text: $searchText, prompt: "Buscar por receta o harina")
+          .searchable(text: $searchText, prompt: "Buscar por receta o tipo de harina")
+          .textInputAutocapitalization(.never)
       }
     }
     .overlay {
