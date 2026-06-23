@@ -10,17 +10,25 @@ import SwiftUI
 struct RecipeRow: View {
   let recipe: BreadUpIngredients
     
-    private var titleRecipe: String {
-        var title = recipe.calculateBread?.recipe ?? "Receta sin título"
-        title.append(" - ")
-        title.append(recipe.flourType.displayName)
-        return title
-    }
+  private var titleRecipe: String {
+      //var title = recipe.calculateBread?.recipe ?? "Receta sin título"
+      //title.append(" - ")
+      //title.append(recipe.flourType.displayName)
+      //return title
+      recipe.calculateBread?.recipe ?? "Receta sin título"
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       Text(titleRecipe)
-        .font(.headline)
+            .font(.headline)// .title3...headline.....largeTitle
+            //.lineLimit(2, reservesSpace:true)//...1....2, reservesSpace:true
+            .lineLimit(1, reservesSpace: true)
+            .allowsTightening(true)
+            .truncationMode(.head)
+      Text(recipe.flourType.displayName)
+          .font(.headline)
+          .lineLimit(1, reservesSpace:true)
       HStack {
         Label("\(recipe.water) ml", systemImage: "drop.fill")
           .foregroundStyle(Color("BreadWater"))
@@ -39,7 +47,7 @@ struct RecipeRow: View {
       if let created = recipe.created {
         HStack {
           Image(systemName: "calendar.circle")
-            .foregroundStyle(Color("BreadDate"))
+            .foregroundStyle(Color(.breadDate)) //"BreadDate"
             .accessibilityHidden(true)
           Text(created, format: .dateTime.day().month().year())
         }

@@ -9,9 +9,7 @@ import SwiftUI
 
 struct GenerateBreadRecipeView: View {
 
-  @Environment(BreadCalculatorVM.self) private var vm
-    
-//  @Environment(\.modelContext) private var modelContext
+  @Environment(BreadCalculatorVM.self) private var vm    
   @Environment(\.dismiss) private var dismiss
 
   @State private var showDatePicker = false

@@ -154,7 +154,6 @@ struct RecipeListView: View {
   }
 
   // MARK: - Acciones
-
   private func clearFilters() {
     withAnimation {
       flourFilter = nil

@@ -11,10 +11,10 @@ import os
 @Observable @MainActor
 final class BreadCalculatorVM {
 
-  var water: Int = 0//250
+  var water: Int = 125
   var flourType: FlourType = .wheat
-  var flourQuantity: Int = 0//250
-  var yeast: Int = 0//10
+  var flourQuantity: Int = 125
+  var yeast: Int = 5
   var selectedDate: Date = Date()
 
   private let model: SystemLanguageModel
@@ -119,11 +119,10 @@ final class BreadCalculatorVM {
   }
 
    private func resetIngredients() {
-      self.water = 0
       self.flourType = .wheat
-      self.flourQuantity = 0
-      self.yeast = 0
-      self.yeast = 0
+      self.flourQuantity = 125
+      self.yeast = 5
+      self.water = 125
   }
 
   func save() {
@@ -203,6 +202,8 @@ final class BreadCalculatorVM {
                   - Agua: \(water) mililitros
                   - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                   - Levadura fresca de panaderia: \(yeast) gramos.
+              
+              El título que generes para la receta de pan debe ser un nombre divertido, original y diferente
               """
 
           let stream = session.streamResponse(
