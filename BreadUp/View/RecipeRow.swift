@@ -21,11 +21,9 @@ struct RecipeRow: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       Text(titleRecipe)
-            .font(.headline)// .title3...headline.....largeTitle
-            //.lineLimit(2, reservesSpace:true)//...1....2, reservesSpace:true
-            .lineLimit(1, reservesSpace: true)
-            .allowsTightening(true)
-            .truncationMode(.head)
+        .font(.headline)
+        .lineLimit(2)
+        .allowsTightening(true)
       Text(recipe.flourType.displayName)
           .font(.headline)
           .lineLimit(1, reservesSpace:true)
