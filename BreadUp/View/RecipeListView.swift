@@ -28,13 +28,14 @@ struct RecipeListView: View {
   @State private var dateTo: Date = .now
 
   var body: some View {
-    List {
-      ForEach(filteredRecipes) { recipe in
-        NavigationLink(value: Route.saved(recipe)) {
-          RecipeRow(recipe: recipe)
-        }
+    Group {
+      if recipes.isEmpty {
+        recipeList
+      } else {
+        // La barra de búsqueda solo se muestra cuando hay recetas que buscar.
+        recipeList
+          .searchable(text: $searchText, prompt: "Buscar receta")
       }
-      .onDelete(perform: deleteRecipes)
     }
     .overlay {
       if recipes.isEmpty {
@@ -53,7 +54,6 @@ struct RecipeListView: View {
     }
     .navigationTitle("Mis Recetas de pan")
     .navigationBarTitleDisplayMode(.large)
-    .searchable(text: $searchText, prompt: "Buscar receta")
     .toolbar {
       ToolbarItem(placement: .topBarLeading) {
         Button {
@@ -78,6 +78,19 @@ struct RecipeListView: View {
     }
     .sheet(isPresented: $showFilters) {
       filtersSheet
+    }
+  }
+
+  // MARK: - Lista
+
+  private var recipeList: some View {
+    List {
+      ForEach(filteredRecipes) { recipe in
+        NavigationLink(value: Route.saved(recipe)) {
+          RecipeRow(recipe: recipe)
+        }
+      }
+      .onDelete(perform: deleteRecipes)
     }
   }
 
