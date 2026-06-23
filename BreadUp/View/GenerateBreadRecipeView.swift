@@ -53,10 +53,6 @@ struct GenerateBreadRecipeView: View {
             }
           }
 
-          if vm.receivedTotalInformationAboutRecipe {
-            actionsBar
-          }
-
           // Ancla invisible al final del contenido: el auto-scroll apunta aquí.
           Color.clear
             .frame(height: 1)
@@ -66,10 +62,14 @@ struct GenerateBreadRecipeView: View {
         .padding(.bottom, 32)
       }
       .background(Color(.systemGroupedBackground))
-      // Separa el contenido del borde inferior del scroll (incluida la
-      // home indicator), de modo que el auto-scroll no pegue el último
-      // elemento — la fila de acciones — al fondo del dispositivo.
-      .contentMargins(.bottom, 28, for: .scrollContent)
+      // Barra de acciones flotante: al registrarla como barra del sistema,
+      // adopta el scroll edge effect (el contenido se difumina al pasar por
+      // detrás) y reserva su propio espacio sobre la home indicator.
+      .safeAreaBar(edge: .bottom) {
+        if vm.receivedTotalInformationAboutRecipe {
+          actionsBar
+        }
+      }
       // Sigue al último paso mientras se va generando (cada token cambia
       // la descripción del último paso), al aparecer un paso nuevo (count)
       // y al completarse la receta.
@@ -82,18 +82,6 @@ struct GenerateBreadRecipeView: View {
       .onChange(of: vm.receivedTotalInformationAboutRecipe) { _, done in
         scrollToBottom(proxy)
         if done { recipeTitleFocused = true }
-      }
-      // Al desplegar el calendario, baja para que quede a la vista.
-      // Se retrasa el scroll para dar tiempo a que el calendario se
-      // inserte y mida; si no, el scroll se queda corto.
-      .onChange(of: showDatePicker) { _, isShowing in
-        guard isShowing else { return }
-        Task {
-          try? await Task.sleep(for: .milliseconds(300))
-          withAnimation(.easeInOut) {
-            proxy.scrollTo(Self.bottomID, anchor: .bottom)
-          }
-        }
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -224,6 +212,7 @@ struct GenerateBreadRecipeView: View {
         }
         .buttonStyle(.glassProminent)
         .buttonBorderShape(.capsule)
+        .tint(Color("HeroTop"))  // acento de marca (mismo del hero guardado)
       }
 
       if showDatePicker {
@@ -243,6 +232,8 @@ struct GenerateBreadRecipeView: View {
         }
       }
     }
+    .padding(.horizontal)
+    .padding(.top, 8)
   }
 
   // MARK: - Helpers
