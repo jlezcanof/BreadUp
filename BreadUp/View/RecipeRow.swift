@@ -5,14 +5,21 @@
 
 import SwiftUI
 
-/// Fila de una receta en la lista: título + ingredientes (con color de marca)
-/// y fecha. Se combina como un único elemento para VoiceOver.
+/// Fila de una receta en la lista: título, tipo de harina + ingredientes
+/// (con color de marca) y fecha. Se combina como un único elemento para VoiceOver.
 struct RecipeRow: View {
   let recipe: BreadUpIngredients
+    
+    private var titleRecipe: String {
+        var title = recipe.calculateBread?.recipe ?? "Receta sin título"
+        title.append(" - ")
+        title.append(recipe.flourType.displayName)
+        return title
+    }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text(recipe.calculateBread?.recipe ?? "Receta sin título")
+      Text(titleRecipe)
         .font(.headline)
       HStack {
         Label("\(recipe.water) ml", systemImage: "drop.fill")

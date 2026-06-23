@@ -11,10 +11,10 @@ import os
 @Observable @MainActor
 final class BreadCalculatorVM {
 
-  var water: Int = 250
+  var water: Int = 0//250
   var flourType: FlourType = .wheat
-  var flourQuantity: Int = 250
-  var yeast: Int = 10
+  var flourQuantity: Int = 0//250
+  var yeast: Int = 0//10
   var selectedDate: Date = Date()
 
   private let model: SystemLanguageModel
