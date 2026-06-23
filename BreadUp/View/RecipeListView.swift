@@ -34,7 +34,7 @@ struct RecipeListView: View {
       } else {
         // La barra de búsqueda solo se muestra cuando hay recetas que buscar.
         recipeList
-          .searchable(text: $searchText, prompt: "Buscar receta")
+          .searchable(text: $searchText, prompt: "Buscar por receta o harina")
       }
     }
     .overlay {
@@ -107,6 +107,8 @@ struct RecipeListView: View {
       let matchesText =
         searchText.isEmpty
         || (recipe.calculateBread?.recipe ?? "")
+          .localizedCaseInsensitiveContains(searchText)
+        || recipe.flourType.displayName
           .localizedCaseInsensitiveContains(searchText)
       let matchesFlour = flourFilter == nil || recipe.flourType == flourFilter
       let matchesDate = !useDateRange || dateInRange(recipe.created)
