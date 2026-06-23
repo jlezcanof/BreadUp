@@ -120,6 +120,9 @@ struct GenerateBreadRecipeView: View {
     } message: {
       Text("¿Quieres guardar esta receta en tu recetario?")
     }
+    .sheet(isPresented: $showDatePicker) {
+      datePickerSheet
+    }
 //    .onAppear {
 //        vm.initVM(modelContext: modelContext)
 //    }
@@ -184,56 +187,63 @@ struct GenerateBreadRecipeView: View {
   /// elaboración y guardar. Los botones usan los estilos Liquid Glass del
   /// sistema por flotar sobre el contenido.
   private var actionsBar: some View {
-    @Bindable var vm = vm
-    return VStack(spacing: 16) {
-      HStack(spacing: 12) {
-        Button {
-          withAnimation { showDatePicker.toggle() }
-        } label: {
-          HStack(spacing: 8) {
-            Image(systemName: "calendar")
-            Text(vm.selectedDate, format: .dateTime.day().month().year())
-          }
-          .font(.subheadline)
+    HStack(spacing: 12) {
+      Button {
+        showDatePicker = true
+      } label: {
+        HStack(spacing: 8) {
+          Image(systemName: "calendar")
+          Text(vm.selectedDate, format: .dateTime.day().month().year())
         }
-        .buttonStyle(.glass)
-        .buttonBorderShape(.capsule)
-        .accessibilityLabel("Fecha de elaboración")
-        .accessibilityValue(vm.selectedDate.formatted(.dateTime.day().month().year()))
-        .accessibilityHint("Cambia la fecha de la receta")
-
-        Spacer(minLength: 12)
-
-        Button {
-          showSaveDialog.toggle()
-        } label: {
-          Label("Guardar", systemImage: "tray.and.arrow.down")
-            .font(.headline)
-        }
-        .buttonStyle(.glassProminent)
-        .buttonBorderShape(.capsule)
-        .tint(Color("HeroTop"))  // acento de marca (mismo del hero guardado)
+        .font(.subheadline)
       }
+      .buttonStyle(.glass)
+      .buttonBorderShape(.capsule)
+      .accessibilityLabel("Fecha de elaboración")
+      .accessibilityValue(vm.selectedDate.formatted(.dateTime.day().month().year()))
+      .accessibilityHint("Cambia la fecha de la receta")
 
-      if showDatePicker {
+      Spacer(minLength: 12)
+
+      Button {
+        showSaveDialog.toggle()
+      } label: {
+        Label("Guardar", systemImage: "tray.and.arrow.down")
+          .font(.headline)
+      }
+      .buttonStyle(.glassProminent)
+      .buttonBorderShape(.capsule)
+      .tint(Color("HeroTop"))  // acento de marca (mismo del hero guardado)
+    }
+    .padding(.horizontal)
+    .padding(.top, 8)
+  }
+
+  /// Hoja con el calendario para elegir la fecha de elaboración. Mantiene la
+  /// barra de acciones compacta y da al `DatePicker` su propio espacio.
+  private var datePickerSheet: some View {
+    @Bindable var vm = vm
+    return NavigationStack {
+      VStack {
         DatePicker(
           "Fecha de elaboración",
           selection: $vm.selectedDate,
           displayedComponents: [.date]
         )
         .datePickerStyle(.graphical)
-        .onChange(of: vm.selectedDate) {
-          withAnimation { showDatePicker = false }
-        }
-        .padding(.horizontal, 8)
-        .background {
-          RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(.secondarySystemGroupedBackground))
+        .padding(.horizontal)
+        .onChange(of: vm.selectedDate) { showDatePicker = false }
+        Spacer()
+      }
+      .navigationTitle("Fecha de elaboración")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Listo") { showDatePicker = false }
         }
       }
     }
-    .padding(.horizontal)
-    .padding(.top, 8)
+    .presentationDetents([.medium])
   }
 
   // MARK: - Helpers
