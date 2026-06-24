@@ -33,8 +33,14 @@ struct RecipeListView: View {
         recipeList
       } else {
         // La barra de búsqueda solo se muestra cuando hay recetas que buscar.
+        // En la toolbar (iOS 26) se colapsa a un botón de lupa que se expande
+        // con el campo y el prompt al tocarlo.
         recipeList
-          .searchable(text: $searchText, prompt: "Buscar por receta o tipo de harina")
+          .searchable(
+            text: $searchText,
+            placement: .toolbar,
+            prompt: "Buscar por receta o tipo de harina"
+          )
           .textInputAutocapitalization(.never)
       }
     }
