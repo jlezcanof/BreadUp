@@ -208,9 +208,9 @@ struct RecipeListView: View {
           Toggle("Filtrar por fecha", isOn: $useDateRange)
           if useDateRange {
             DatePicker(
-              "Desde", selection: $dateFrom, displayedComponents: .date)
+                "Desde", selection: $dateFrom, in: ...dateTo, displayedComponents: .date)
             DatePicker(
-              "Hasta", selection: $dateTo, in: dateFrom...,//in: dateFrom...
+              "Hasta", selection: $dateTo, in: dateFrom...,
               displayedComponents: .date)
           }
         }
@@ -229,7 +229,7 @@ struct RecipeListView: View {
         }
       }
     }
-    .presentationDetents([.medium, .large])
+    .presentationDetents([.medium])
   }
 
   // MARK: - Acciones
