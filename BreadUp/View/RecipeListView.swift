@@ -26,6 +26,7 @@ struct RecipeListView: View {
   @State private var dateFrom: Date =
     Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
   @State private var dateTo: Date = .now
+//  @State private var isSearching = false
 
   var body: some View {
     Group {
@@ -38,7 +39,8 @@ struct RecipeListView: View {
         recipeList
           .searchable(
             text: $searchText,
-            placement: .toolbar,
+//            isPresented: <#T##Binding<Bool>#>,
+            placement: .toolbar,//.toolbar
             prompt: "Buscar por receta o tipo de harina"
           )
           .textInputAutocapitalization(.never)
