@@ -64,7 +64,7 @@ final class BreadCalculatorVM {
                      de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
                   4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
                      y propón el ajuste mínimo necesario.
-                  5. Si te preguntan algo ajeno a la panadería, responde amablemente que
+                  5. Si te preguntan con algo ajeno a la panadería, responde amablemente que
                      solo ayudas con recetas de pan.
       """
 
@@ -231,6 +231,7 @@ final class BreadCalculatorVM {
           )
           self.alert = "Se ha excedido el contexto del tamaño de la ventana"
           hasGenerationError = true
+          // TODO informar en el log de error las condiciones de entrada de la receta
       } catch LanguageModelSession.GenerationError.guardrailViolation(
           let content
       ) {
@@ -239,6 +240,7 @@ final class BreadCalculatorVM {
           )
           self.alert = "No podemos responder a dicha petición de receta"
           hasGenerationError = true
+          // TODO informar en el log de error las condiciones de entrada de la receta
       } catch LanguageModelSession.GenerationError.assetsUnavailable(
           let content
       ) {
@@ -247,6 +249,7 @@ final class BreadCalculatorVM {
           )
           self.alert = "Los assets del modelo no están disponible"
           hasGenerationError = true
+          // TODO informar en el log de error las condiciones de entrada de la receta
       } catch {
           if containsSafetyAssetFailure(error) {
               Self.log.error(
