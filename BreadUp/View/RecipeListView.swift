@@ -151,8 +151,10 @@ struct RecipeListView: View {
         } label: {
             Image(systemName: !searchText.isEmpty ? "xmark.circle.fill" :
                     "xmark.circle" )
-                //.foregroundStyle(.primary)//TODO cambiar
         }
+        .buttonStyle(.glass)
+        .foregroundStyle(.black)
+        .accessibilityLabel("Cerrar búsqueda")
     }
     .padding(.horizontal)
     .padding(.vertical, 4)
