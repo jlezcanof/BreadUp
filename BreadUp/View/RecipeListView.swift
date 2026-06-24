@@ -62,26 +62,28 @@ struct RecipeListView: View {
     .navigationTitle("Mis Recetas de pan")
     .navigationBarTitleDisplayMode(.large)
     .toolbar {
-      ToolbarItem(placement: .topBarLeading) {
-        Button {
-          showFilters = true
-        } label: {
-          Image(
-            systemName: hasActiveFilters
-              ? "line.3.horizontal.decrease.circle.fill"
-              : "line.3.horizontal.decrease.circle")
-        }
-        .accessibilityLabel("Filtros")
-        .accessibilityValue(hasActiveFilters ? "Activos" : "Ninguno")
-      }
-      ToolbarItem(placement: .primaryAction) {
-        Button {
-          vm.path.append(.detail)
-        } label: {
-          Image(systemName: "plus")
-        }
-        .accessibilityLabel("Nueva receta")
-      }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    vm.path.append(.detail)
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("Nueva receta")
+            }
+            ToolbarItemGroup(placement: .bottomBar) { // .topBarLeading
+                Button {
+                    showFilters = true
+                } label: {
+                    Image(
+                        systemName: hasActiveFilters
+                            ? "line.3.horizontal.decrease.circle.fill"
+                            : "line.3.horizontal.decrease.circle"
+                    )
+                }
+                .accessibilityLabel("Filtros")
+                .accessibilityValue(hasActiveFilters ? "Activos" : "Ninguno")
+                Spacer()
+            }
     }
     .sheet(isPresented: $showFilters) {
       filtersSheet
