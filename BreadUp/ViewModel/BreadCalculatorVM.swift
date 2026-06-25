@@ -33,6 +33,9 @@ final class BreadCalculatorVM {
   /// La pantalla de ingredientes observa este flag para avisar sin navegar.
   var hasDuplicateError = false
   var hydrationNotPermitted = false
+  var alertHydrationNotPermmited = ""
+    
+    
   var path: [Route] = []
   var receivedTotalInformationAboutRecipe = false
   var alert =
@@ -118,19 +121,21 @@ final class BreadCalculatorVM {
         print("hidratacion minima: \(hidrationMininumRecommended)")
         print("hidratacion minima: \(hidrationMaximumRecommended)")
 
-        //let hydration = (Double(water) / Double(flourQuantity)) / 100
-        //let hydration2 = (water / flourQuantity) / 100
         let hydration = (Double(water) / Double(flourQuantity)) * 100
 
         print("La hidratación es \(hydration)")
-        let isHidrated = (hidrationMininumRecommended...hidrationMaximumRecommended).contains(hydration)
-        
-        if  !isHidrated {
-            Self.log.notice("La hidratación es menor al 60% no es aconsejable")
+        let isHidrated =
+            (hidrationMininumRecommended...hidrationMaximumRecommended)
+            .contains(hydration)
+
+        if !isHidrated {
+            Self.log.notice("La hidratación no es la mas aconsejable")
+            self.alertHydrationNotPermmited = "La hidratación no es la más adecuada para \(flourType.displayName), agua \(water) y cantidad \(flourQuantity)"
             hydrationNotPermitted = true
             return
         }
 
+        // WIP
         let flourFactor: Double =
             switch flourType {
             case .wheat: 1.0
@@ -196,18 +201,21 @@ final class BreadCalculatorVM {
   }
 
   private func calculateRecipe() async {
-    self.calculateHydratation()// luego probamos
-//    try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
+//    self.calculateHydratation()// luego probamos
+    try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
   }
 
   func navigateToGenerateView() async {
     // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
     // entrar en la pantalla de generación (evita mostrarla vacía).
-//    if recipeAlreadyExists() {
-//      Self.log.notice("Generación cancelada: la receta ya existe")
-//      hasDuplicateError = true
-//      return
-//    }
+    if recipeAlreadyExists() {
+      Self.log.notice("Generación cancelada: la receta ya existe")
+      hasDuplicateError = true
+      return
+    }
+      
+    self.calculateHydratation()
+    guard !hydrationNotPermitted else { return }   // se queda en RecipeDetailView con el alert
       
     path.append(.generate)
     await calculateRecipe()

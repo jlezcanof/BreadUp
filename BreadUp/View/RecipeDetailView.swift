@@ -104,15 +104,15 @@ struct RecipeDetailView: View {
       .navigationTitle("Nueva receta")
     }
     .loadingOverlay(vm.isLoading, message: "Generando receta…")
-//    .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
-//      Button("De acuerdo", role: .cancel) {}
-//    } message: {
-//      Text("Ya tienes guardada una receta con estos ingredientes y fecha.")
-//    }
-    .alert("La hidratación no es la más adecuada para estos ingredientes", isPresented: $vm.hydrationNotPermitted) {
+    .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
+      Button("De acuerdo", role: .cancel) {}
+    } message: {
+      Text("Ya tienes guardada una receta con estos ingredientes y fecha.")
+    }
+    .alert(vm.alertHydrationNotPermmited, isPresented: $vm.hydrationNotPermitted) {
         Button("De acuerdo", role: .cancel) {}
     } message: {
-        Text("La hidratación no es la más adecuada para estos ingredientes")
+        Text("Por favor, ajuste estos valores para tener una hidratación más adecuada")
     }
   }
 
