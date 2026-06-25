@@ -16,6 +16,9 @@ final class BreadCalculatorVM {
   var flourQuantity: Int = 125
   var yeast: Int = 5
   var selectedDate: Date = Date()
+    
+  var time: Int = 0
+  var temperature: Int = 0
 
   private let model: SystemLanguageModel
   private var session: LanguageModelSession
@@ -29,6 +32,7 @@ final class BreadCalculatorVM {
   /// La receta que se intenta generar ya existe (mismos ingredientes y fecha).
   /// La pantalla de ingredientes observa este flag para avisar sin navegar.
   var hasDuplicateError = false
+  var hydrationNotPermitted = false
   var path: [Route] = []
   var receivedTotalInformationAboutRecipe = false
   var alert =
@@ -90,35 +94,71 @@ final class BreadCalculatorVM {
     model.availability
   }
 
-  // TODO pendiente de calcular
-  func calculate() {
-    //        let hydration = Double(water) / Double(flourQuantity)
-    //
-    //        let flourFactor: Double = switch flourType {
-    //        case .wheat:      1.0
-    //        case .wholewheat:  1.15
-    //        case .rye:         1.2
-    //        case .spelt:       1.1
-    //        case .corn:        1.25
-    //        }
-    //
-    //        let baseTime = 60.0 - (Double(yeast) * 0.8)
-    //        let adjustedTime = baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
-    //        time = max(25, Int(adjustedTime.rounded()))
-    //
-    //        let baseTemp: Double = switch flourType {
-    //        case .wheat:      200
-    //        case .wholewheat:  190
-    //        case .rye:         195
-    //        case .spelt:       185
-    //        case .corn:        210
-    //        }
-    //
-    //        let tempAdjustment = (hydration - 0.6) * 15
-    //        temperature = Int((baseTemp - tempAdjustment).rounded())
-  }
+    func calculateHydratation() {
+        var hidrationMininumRecommended = 0.0
+        var hidrationMaximumRecommended = 0.0
 
-   private func resetIngredients() {
+        switch flourType {
+        case .wheat:
+            hidrationMininumRecommended = 60.0
+            hidrationMaximumRecommended = 75.0
+        case .wholewheat:
+            hidrationMininumRecommended = 65.0
+            hidrationMaximumRecommended = 85.0
+        case .rye:
+            hidrationMininumRecommended = 75.0
+            hidrationMaximumRecommended = 100.0
+        case .spelt:
+            hidrationMininumRecommended = 65.0
+            hidrationMaximumRecommended = 80.0
+        case .corn:
+            hidrationMininumRecommended = 70.0
+            hidrationMaximumRecommended = 78.0
+        }
+        print("hidratacion minima: \(hidrationMininumRecommended)")
+        print("hidratacion minima: \(hidrationMaximumRecommended)")
+
+        //let hydration = (Double(water) / Double(flourQuantity)) / 100
+        //let hydration2 = (water / flourQuantity) / 100
+        let hydration = (Double(water) / Double(flourQuantity)) * 100
+
+        print("La hidratación es \(hydration)")
+        let isHidrated = (hidrationMininumRecommended...hidrationMaximumRecommended).contains(hydration)
+        
+        if  !isHidrated {
+            Self.log.notice("La hidratación es menor al 60% no es aconsejable")
+            hydrationNotPermitted = true
+            return
+        }
+
+        let flourFactor: Double =
+            switch flourType {
+            case .wheat: 1.0
+            case .wholewheat: 1.15
+            case .rye: 1.2
+            case .spelt: 1.1
+            case .corn: 1.25
+            }
+
+        let baseTime = 60.0 - (Double(yeast) * 0.8)
+        let adjustedTime =
+            baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
+        time = max(25, Int(adjustedTime.rounded()))
+
+        let baseTemp: Double =
+            switch flourType {
+            case .wheat: 200
+            case .wholewheat: 190
+            case .rye: 195
+            case .spelt: 185
+            case .corn: 210
+            }
+
+        let tempAdjustment = (hydration - 0.6) * 15
+        temperature = Int((baseTemp - tempAdjustment).rounded())
+    }
+
+    private func resetIngredients() {
       self.flourType = .wheat
       self.flourQuantity = 125
       self.yeast = 5
@@ -156,17 +196,19 @@ final class BreadCalculatorVM {
   }
 
   private func calculateRecipe() async {
-    try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
+    self.calculateHydratation()// luego probamos
+//    try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
   }
 
   func navigateToGenerateView() async {
     // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
     // entrar en la pantalla de generación (evita mostrarla vacía).
-    if recipeAlreadyExists() {
-      Self.log.notice("Generación cancelada: la receta ya existe")
-      hasDuplicateError = true
-      return
-    }
+//    if recipeAlreadyExists() {
+//      Self.log.notice("Generación cancelada: la receta ya existe")
+//      hasDuplicateError = true
+//      return
+//    }
+      
     path.append(.generate)
     await calculateRecipe()
   }
@@ -198,12 +240,15 @@ final class BreadCalculatorVM {
         do {
             let prompt =
               """
-                  Crea una receta de pan casero usando estos ingredientes/cantidades:
+                  Crea una receta de pan casero usando estos ingredientes/cantidades y con estas condiciones de horneado:
                   - Agua: \(water) mililitros
                   - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                   - Levadura fresca de panaderia: \(yeast) gramos.
               
-              El título que generes para la receta de pan debe ser un nombre divertido, original y diferente
+                  - Temperatura del horno \(temperature) grados centígrados
+                  - Minutos en el horno: \(time)
+              
+              El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario
               """
 
           let stream = session.streamResponse(
