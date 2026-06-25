@@ -153,7 +153,7 @@ struct RecipeListView: View {
                     "xmark.circle" )
         }
         .buttonStyle(.glass)
-        .foregroundStyle(.black)
+        .foregroundStyle(.primary)
         .accessibilityLabel("Cerrar búsqueda")
     }
     .padding(.horizontal)
