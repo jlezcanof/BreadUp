@@ -164,6 +164,9 @@ final class BreadCalculatorVM {
 
         let tempAdjustment = (hydration - 0.6) * 15
         temperature = Int((baseTemp - tempAdjustment).rounded())
+        
+        print("El tiempo de cocción debe de ser de \(time) minutos")
+        print("La temperatura debe de ser de \(temperature) grados centígrados")
     }
     
     private func resetIngredients() {
