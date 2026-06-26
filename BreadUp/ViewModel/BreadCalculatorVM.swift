@@ -141,14 +141,14 @@ final class BreadCalculatorVM {
         // WIP
         let flourFactor: Double =
             switch flourType {
-            case .wheat: 1.0
-            case .wholewheat: 1.15
-            case .rye: 1.2
-            case .spelt: 1.1
-            case .corn: 1.25
+                case .wheat: 1.0
+                case .wholewheat: 1.15
+                case .rye: 1.2
+                case .spelt: 1.1
+                case .corn: 1.25
             }
 
-        let baseTime = 60.0 - (Double(yeast) * 0.8)
+        let baseTime = 60.0 - (Double(yeast) * 0.8)//la levadura no determina el tiempo de horneado..depende del tamaño/peso de la pieza y de la temperatura del horno
         let adjustedTime =
             baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
         time = max(25, Int(adjustedTime.rounded()))
