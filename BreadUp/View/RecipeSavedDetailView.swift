@@ -125,7 +125,7 @@ struct RecipeSavedDetailView: View {
           icon: "leaf.fill",
           tint: Color("BreadFlour"),
           title: "Harina",
-          detail: recipe.flourType.displayName,
+          detail: recipe.flourType.displayName,//recipe.flourType.rawValue
           value: "\(recipe.flourQuantity) g")
         Divider().padding(.leading, 60)
         ingredientRow(

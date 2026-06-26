@@ -48,7 +48,7 @@ struct RecipeListView: View {
           )
         }
       }
-      .navigationTitle("Mis Recetas de pan")
+      .navigationTitle("Mis recetas de pan")
       .navigationBarTitleDisplayMode(.large)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
@@ -57,7 +57,8 @@ struct RecipeListView: View {
           } label: {
             Image(systemName: "plus")
           }
-          .accessibilityLabel("Nueva receta")
+          .accessibilityLabel("Nueva receta de pan")
+          .accessibilitySortPriority(1)
         }
       }
       // Barra inferior: en reposo, filtro + lupa; al buscar, el campo de texto

@@ -59,11 +59,11 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
 }
 
 enum FlourType: String, CaseIterable, Identifiable, Codable {
-  case wheat = "Harina de trigo"
-  case wholewheat = "Harina de trigo integral"
-  case rye = "Harina de Centeno"
-  case spelt = "Harina de espelta"
-  case corn = "Harina de maíz"
+  case wheat = "Trigo"//Harina de trigo
+  case wholewheat = "Trigo integral"//Harina de trigo integral
+  case rye = "Centeno"//Harina de Centeno
+  case spelt = "Espelta"//Harina de espelta
+  case corn = "Maíz"//Harina de maz
 
   var id: Self { self }
 }

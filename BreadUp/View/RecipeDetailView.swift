@@ -14,6 +14,29 @@ struct RecipeDetailView: View {
   @Environment(BreadCalculatorVM.self) private var vm
 
   @State private var resultID = "resultado"
+    
+  private var canGenerate: Bool {
+      print("canGenerate \(vm.hydrationNotPermitted)")
+      return vm.hydrationNotPermitted//isModelAvailable &&
+  }
+    
+//  @ViewBuilder
+//  private var generateButton: some View {
+//      let content = Label("Generar receta", systemImage: "sparkles.2")
+//            .frame(maxWidth: .infinity)
+//            .font(.headline)
+//
+//      if canGenerate {
+//             Button { Task { await vm.navigateToGenerateView() } }
+//                label: { content }
+//              .buttonStyle(.glassProminent)
+//              .tint(Color("HeroTop"))
+//    } else {
+//            Button { Task { await vm.navigateToGenerateView() } }
+//            label: { content }
+//              .buttonStyle(.glass)
+//        }
+// }
 
   var body: some View {
     @Bindable var vm = vm
@@ -84,17 +107,26 @@ struct RecipeDetailView: View {
           }
         }
         Section {
+//            generateButton
+//                .disabled(!canGenerate)
+//                .grayscale(canGenerate ? 0 : 1)
+//                .opacity(canGenerate ? 1 : 0.6)
+//                .animation(.easeInOut(duration: 0.2), value: canGenerate )
           Button {
             Task {
               await vm.navigateToGenerateView()
             }
           } label: {
-            Label("Generar receta", systemImage: "sparkles")
+            Label("Generar receta", systemImage: "sparkles.2")
               .frame(maxWidth: .infinity)
               .font(.headline)
           }
-          //.buttonStyle(.borderedProminent)//prueba
-          .disabled(!isModelAvailable)
+//          .buttonStyle( canGenerate ? .glassProminent : .glass)
+//          // !isModelAvailable || && !...true....!vm.hydrationNotPermitted
+          .disabled(!canGenerate)
+          .grayscale(canGenerate ? 0 : 1)
+          .opacity(canGenerate ? 1 : 0.6)
+          .animation(.easeInOut(duration: 0.2), value: canGenerate)
         } footer: {
           if let unavailableNote {
             Text(unavailableNote)
@@ -104,6 +136,10 @@ struct RecipeDetailView: View {
       .navigationTitle("Nueva receta")
     }
     .loadingOverlay(vm.isLoading, message: "Generando receta…")
+    .onChange(of: vm.water) {vm.verifyHidration()}
+//    .onChange(of: vm.flourType) {vm.verifyHidration()}
+    .onChange(of: vm.flourQuantity) {vm.verifyHidration()}
+//    .onChange(of: vm.yeast) {vm.verifyHidration()}
     .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
       Button("De acuerdo", role: .cancel) {}
     } message: {
@@ -112,7 +148,7 @@ struct RecipeDetailView: View {
     .alert(vm.alertHydrationNotPermmited, isPresented: $vm.hydrationNotPermitted) {
         Button("De acuerdo", role: .cancel) {}
     } message: {
-        Text("Por favor, ajuste estos valores para tener una hidratación más adecuada")
+        Text("Por favor, ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada")
     }
   }
 

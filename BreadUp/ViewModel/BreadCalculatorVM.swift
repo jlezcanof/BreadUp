@@ -129,11 +129,12 @@ final class BreadCalculatorVM {
             .contains(hydration)
 
         if !isHidrated {
-            Self.log.notice("La hidratación no es la mas aconsejable")
-            self.alertHydrationNotPermmited = "La hidratación no es la más adecuada para \(flourType.displayName), agua \(water) y cantidad \(flourQuantity)"
-            hydrationNotPermitted = true
+            Self.log.notice("La hidratación no es la mas aconsejable para esta combinación")
+            self.alertHydrationNotPermmited = "El cálculo de la hidratación no es la más adecuada para \(flourType.displayName), agua \(water) y cantidad \(flourQuantity)"
+            // hydrationNotPermitted = true
             return
         }
+        hydrationNotPermitted = true
 
         // WIP
         let flourFactor: Double =
@@ -168,7 +169,11 @@ final class BreadCalculatorVM {
       self.flourQuantity = 125
       self.yeast = 5
       self.water = 125
-  }
+    }
+    
+    func verifyHidration() {
+        calculateHydratation()
+    }
 
   func save() {
     guard let modelContext else { return }
