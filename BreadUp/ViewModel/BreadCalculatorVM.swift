@@ -29,12 +29,13 @@ final class BreadCalculatorVM {
   var recipeSteps: [RecipeStep] = []
   var isLoading = false
   var hasGenerationError = false
+    
   /// La receta que se intenta generar ya existe (mismos ingredientes y fecha).
   /// La pantalla de ingredientes observa este flag para avisar sin navegar.
   var hasDuplicateError = false
-  var hydrationNotPermitted = false
+  var hydrationNotPermitted = false // Estado de validez - controla el botón
+  var showHidrationAlert = false //presentación del alert - independiente
   var alertHydrationNotPermmited = ""
-    
     
   var path: [Route] = []
   var receivedTotalInformationAboutRecipe = false
@@ -48,7 +49,8 @@ final class BreadCalculatorVM {
 
   private(set) var recipeBreadSequence: LanguageModelSession.ResponseStream<BreadRecipe>.Snapshot?
 
-  private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)  // 0.8....12000
+  // 0.8....12000
+  private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
 
   init() {
     model = SystemLanguageModel.default
@@ -131,10 +133,10 @@ final class BreadCalculatorVM {
         if !isHidrated {
             Self.log.notice("La hidratación no es la mas aconsejable para esta combinación")
             self.alertHydrationNotPermmited = "El cálculo de la hidratación no es la más adecuada para \(flourType.displayName), agua \(water) y cantidad \(flourQuantity)"
-            // hydrationNotPermitted = true
+             hydrationNotPermitted = true
             return
         }
-        hydrationNotPermitted = true
+        hydrationNotPermitted = false
 
         // WIP
         let flourFactor: Double =
@@ -163,7 +165,7 @@ final class BreadCalculatorVM {
         let tempAdjustment = (hydration - 0.6) * 15
         temperature = Int((baseTemp - tempAdjustment).rounded())
     }
-
+    
     private func resetIngredients() {
       self.flourType = .wheat
       self.flourQuantity = 125
@@ -173,6 +175,9 @@ final class BreadCalculatorVM {
     
     func verifyHidration() {
         calculateHydratation()
+        if hydrationNotPermitted {
+            showHidrationAlert = true
+        }
     }
 
   func save() {
@@ -206,7 +211,6 @@ final class BreadCalculatorVM {
   }
 
   private func calculateRecipe() async {
-//    self.calculateHydratation()// luego probamos
     try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
   }
 

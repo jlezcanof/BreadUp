@@ -16,147 +16,134 @@ struct RecipeDetailView: View {
   @State private var resultID = "resultado"
     
   private var canGenerate: Bool {
-      print("canGenerate \(vm.hydrationNotPermitted)")
-      return vm.hydrationNotPermitted//isModelAvailable &&
+      //print("canGenerate \(!vm.hydrationNotPermitted)")
+      return !vm.hydrationNotPermitted//isModelAvailable &&
   }
     
-//  @ViewBuilder
-//  private var generateButton: some View {
-//      let content = Label("Generar receta", systemImage: "sparkles.2")
-//            .frame(maxWidth: .infinity)
-//            .font(.headline)
-//
-//      if canGenerate {
-//             Button { Task { await vm.navigateToGenerateView() } }
-//                label: { content }
-//              .buttonStyle(.glassProminent)
-//              .tint(Color("HeroTop"))
-//    } else {
-//            Button { Task { await vm.navigateToGenerateView() } }
-//            label: { content }
-//              .buttonStyle(.glass)
-//        }
-// }
-
-  var body: some View {
-    @Bindable var vm = vm
-    return ScrollViewReader { proxy in
-      Form {
-        Section("Harina") {
-          Picker("Tipo de harina", selection: $vm.flourType) {
-            ForEach(FlourType.allCases) { type in
-              Text(type.rawValue).tag(type)
+    var body: some View {
+        @Bindable var vm = vm
+        return ScrollViewReader { proxy in
+            Form {
+                Section("Harina") {
+                    Picker("Tipo de harina", selection: $vm.flourType) {
+                        ForEach(FlourType.allCases) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    VStack(alignment: .leading) {
+                        Text("\(vm.flourQuantity) g")
+                            .font(.headline)
+                        Slider(
+                            value: Binding(
+                                get: { Double(vm.flourQuantity) },
+                                set: { vm.flourQuantity = Int($0) }
+                            ),
+                            in: 125...400,
+                            step: 25
+                        )
+                        .accessibilityLabel("Cantidad de harina")
+                        .accessibilityValue("\(vm.flourQuantity) gramos")
+                        HStack {
+                            Text("125 g")
+                            Spacer()
+                            Text("400 g")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    }
+                }
+                Section("Levadura") {
+                    yeast
+                    sliderYeast
+                    HStack {
+                        Text("5 g")
+                        Spacer()
+                        Text("50 g")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+                }
+                Section("Agua") {
+                    VStack(alignment: .leading) {
+                        water
+                        Slider(
+                            value: Binding(
+                                get: { Double(vm.water) },
+                                set: { vm.water = Int($0) }
+                            ),
+                            in: 125...500,
+                            step: 25
+                        )
+                        .accessibilityLabel("Cantidad de agua")
+                        .accessibilityValue("\(vm.water) mililitros")
+                        HStack {
+                            Text("125 ml")
+                            Spacer()
+                            Text("500 ml")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    }
+                }
+                Section {
+                    Button {
+                        Task {
+                            await vm.navigateToGenerateView()
+                        }
+                    } label: {
+                        Label("Generar receta", systemImage: "sparkles.2")
+                            .frame(maxWidth: .infinity)
+                            .font(.headline)
+                    }
+//                    .buttonStyle( !canGenerate ? .glass : .glassProminent)// .glassProminent : .glass
+                    //          // !isModelAvailable || && !...true....!vm.hydrationNotPermitted
+                    .disabled(!canGenerate)
+                    .grayscale(canGenerate ? 0 : 1)
+                    .opacity(canGenerate ? 1 : 0.6)
+                    .animation(.easeInOut(duration: 0.2), value: canGenerate)
+                } footer: {
+                    if let unavailableNote {
+                        Text(unavailableNote)
+                    }
+                }
             }
-          }
-          VStack(alignment: .leading) {
-            Text("\(vm.flourQuantity) g")
-              .font(.headline)
-            Slider(
-              value: Binding(
-                get: { Double(vm.flourQuantity) },
-                set: { vm.flourQuantity = Int($0) }
-              ),
-              in: 125...400,
-              step: 25
+            .navigationTitle("Nueva receta")
+        }
+        .loadingOverlay(vm.isLoading, message: "Generando receta…")
+        .onAppear {
+            vm.calculateHydratation()
+        }
+        .onChange(of: vm.water) { vm.verifyHidration() }
+        .onChange(of: vm.flourType) { vm.verifyHidration() }
+        .onChange(of: vm.flourQuantity) { vm.verifyHidration() }
+        //    .onChange(of: vm.yeast) {vm.verifyHidration()}//
+        .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
+            Button("De acuerdo", role: .cancel) {}
+        } message: {
+            Text(
+                "Ya tienes guardada una receta con estos ingredientes y fecha."
             )
-            .accessibilityLabel("Cantidad de harina")
-            .accessibilityValue("\(vm.flourQuantity) gramos")
-            HStack {
-              Text("125 g")
-              Spacer()
-              Text("400 g")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .accessibilityHidden(true)
-          }
         }
-        Section("Levadura") {
-          yeast
-          sliderYeast
-          HStack {
-            Text("5 g")
-            Spacer()
-            Text("50 g")
-          }
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .accessibilityHidden(true)
-        }
-        Section("Agua") {
-          VStack(alignment: .leading) {
-            water
-            Slider(
-              value: Binding(
-                get: { Double(vm.water) },
-                set: { vm.water = Int($0) }
-              ),
-              in: 125...500,
-              step: 25
+        .alert(
+            vm.alertHydrationNotPermmited,
+            isPresented: $vm.showHidrationAlert
+        ) {
+            Button("De acuerdo", role: .cancel) {}
+        } message: {
+            Text(
+                "Por favor, ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada"
             )
-            .accessibilityLabel("Cantidad de agua")
-            .accessibilityValue("\(vm.water) mililitros")
-            HStack {
-              Text("125 ml")
-              Spacer()
-              Text("500 ml")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .accessibilityHidden(true)
-          }
         }
-        Section {
-//            generateButton
-//                .disabled(!canGenerate)
-//                .grayscale(canGenerate ? 0 : 1)
-//                .opacity(canGenerate ? 1 : 0.6)
-//                .animation(.easeInOut(duration: 0.2), value: canGenerate )
-          Button {
-            Task {
-              await vm.navigateToGenerateView()
-            }
-          } label: {
-            Label("Generar receta", systemImage: "sparkles.2")
-              .frame(maxWidth: .infinity)
-              .font(.headline)
-          }
-//          .buttonStyle( canGenerate ? .glassProminent : .glass)
-//          // !isModelAvailable || && !...true....!vm.hydrationNotPermitted
-          .disabled(!canGenerate)
-          .grayscale(canGenerate ? 0 : 1)
-          .opacity(canGenerate ? 1 : 0.6)
-          .animation(.easeInOut(duration: 0.2), value: canGenerate)
-        } footer: {
-          if let unavailableNote {
-            Text(unavailableNote)
-          }
-        }
-      }
-      .navigationTitle("Nueva receta")
     }
-    .loadingOverlay(vm.isLoading, message: "Generando receta…")
-    .onChange(of: vm.water) {vm.verifyHidration()}
-//    .onChange(of: vm.flourType) {vm.verifyHidration()}
-    .onChange(of: vm.flourQuantity) {vm.verifyHidration()}
-//    .onChange(of: vm.yeast) {vm.verifyHidration()}
-    .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
-      Button("De acuerdo", role: .cancel) {}
-    } message: {
-      Text("Ya tienes guardada una receta con estos ingredientes y fecha.")
-    }
-    .alert(vm.alertHydrationNotPermmited, isPresented: $vm.hydrationNotPermitted) {
-        Button("De acuerdo", role: .cancel) {}
-    } message: {
-        Text("Por favor, ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada")
-    }
-  }
 
-  /// El modelo está disponible para generar.
-  private var isModelAvailable: Bool {
-    if case .available = vm.availableModel() { return true }
-    return false
-  }
+    /// El modelo está disponible para generar.
+    private var isModelAvailable: Bool {
+        if case .available = vm.availableModel() { return true }
+        return false
+    }
 
   /// Nota explicativa (footer) cuando la generación no está disponible.
   private var unavailableNote: String? {
@@ -205,7 +192,7 @@ struct RecipeDetailView: View {
     .accessibilityValue("\(vm.yeast) gramos")
   }
 
-  private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
+  //  private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
   //      .inlineOnlyPreservingWhitespace
 }
 
