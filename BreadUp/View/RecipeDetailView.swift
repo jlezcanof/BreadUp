@@ -115,6 +115,7 @@ struct RecipeDetailView: View {
         .loadingOverlay(vm.isLoading, message: "Generando receta…")
         .onAppear {
             vm.calculateHydratation()
+            //TODO deberiamos mostrar un mensaje de que debe de tener en cuenta la hidratación de la masa
         }
         .onChange(of: vm.water) { vm.verifyHidration() }
         .onChange(of: vm.flourType) { vm.verifyHidration() }

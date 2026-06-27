@@ -19,6 +19,9 @@ final class BreadCalculatorVM {
     
   var time: Int = 0
   var temperature: Int = 0
+  /// Temperatura objetivo en el centro de la miga (criterio real de cocción,
+  /// según ThermoWorks/Wordloaf). Más fiable que el tiempo de horneado.
+  var internalTemperature: Int = 0
 
   private let model: SystemLanguageModel
   private var session: LanguageModelSession
@@ -138,35 +141,42 @@ final class BreadCalculatorVM {
         }
         hydrationNotPermitted = false
 
-        // WIP
-        let flourFactor: Double =
+        // Parámetros de horneado. Fundamentado en Modernist Cuisine,
+        // ThermoWorks, Wordloaf y King Arthur. Aquí la hidratación se usa en
+        // FRACCIÓN (no en porcentaje).
+        let hydrationFraction = Double(water) / Double(flourQuantity)
+
+        // Por harina: (temp. horno base °C, factor de densidad, temp. interna °C)
+        let baking: (oven: Double, density: Double, coreTemp: Int) =
             switch flourType {
-                case .wheat: 1.0
-                case .wholewheat: 1.15
-                case .rye: 1.2
-                case .spelt: 1.1
-                case .corn: 1.25
+            case .wheat: (230, 1.00, 96)
+            case .wholewheat: (220, 1.10, 96)
+            case .rye: (220, 1.15, 97)
+            case .spelt: (215, 1.05, 95)
+            case .corn: (200, 1.10, 90)
             }
 
-        let baseTime = 60.0 - (Double(yeast) * 0.8)//la levadura no determina el tiempo de horneado..depende del tamaño/peso de la pieza y de la temperatura del horno
-        let adjustedTime =
-            baseTime * flourFactor * (1 + (hydration - 0.6) * 0.3)
-        time = max(25, Int(adjustedTime.rounded()))
+        // Temperatura del horno: ajuste suave centrado en el punto medio del
+        // rango de hidratación de la harina (más húmeda → un poco más calor).
+        let midHydration =
+            (hidrationMininumRecommended + hidrationMaximumRecommended) / 2 / 100
+        let tempAdjust = (hydrationFraction - midHydration) * 20
+        temperature = min(250, max(190, Int((baking.oven + tempAdjust).rounded())))
 
-        let baseTemp: Double =
-            switch flourType {
-            case .wheat: 200
-            case .wholewheat: 190
-            case .rye: 195
-            case .spelt: 185
-            case .corn: 210
-            }
+        // Tiempo de horneado: lo determina el PESO de la pieza, modulado por
+        // hidratación, densidad de la harina y temperatura del horno.
+        let doughWeight = Double(flourQuantity + water + yeast)
+        var bakeTime = 15.0 + (doughWeight / 100) * 3.5
+        bakeTime *= (1 + (hydrationFraction - 0.65) * 0.5)  // +húmeda → +tiempo
+        bakeTime *= baking.density  // integral/centeno densos → +tiempo
+        bakeTime *= (230 / Double(temperature))  // +caliente → -tiempo
+        time = min(75, max(18, Int(bakeTime.rounded())))
 
-        let tempAdjustment = (hydration - 0.6) * 15
-        temperature = Int((baseTemp - tempAdjustment).rounded())
+        // Criterio real de cocción (ThermoWorks/Wordloaf): temperatura en el
+        // centro de la miga, más fiable que el tiempo.
+        internalTemperature = baking.coreTemp
         
-        print("El tiempo de cocción debe de ser de \(time) minutos")
-        print("La temperatura debe de ser de \(temperature) grados centígrados")
+        print("Horno: \(temperature) °C · Tiempo: \(time) min · Temp. interna objetivo: \(internalTemperature) °C")
     }
     
     private func resetIngredients() {
@@ -260,13 +270,15 @@ final class BreadCalculatorVM {
         do {
             let prompt =
               """
-                  Crea una receta de pan casero usando estos ingredientes/cantidades y con estas condiciones de horneado:
+                  Crea una receta de pan casero usando estos ingredientes/cantidades:
                   - Agua: \(water) mililitros
                   - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                   - Levadura fresca de panaderia: \(yeast) gramos.
               
-                  - Temperatura del horno \(temperature) grados centígrados
-                  - Minutos en el horno: \(time)
+              Condiciones de horneado (oriéntate por ellas, no las contradigas):
+                  - Temperatura del horno \(temperature) °C
+                  - Tiempo aproximado  en el horno: \(time) minutos (es ORIENTATIVO, varía según el horno)
+                  - Punto de cocción: el pan estará listo cuando el centro de la miga alcanze \(internalTemperature) °C y el color de la corteza, no sólo por el reloj.
               
               El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario
               """
