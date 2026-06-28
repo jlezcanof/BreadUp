@@ -140,20 +140,31 @@ struct GenerateBreadRecipeView: View {
         .accessibilityAddTraits(.isHeader)
         .accessibilityFocused($recipeTitleFocused)
 
-      HStack(spacing: 10) {
-        ingredientChip(
-          icon: "leaf.fill", tint: Color("BreadFlour"),
-          value: "\(vm.flourQuantity) g",
-          label: "Harina, \(vm.flourQuantity) gramos")
-        ingredientChip(
-          icon: "drop.fill", tint: Color("BreadWater"),
-          value: "\(vm.water) ml",
-          label: "Agua, \(vm.water) mililitros")
-        ingredientChip(
-          icon: "bubbles.and.sparkles.fill", tint: Color("BreadYeast"),
-          value: "\(vm.yeast) g",
-          label: "Levadura, \(vm.yeast) gramos")
-        Spacer(minLength: 0)
+      VStack(alignment: .leading, spacing: 10) {
+        // Fila 1: los 3 chips de cantidad (valores cortos).
+        HStack(spacing: 10) {
+          IngredientChip(
+            icon: "leaf.fill", tint: Color("BreadFlour"),
+            value: "\(vm.flourQuantity) g",
+            label: "Harina, \(vm.flourQuantity) gramos")
+          IngredientChip(
+            icon: "drop.fill", tint: Color("BreadWater"),
+            value: "\(vm.water) ml",
+            label: "Agua, \(vm.water) mililitros")
+          IngredientChip(
+            icon: "bubbles.and.sparkles.fill", tint: Color("BreadYeast"),
+            value: "\(vm.yeast) g",
+            label: "Levadura, \(vm.yeast) gramos")
+          Spacer(minLength: 0)
+        }
+        // Fila 2: tipo de harina solo, dispone de todo el ancho.
+        HStack(spacing: 10) {
+          IngredientChip(
+            icon: "tag.fill", tint: Color("BreadFlour"),
+            value: vm.flourType.displayName,
+            label: "Tipo de harina, \(vm.flourType.displayName)")
+          Spacer(minLength: 0)
+        }
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -162,23 +173,6 @@ struct GenerateBreadRecipeView: View {
       RoundedRectangle(cornerRadius: 20, style: .continuous)
         .fill(Color(.secondarySystemGroupedBackground))
     }
-  }
-
-  private func ingredientChip(
-    icon: String, tint: Color, value: String, label: String
-  ) -> some View {
-    HStack(spacing: 6) {
-      Image(systemName: icon)
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(tint)
-      Text(value)
-        .font(.subheadline.weight(.medium))
-    }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 7)
-    .background { Capsule().fill(tint.opacity(0.12)) }
-    .accessibilityElement(children: .combine)
-    .accessibilityLabel(label)
   }
 
   // MARK: - Barra de acciones
@@ -202,7 +196,6 @@ struct GenerateBreadRecipeView: View {
       .accessibilityLabel("Fecha de elaboración")
       .accessibilityValue(vm.selectedDate.formatted(.dateTime.day().month().year()))
       .accessibilityHint("Cambia la fecha de la receta")
-
       Spacer(minLength: 12)
 
       Button {
@@ -259,6 +252,33 @@ struct GenerateBreadRecipeView: View {
     proxy.scrollTo(Self.bottomID, anchor: .bottom)
   }
 
+}
+
+// MARK: - IngredientChip
+
+/// Cápsula compacta que muestra un icono + valor para un ingrediente.
+/// Reutilizable en cualquier cabecera de receta.
+private struct IngredientChip: View {
+
+  let icon: String
+  let tint: Color
+  let value: String
+  let label: String
+
+  var body: some View {
+    HStack(spacing: 6) {
+      Image(systemName: icon)
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(tint)
+      Text(value)
+        .font(.subheadline.weight(.medium))
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 7)
+    .background { Capsule().fill(tint.opacity(0.12)) }
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(label)
+  }
 }
 
 #Preview {
