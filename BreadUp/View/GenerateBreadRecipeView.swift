@@ -141,29 +141,31 @@ struct GenerateBreadRecipeView: View {
         .accessibilityFocused($recipeTitleFocused)
 
       VStack(alignment: .leading, spacing: 10) {
-        // Fila 1: los 3 chips de cantidad (valores cortos).
-        HStack(spacing: 10) {
+        // Fila 1: los 3 chips de cantidad distribuidos de lado a lado.
+        HStack(spacing: 0) {
           IngredientChip(
             icon: "leaf.fill", tint: Color("BreadFlour"),
             value: "\(vm.flourQuantity) g",
             label: "Harina, \(vm.flourQuantity) gramos")
+          Spacer(minLength: 10)
           IngredientChip(
             icon: "drop.fill", tint: Color("BreadWater"),
             value: "\(vm.water) ml",
             label: "Agua, \(vm.water) mililitros")
+          Spacer(minLength: 10)
           IngredientChip(
             icon: "bubbles.and.sparkles.fill", tint: Color("BreadYeast"),
             value: "\(vm.yeast) g",
             label: "Levadura, \(vm.yeast) gramos")
-          Spacer(minLength: 0)
         }
-        // Fila 2: tipo de harina solo, dispone de todo el ancho.
-        HStack(spacing: 10) {
+        // Fila 2: tipo de harina centrado en todo el ancho.
+        HStack(spacing: 0) {
+          Spacer()
           IngredientChip(
             icon: "tag.fill", tint: Color("BreadFlour"),
             value: vm.flourType.displayName,
             label: "Tipo de harina, \(vm.flourType.displayName)")
-          Spacer(minLength: 0)
+          Spacer()
         }
       }
     }
