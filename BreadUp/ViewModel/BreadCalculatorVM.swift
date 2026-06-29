@@ -251,6 +251,22 @@ final class BreadCalculatorVM {
   func retryGeneration() async {
     await calculateRecipe()
   }
+    
+  /// Devuelve los títulos de todas las recetas ya persistidas.
+  ///
+  /// Consultamos `BreadUpCalculate` directamente (es la entidad que guarda
+  /// `recipe`) en lugar de partir de `BreadUpIngredients` y navegar la
+  /// relación: así evitamos faultar los ingredientes para llegar al título.
+  /// Descartamos los `nil` con `compactMap`, porque `recipe` es `String?`
+  /// mientras la receta no se ha generado.
+  private func allNamesRecipes() -> [String] {
+    guard let modelContext else { return [] }
+
+    let descriptor = FetchDescriptor<BreadUpCalculate>()
+    let calculations = (try? modelContext.fetch(descriptor)) ?? []
+
+    return calculations.compactMap(\.recipe)
+  }
 
   private func generateRecipeBread() async throws {
         guard availableLanguageModel() else {
@@ -266,6 +282,12 @@ final class BreadCalculatorVM {
         recipeTitle = ""
         recipeSteps = []
         defer { isLoading = false }
+      
+      let namesRecipes = allNamesRecipes()
+//        Self.log.info("Nombre de recetas ")
+//        namesRecipes.forEach { name in
+//            Self.log.info("\(name)")
+//        }
 
         do {
             let prompt =
@@ -280,9 +302,13 @@ final class BreadCalculatorVM {
                   - Tiempo aproximado  en el horno: \(time) minutos (es ORIENTATIVO, varía según el horno)
                   - Punto de cocción: el pan estará listo cuando el centro de la miga alcanze \(internalTemperature) °C y el color de la corteza, no sólo por el reloj.
               
-              El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario
+              El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario.
+              Y lo que es más importante, tiene que ser un nombre DISTINTO a estas recetas ya existentes: \(namesRecipes.joined(separator: ", "))
               """
-
+            
+          Self.log.info("prompt is:")
+          Self.log.info("\(prompt)")
+       
           let stream = session.streamResponse(
               to: prompt,
               generating: BreadRecipe.self,
@@ -303,12 +329,14 @@ final class BreadCalculatorVM {
       } catch LanguageModelSession.GenerationError.exceededContextWindowSize(
           let content
       ) {
+//          let totaltokens = try await model.tokenCount(for: session.transcript)
+//          Self.log.error("Total de tokens \(totalTokens)")
           Self.log.error(
               "Context window excedido: \(content.debugDescription, privacy: .public)"
           )
           self.alert = "Se ha excedido el contexto del tamaño de la ventana"
           hasGenerationError = true
-          // TODO informar en el log de error las condiciones de entrada de la receta
+          showConditionsRecipe()
       } catch LanguageModelSession.GenerationError.guardrailViolation(
           let content
       ) {
@@ -344,6 +372,16 @@ final class BreadCalculatorVM {
           hasGenerationError = true
       }
   }
+    
+    private func showConditionsRecipe() {
+        Self.log.error("Tipo de harina \(self.flourType.rawValue)")
+        Self.log.error("Cantidad de harina \(self.flourQuantity)")
+        Self.log.error("Cantidad de agua \(self.water)")
+        Self.log.error("Levadura \(self.yeast)")
+        Self.log.error("Temperatura del horno \(self.temperature) °C")
+        Self.log.error("Tiempo en el horno \(self.time)")
+        Self.log.error("Punto de cocción \(self.internalTemperature)")
+    }
 
     /// `true` si ya hay una receta persistida con los mismos ingredientes de
     /// entrada (tipo y cantidad de harina, levadura) y el mismo día de elaboración.
