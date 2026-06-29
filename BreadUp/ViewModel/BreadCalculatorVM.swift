@@ -54,6 +54,26 @@ final class BreadCalculatorVM {
 
   // 0.8....12000
   private let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 1200)
+    
+    
+  // TODO "Actúa??
+  private let instructions = """
+                Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
+                reales y contrastadas, explicadas con un toque cercano y evocador.
+
+                Reglas:
+                1. Responde siempre en castellano.
+                2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
+                   Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
+                3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
+                   de 2 frases como máximo, con una acción concreta, tiempos y temperaturas.
+                4. Si te preguntan con algo ajeno a la panadería, responde amablemente que
+                   solo ayudas con recetas de pan.
+                5. El título de la receta debe ser SIEMPRE único, no se puede NUNCA repetir.
+    """
+//
+//      4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
+//         y propón el ajuste mínimo necesario.
 
   init() {
     model = SystemLanguageModel.default
@@ -62,24 +82,7 @@ final class BreadCalculatorVM {
 
   func initVM(modelContext: ModelContext) {
     self.modelContext = modelContext
-      
-    // TODO "Actúa??
-    let instructions = """
-                  Eres un maestro panadero con 40 años de experiencia. Creas recetas de pan
-                  reales y contrastadas, explicadas con un toque cercano y evocador.
-
-                  Reglas:
-                  1. Responde siempre en castellano.
-                  2. Usa únicamente los ingredientes y cantidades que te dé el usuario.
-                     Solo puedes añadir agua o sal si son imprescindibles, indicándolo.
-                  3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
-                     de 2 frases como máximo, con acción concreta, tiempos y temperaturas.
-                  4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
-                     y propón el ajuste mínimo necesario.
-                  5. Si te preguntan con algo ajeno a la panadería, responde amablemente que
-                     solo ayudas con recetas de pan.
-      """
-
+  
     //        self.session = LanguageModelSession(
     //                    tools:  [GetBreadRecipeTool()],
     //                    instructions: instructions)
@@ -248,7 +251,10 @@ final class BreadCalculatorVM {
   }
 
   /// Reintenta la generación sin volver a navegar (ya estamos en la vista de generación).
-  func retryGeneration() async {
+  func retryGeneration() async {  
+    session = LanguageModelSession(model: model, instructions: instructions)
+    session.prewarm()
+      
     await calculateRecipe()
   }
     
