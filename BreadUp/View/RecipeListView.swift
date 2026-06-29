@@ -224,11 +224,17 @@ struct RecipeListView: View {
         // "Limpiar" vive en la barra del sheet (no en el Form), así no queda
         // pegado a la home indicator y está siempre accesible sin hacer scroll.
         ToolbarItem(placement: .topBarLeading) {
-          Button("Limpiar", action: clearFilters)
-            .disabled(!hasActiveFilters)
+          Button(action: clearFilters) {
+            Image(systemName: "arrow.counterclockwise")
+          }
+          .disabled(!hasActiveFilters)
+          .accessibilityLabel("Limpiar filtros")
         }
         ToolbarItem(placement: .confirmationAction) {
-          Button("Listo") { showFilters = false }
+          Button { showFilters = false } label: {
+            Image(systemName: "checkmark")
+          }
+          .accessibilityLabel("Listo")
         }
       }
     }
