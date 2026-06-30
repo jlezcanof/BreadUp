@@ -132,52 +132,59 @@ struct GenerateBreadRecipeView: View {
 
   /// Tarjeta de cabecera: título de la receta + chips con los ingredientes
   /// elegidos, usando los colores de marca. Conecta el resultado con lo pedido.
-  private func summaryHeader(title: String) -> some View {
-    VStack(alignment: .leading, spacing: 14) {
-      Text(title)
-        .font(.title2.bold())
-        .foregroundStyle(.primary)
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityFocused($recipeTitleFocused)
-
-      VStack(alignment: .leading, spacing: 10) {
-        // Fila 1: los 3 chips de cantidad distribuidos de lado a lado.
-        HStack(spacing: 0) {
-          IngredientChip(
-            icon: "leaf.fill", tint: Color("BreadFlour"),
-            value: "\(vm.flourQuantity) g",
-            label: "Harina, \(vm.flourQuantity) gramos")
-          Spacer(minLength: 10)
-          IngredientChip(
-            icon: "drop.fill", tint: Color("BreadWater"),
-            value: "\(vm.water) ml",
-            label: "Agua, \(vm.water) mililitros")
-          Spacer(minLength: 10)
-          IngredientChip(
-            icon: "bubbles.and.sparkles.fill", tint: Color("BreadYeast"),
-            value: "\(vm.yeast) g",
-            label: "Levadura, \(vm.yeast) gramos")
+    private func summaryHeader(title: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(.title2.bold())
+                .foregroundStyle(.primary)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($recipeTitleFocused)
+            VStack(alignment: .leading, spacing: 10) {
+                // Fila 1: tipo de harina centrado en todo el ancho.
+                HStack(spacing: 0) {
+                    Spacer()
+                    IngredientChip(
+                        icon: "tag.fill",
+                        tint: Color("BreadFlour"),
+                        value: vm.flourType.displayName,
+                        label: "Tipo de harina, \(vm.flourType.displayName)"
+                    )
+                    Spacer()
+                }
+                // Fila 2: los 3 chips de cantidad distribuidos de lado a lado.
+                HStack(spacing: 0) {
+                    IngredientChip(
+                        icon: "leaf.fill",
+                        tint: Color("BreadFlour"),
+                        value: "\(vm.flourQuantity) g",
+                        label: "Harina, \(vm.flourQuantity) gramos"
+                    )
+                    Spacer(minLength: 10)
+                    IngredientChip(
+                        icon: "drop.fill",
+                        tint: Color("BreadWater"),
+                        value: "\(vm.water) ml",
+                        label: "Agua, \(vm.water) mililitros"
+                    )
+                    Spacer(minLength: 10)
+                    IngredientChip(
+                        icon: "bubbles.and.sparkles.fill",
+                        tint: Color("BreadYeast"),
+                        value: "\(vm.yeast) g",
+                        label: "Levadura, \(vm.yeast) gramos"
+                    )
+                }
+            }
         }
-        // Fila 2: tipo de harina centrado en todo el ancho.
-        HStack(spacing: 0) {
-          Spacer()
-          IngredientChip(
-            icon: "tag.fill", tint: Color("BreadFlour"),
-            value: vm.flourType.displayName,
-            label: "Tipo de harina, \(vm.flourType.displayName)")
-          Spacer()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .background {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
         }
-      }
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(18)
-    .background {
-      RoundedRectangle(cornerRadius: 20, style: .continuous)
-        .fill(Color(.secondarySystemGroupedBackground))
-    }
-  }
 
-  // MARK: - Barra de acciones
+    // MARK: - Barra de acciones
 
   /// Fila de acciones que aparece al completarse la receta: elegir fecha de
   /// elaboración y guardar. Los botones usan los estilos Liquid Glass del

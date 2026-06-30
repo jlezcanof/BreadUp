@@ -220,24 +220,34 @@ struct RecipeListView: View {
       }
       .navigationTitle("Filtros")
       .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        // "Limpiar" vive en la barra del sheet (no en el Form), así no queda
-        // pegado a la home indicator y está siempre accesible sin hacer scroll.
-        ToolbarItem(placement: .topBarLeading) {
-          Button(action: clearFilters) {
-            Image(systemName: "arrow.counterclockwise")
-          }
-          .disabled(!hasActiveFilters)
-          .accessibilityLabel("Limpiar filtros")
+            .toolbar {
+                // "Limpiar" vive en la barra del sheet (no en el Form), así no queda
+                // pegado a la home indicator y está siempre accesible sin hacer scroll.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .cancel) {
+                        showFilters = false
+                    }
+                    .accessibilityLabel("Cerrar filtros")
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(action: clearFilters) {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
+                    .disabled(!hasActiveFilters)
+                    .accessibilityLabel("Limpiar filtros")
+                }
+//                ToolbarItem(placement: .confirmationAction) {
+//                    Button(role: .confirm) {
+//                        
+//                        //showFilters = false
+//                    } label: {
+//                        Image(systemName: "checkmark")
+//                    }
+//                    .accessibilityLabel("Listo")
+//                    .disabled(true)
+//                }
+            }
         }
-        ToolbarItem(placement: .confirmationAction) {
-          Button { showFilters = false } label: {
-            Image(systemName: "checkmark")
-          }
-          .accessibilityLabel("Listo")
-        }
-      }
-    }
     .presentationDetents([.medium])
   }
 

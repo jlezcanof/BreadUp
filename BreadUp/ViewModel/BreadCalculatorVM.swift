@@ -76,7 +76,8 @@ final class BreadCalculatorVM {
 //         y propón el ajuste mínimo necesario.
 
   init() {
-    model = SystemLanguageModel.default
+//    model = SystemLanguageModel.default
+      model = SystemLanguageModel(useCase: .contentTagging, guardrails: .permissiveContentTransformations)
     session = LanguageModelSession()
   }
 
@@ -251,10 +252,10 @@ final class BreadCalculatorVM {
   }
 
   /// Reintenta la generación sin volver a navegar (ya estamos en la vista de generación).
-  func retryGeneration() async {  
+  func retryGeneration() async {
     session = LanguageModelSession(model: model, instructions: instructions)
     session.prewarm()
-      
+//      session.logFeedbackAttachment(sentiment: .)
     await calculateRecipe()
   }
     
@@ -335,8 +336,7 @@ final class BreadCalculatorVM {
       } catch LanguageModelSession.GenerationError.exceededContextWindowSize(
           let content
       ) {
-//          let totaltokens = try await model.tokenCount(for: session.transcript)
-//          Self.log.error("Total de tokens \(totalTokens)")
+          session.logFeedbackAttachment(sentiment: .negative)
           Self.log.error(
               "Context window excedido: \(content.debugDescription, privacy: .public)"
           )
@@ -346,22 +346,26 @@ final class BreadCalculatorVM {
       } catch LanguageModelSession.GenerationError.guardrailViolation(
           let content
       ) {
+          session.logFeedbackAttachment(sentiment: .negative)
           Self.log.error(
               "Bloqueado por guardrails: \(content.debugDescription, privacy: .public)"
           )
           self.alert = "No podemos responder a dicha petición de receta"
           hasGenerationError = true
-          // TODO informar en el log de error las condiciones de entrada de la receta
+          showConditionsRecipe()
       } catch LanguageModelSession.GenerationError.assetsUnavailable(
           let content
       ) {
+          session.logFeedbackAttachment(sentiment: .negative)
           Self.log.error(
               "Assets del modelo no disponibles: \(content.debugDescription, privacy: .public)"
           )
           self.alert = "Los assets del modelo no están disponible"
           hasGenerationError = true
-          // TODO informar en el log de error las condiciones de entrada de la receta
+          showConditionsRecipe()
       } catch {
+          session.logFeedbackAttachment(sentiment: .negative)
+          showConditionsRecipe()
           if containsSafetyAssetFailure(error) {
               Self.log.error(
                   "Assets del clasificador de seguridad ausentes o corruptos"
