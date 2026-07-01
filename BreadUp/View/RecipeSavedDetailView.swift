@@ -2,7 +2,7 @@
 //  RecipeSavedDetailView.swift
 //  BreadUp
 //
-//  Created by Yomismista on 8/4/26.
+//  Created by Jose Manuel Lezcano Fresno on 8/4/26.
 //
 
 import SwiftUI

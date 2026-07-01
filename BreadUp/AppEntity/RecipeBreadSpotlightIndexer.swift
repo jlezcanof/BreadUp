@@ -2,7 +2,7 @@
 //  RecipeBreadSpotlightIndexer.swift
 //  BreadUp
 //
-//  Created by Yomismista on 04/06/2026.
+//  Created by Jose Manuel Lezcano Fresno on 04/06/2026.
 //
 import AppIntents
 import CoreSpotlight

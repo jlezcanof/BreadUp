@@ -76,8 +76,7 @@ final class BreadCalculatorVM {
 //         y propón el ajuste mínimo necesario.
 
   init() {
-//    model = SystemLanguageModel.default
-      model = SystemLanguageModel(useCase: .contentTagging, guardrails: .permissiveContentTransformations)
+    model = SystemLanguageModel.default
     session = LanguageModelSession()
   }
 

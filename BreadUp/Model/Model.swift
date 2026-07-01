@@ -2,7 +2,7 @@
 //  Generable.swift
 //  BreadUp
 //
-//  Created by Yomismista on 9/4/26.
+//  Created by Jose Manuel Lezcano Fresno on 9/4/26.
 //
 import FoundationModels
 //import Contacts

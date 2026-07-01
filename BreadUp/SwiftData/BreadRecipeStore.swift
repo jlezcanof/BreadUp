@@ -2,7 +2,7 @@
 //  BreadRecipeStore.swift
 //  BreadUp
 //
-//  Created by Yomismista on 16/06/2026.
+//  Created by Jose Manuel Lezcano Fresno on 16/06/2026.
 //
 import Foundation
 import SwiftData

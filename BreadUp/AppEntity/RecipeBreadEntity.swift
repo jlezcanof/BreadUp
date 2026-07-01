@@ -2,7 +2,7 @@
 //  RecipeBreadEntity.swift
 //  BreadUp
 //
-//  Created by Yomismista on 04/06/2026.
+//  Created by Jose Manuel Lezcano Fresno on 04/06/2026.
 //
 import Foundation
 import SwiftData

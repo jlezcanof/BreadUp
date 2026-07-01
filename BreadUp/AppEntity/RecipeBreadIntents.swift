@@ -2,12 +2,13 @@
 //  RecipeBreadIntents.swift
 //  BreadUp
 //
-//  Created by Yomismista on 04/06/2026.
+//  Created by Jose Manuel Lezcano Fresno on 04/06/2026.
 //
 
 import SwiftUI
 import AppIntents
 
+@available(*, deprecated, renamed: "GetRecipeBreadIntent", message: "No vamos a tener un app intentar para generar recetas, no tiene sentido")
 struct CreateRecipeBreadIntent: AppIntent {
     
     static let title: LocalizedStringResource = "Crear receta de pan en BreadUp"
@@ -79,18 +80,18 @@ struct BreadRecipeSnippetView: View {
 }
 
 
-struct BreadRecipeShortcuts: AppShortcutsProvider {
-    
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: CreateRecipeBreadIntent(),
-                    phrases:  ["idioma por defecto de la aplicación \(.applicationName)",
-                               "Crea una receta con display name \(.applicationName)",
-                               "Anotado con \(.applicationName)"
-                              ],
-                    shortTitle: "Receta rápida",
-                    // LocalizedStringResource(stringLiteral: "pan para pan pan pan")
-                    systemImageName: "cooktop.fill")
-    }
-    
-    
-}
+//struct BreadRecipeShortcuts: AppShortcutsProvider {
+//    
+//    static var appShortcuts: [AppShortcut] {
+//        AppShortcut(intent: CreateRecipeBreadIntent(),
+//                    phrases:  ["idioma por defecto de la aplicación \(.applicationName)",
+//                               "Crea una receta con display name \(.applicationName)",
+//                               "Anotado con \(.applicationName)"
+//                              ],
+//                    shortTitle: "Receta rápida",
+//                    // LocalizedStringResource(stringLiteral: "pan para pan pan pan")
+//                    systemImageName: "cooktop.fill")
+//    }
+//    
+//    
+//}
