@@ -30,24 +30,23 @@ struct RecipeBreadEntity: AppEntity, IndexedEntity {
 struct RecipeBreadQuery: EntityQuery {
 
     @MainActor func entities(for identifiers: [RecipeBreadEntity.ID]) async throws -> [RecipeBreadEntity] {
-        let uuids = identifiers.compactMap (UUID.init)
-        let descriptor = FetchDescriptor<BreadUpIngredients>(predicate: #Predicate {uuids.contains($0.id)})
+        let descriptor = FetchDescriptor<BreadUpIngredients>(predicate: #Predicate {bread in identifiers.contains(bread.id.uuidString)})
         let recipes = try AppModelStore.shared.mainContext.fetch(descriptor)
-        print("\(recipes)")
+        // TODO
+//        print("\(recipes)")
         // recuperamos todo y filtramos
 //        return recipes.filter { identifiers.contains($0.id.uuidString) }.map(\.toEntity)
-       
-        //return recipes.map(\.toEntity)
-        return []
+        return recipes.map(\.toEntity)
+//        return []
     }
 
     @MainActor func suggestedEntities() async throws -> [RecipeBreadEntity] {
+        // TODO
         var descriptor = FetchDescriptor<BreadUpIngredients>(sortBy: [SortDescriptor(\.created, order: .reverse)])
         descriptor.fetchLimit = 5
         let recipes = try AppModelStore.shared.mainContext.fetch(descriptor)
         print("\(recipes)")
-//        return recipes.map(\.toEntity)
-        
-        return []
+        return recipes.map(\.toEntity)
+//        return []
     }
 }

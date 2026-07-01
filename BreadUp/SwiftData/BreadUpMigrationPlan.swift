@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import AppIntents
 
 typealias BreadUpIngredients = BreadUpSchemaV3.Ingredients
 typealias BreadUpCalculate   = BreadUpSchemaV3.CalculateBread
@@ -58,7 +59,7 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
   }
 }
 
-enum FlourType: String, CaseIterable, Identifiable, Codable {
+enum FlourType: String, CaseIterable, Identifiable, Codable, AppEnum {
   case wheat = "Trigo"//Harina de trigo
   case wholewheat = "Trigo integral"//Harina de trigo integral
   case rye = "Centeno"//Harina de Centeno
@@ -66,6 +67,16 @@ enum FlourType: String, CaseIterable, Identifiable, Codable {
   case corn = "Maíz"//Harina de maz
 
   var id: Self { self }
+    
+  static let typeDisplayRepresentation: TypeDisplayRepresentation = "Tipo de Harina"
+    
+  static let caseDisplayRepresentations: [FlourType : DisplayRepresentation] = [
+        .wheat: .init(title: "Trigo", image: .init(systemName: "leaf")),
+        .wholewheat: .init(title: "Trigo integral", image: .init(systemName: "laurel.leading")),
+        .rye: .init(title: "Centeno", image: .init(systemName: "leaf.arrow.circlepath")),
+        .spelt: .init(title: "Espelto", image: .init(systemName: "sparkles")),
+       .corn: .init(title: "Maíz", image: .init(systemName: "triangle.fill"))
+      ]
 }
 
 extension FlourType {

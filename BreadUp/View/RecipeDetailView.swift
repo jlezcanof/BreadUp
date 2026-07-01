@@ -107,6 +107,7 @@ struct RecipeDetailView: View {
                 } footer: {
                     if let unavailableNote {
                         Text(unavailableNote)
+                            .font(.footnote)
                     }
                 }
             }

@@ -12,39 +12,56 @@ struct CreateRecipeBreadIntent: AppIntent {
     
     static let title: LocalizedStringResource = "Crear receta de pan en BreadUp"
     
-    static let description = IntentDescription("Guardar una receta rapida de pan en BreadUp, con harina, mantequilla, azúcar y sal",
+    static let description = IntentDescription("Guardar una receta rapida de pan en BreadUp, con tipo de harina, cantidad de harina, cantidad de agua y levadura",
     categoryName: "Recetas")
     
-    @Parameter(title: "Texto", requestValueDialog: "¿qué quieres que BreadUp recuerde?") var text: String
-    @Parameter(title: "Tipo de harina", requestValueDialog: "¿Conque tipo de harina?") var category: String
+    @Parameter(title: "Tipo de harina", default: .wheat ,requestValueDialog: "Tipo de harina") var flourType: FlourType
+    @Parameter(title: "Cantidad de harina", requestValueDialog: "¿Cantidad de harina (125 - 400) gramos ?") var flourQuantity: Int
+    @Parameter(title: "agua", requestValueDialog: "¿Cantidad de agua (125 - 500) gramos ?") var water: Int
+    @Parameter(title: "levadura", requestValueDialog: "¿Cantidad de levadura (5 - 50) gramos?") var yeast: Int
     
-//    @ParameterSummary(<#T##IntentDialog?#>, alwaysConfirm: <#T##Bool#>)
     static var parameterSummary: some ParameterSummary {
-        Summary("Anotar \(\.$text) como \(\.$category) con el contenido ")
+        Summary("Generar receta para una harina de tipo \(\.$flourType), cantidad \(\.$flourQuantity), agua \(\.$water) ml, y \(\.$yeast) gramos de levadura")
     }
     
-    func perform() async throws -> some IntentResult {
-        let intentDialog = IntentDialog("Guardado en BreadUp")
-        return .result(dialog: intentDialog, view: BreadRecipeSnippetView(text: text, content: category))
+    @MainActor
+    func perform() async throws -> some IntentResult {// & ProvidesDialog & ShowsSnippetView
+        let intentDialog = IntentDialog("Generado en BreadUp")// Guardado
+        return .result(dialog: intentDialog,
+                       view: BreadRecipeSnippetView(flourType: flourType, flourQuantity: flourQuantity, water: water, yeast: yeast))
     }
+    
+    //     static var openAppWhenRun: Bool { get }//true
+    
+    //     static var supportedModes: IntentModes { get }
+
 }
 
+
 struct BreadRecipeSnippetView: View {
-    let text: String
-    let content: String
-//    let category: NoteCategoryValue
+    let flourType: FlourType
+    
+    let flourQuantity: Int//Enum
+    
+    let water: Int//Enum
+    
+    let yeast: Int//Enum 
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-//            Label(category.localizedTitle, systemImage: category.symbolName)
-//                .font(.caption.weight(.semibold))
-//                .foregroundStyle(.secondary)
-
-            Text(text)
+            Text(flourType.rawValue)
                 .font(.body)
                 .lineLimit(2)
 
-            Text(content)
+            Text(flourQuantity.description)
+                .font(.body)
+                .lineLimit(4)
+            
+            Text(water.description)
+                .font(.body)
+                .lineLimit(4)
+            
+            Text(yeast.description)
                 .font(.body)
                 .lineLimit(4)
         }

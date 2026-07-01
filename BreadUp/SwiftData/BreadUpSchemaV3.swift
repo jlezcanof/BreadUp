@@ -81,6 +81,11 @@ enum BreadUpSchemaV3: VersionedSchema {
         createdAt: createdAt
       )
     }
+      
+      var toEntity: RecipeBreadEntity {
+          RecipeBreadEntity(id: self.id.uuidString, title: self.calculateBread?.recipe ?? "title" ,
+                            subtitle: "subtitle", createdAt: created ?? .now)
+      }
   }
 
   @Model
