@@ -104,12 +104,13 @@ struct RecipeDetailView: View {
                     .grayscale(canGenerate ? 0 : 1)
                     .opacity(canGenerate ? 1 : 0.6)
                     .animation(.easeInOut(duration: 0.2), value: canGenerate)
-                } footer: {
-                    if let unavailableNote {
-                        Text(unavailableNote)
-                            .font(.footnote)
-                    }
                 }
+//                footer: {
+//                    if let unavailableNote {
+//                        Text(unavailableNote)
+//                            .font(.footnote)
+//                    }
+//                }
             }
             .navigationTitle("Nueva receta")
         }
@@ -148,19 +149,19 @@ struct RecipeDetailView: View {
     }
 
   /// Nota explicativa (footer) cuando la generación no está disponible.
-  private var unavailableNote: String? {
-    guard case .unavailable(let reason) = vm.availableModel() else { return nil }
-    switch reason {
-    case .appleIntelligenceNotEnabled:
-      return "Activa Apple Intelligence en los Ajustes del sistema para generar recetas."
-    case .modelNotReady:
-      return "El modelo se está preparando. Vuelve a intentarlo en unos minutos."
-    case .deviceNotEligible:
-      return "Este dispositivo no es compatible con la generación de recetas."
-    @unknown default:
-      return "La generación de recetas no está disponible ahora mismo."
-    }
-  }
+//  private var unavailableNote: String? {
+//    guard case .unavailable(let reason) = vm.availableModel() else { return nil }
+//    switch reason {
+//    case .appleIntelligenceNotEnabled:
+//      return "Activa Apple Intelligence en los Ajustes del sistema para generar recetas."
+//    case .modelNotReady:
+//      return "El modelo se está preparando. Vuelve a intentarlo en unos minutos."
+//    case .deviceNotEligible:
+//      return "Este dispositivo no es compatible con Apple Inteligence."
+//    @unknown default:
+//      return "La generación de recetas no está disponible ahora mismo."
+//    }
+//  }
 
   private var water: some View {
     Text("\(vm.water) ml")

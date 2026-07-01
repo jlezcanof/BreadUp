@@ -101,6 +101,10 @@ final class BreadCalculatorVM {
       return false
     }
   }
+    
+    func availableModel() -> Bool {
+        return self.availableLanguageModel()
+    }
 
   func availableModel() -> SystemLanguageModel.Availability {
     model.availability

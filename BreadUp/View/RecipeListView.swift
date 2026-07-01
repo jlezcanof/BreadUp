@@ -3,10 +3,10 @@
 //  BreadUp
 //
 //  Created by Jose Manuel Lezcano Fresno on 8/4/26.
-//
 
 import SwiftData
 import SwiftUI
+import FoundationModels
 
 struct RecipeListView: View {
   @Environment(\.modelContext) private var modelContext
@@ -34,7 +34,16 @@ struct RecipeListView: View {
   var body: some View {
     recipeList
       .overlay {
-        if recipes.isEmpty {
+          if !vm.availableModel() {
+              ContentUnavailableView(
+                "Apple Intelligence no disponible",//Este dispositivo no es compatible con Apple Inteligence
+                systemImage: "apple.intelligence",
+                description: Text(
+                  "Esta app necesita Apple Intelligence activo en el dispositivo. Actívalo en Ajustes › Apple Intelligence y Siri."
+                )
+              )
+          }
+          else if recipes.isEmpty {
           ContentUnavailableView(
             "No hay recetas",
             systemImage: "cooktop",
@@ -48,18 +57,20 @@ struct RecipeListView: View {
           )
         }
       }
-      .navigationTitle("Mis recetas de pan")
+      .navigationTitle(vm.availableModel() ? "Mis recetas de pan": "" )
       .navigationBarTitleDisplayMode(.large)
       .toolbar {
-        ToolbarItem(placement: .primaryAction) {
-          Button {
-            vm.path.append(.detail)
-          } label: {
-            Image(systemName: "plus")
+          if vm.availableModel() {
+              ToolbarItem(placement: .primaryAction) {
+                Button {
+                  vm.path.append(.detail)
+                } label: {
+                  Image(systemName: "plus")
+                }
+                .accessibilityLabel("Nueva receta de pan")
+                .accessibilitySortPriority(1)
+              }
           }
-          .accessibilityLabel("Nueva receta de pan")
-          .accessibilitySortPriority(1)
-        }
       }
       // Barra inferior: en reposo, filtro + lupa; al buscar, el campo de texto
       // desplegado abajo. Solo cuando hay recetas que filtrar/buscar.
