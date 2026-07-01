@@ -12,20 +12,27 @@ struct CreateRecipeBreadIntent: AppIntent {
     
     static let title: LocalizedStringResource = "Crear receta de pan en BreadUp"
     
-    static let description = IntentDescription("Guardar una receta rapida de pan en BreadUp, con tipo de harina, cantidad de harina, cantidad de agua y levadura",
+    static let description = IntentDescription("Genera una receta de pan en BreadUp, con tipo de harina, cantidad de harina, cantidad de agua y levadura",
     categoryName: "Recetas")
     
     @Parameter(title: "Tipo de harina", default: .wheat ,requestValueDialog: "Tipo de harina") var flourType: FlourType
-    @Parameter(title: "Cantidad de harina", requestValueDialog: "¿Cantidad de harina (125 - 400) gramos ?") var flourQuantity: Int
+    @Parameter(title: "Cantidad de harina", requestValueDialog: "¿Cantidad de harina (125 - 400) gramos ?") var flourQuantity: Int// picker de valores a seleccionar
+//    in: 125...400,
+//    step: 25
     @Parameter(title: "agua", requestValueDialog: "¿Cantidad de agua (125 - 500) gramos ?") var water: Int
+//    in: 125...500,
+//    step: 25
     @Parameter(title: "levadura", requestValueDialog: "¿Cantidad de levadura (5 - 50) gramos?") var yeast: Int
+//    in: 5...50,
+//    step: 5,
     
+    // expongo la accion al atajo
     static var parameterSummary: some ParameterSummary {
         Summary("Generar receta para una harina de tipo \(\.$flourType), cantidad \(\.$flourQuantity), agua \(\.$water) ml, y \(\.$yeast) gramos de levadura")
     }
     
-    @MainActor
-    func perform() async throws -> some IntentResult {// & ProvidesDialog & ShowsSnippetView
+    @MainActor // / & ProvidesDialog & ShowsSnippetView
+    func perform() async throws -> some IntentResult {
         let intentDialog = IntentDialog("Generado en BreadUp")// Guardado
         return .result(dialog: intentDialog,
                        view: BreadRecipeSnippetView(flourType: flourType, flourQuantity: flourQuantity, water: water, yeast: yeast))
