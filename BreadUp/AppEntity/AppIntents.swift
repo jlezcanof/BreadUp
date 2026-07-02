@@ -240,7 +240,7 @@ struct BreadRecipeView: View {
     private var stepsSection: some View {
       VStack(alignment: .leading, spacing: 16) {
         sectionTitle("Elaboración", systemImage: "list.number")
-          Text("Numero de pasos que hay \(steps.count)")
+//          Text("Numero de pasos que hay \(steps.count)")
         ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
 //            Text("Paso \(index + 1)").font(.title)
 //            Text("Titulo \(step.title)").font(.title2)
@@ -274,22 +274,22 @@ private struct StepSnippetCard: View {
     private var theme: (top: Color, bottom: Color) {
       Self.palette[(max(number, 1) - 1) % Self.palette.count]
     }
-
+    
     var body: some View {
       HStack(alignment: .top, spacing: 14) {
         badge
         VStack(alignment: .leading, spacing: 6) {
           Text("Paso \(number)")
-            .font(.caption.weight(.bold))
+                .font(.caption.weight(.bold))//,,,,.title..
             .textCase(.uppercase)
             .tracking(1.2)
             .foregroundStyle(theme.bottom)
-//          Text(titulo)
-//            .font(.headline)
-//            .foregroundStyle(.primary)
-//          Text(descripcion)
-//            .font(.subheadline)
-//            .foregroundStyle(.secondary)
+          Text(titulo)
+            .font(.headline)
+            .foregroundStyle(.primary)
+          Text(descripcion)
+            .font(.caption)
+            .foregroundStyle(.secondary)
 //            .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
