@@ -103,8 +103,8 @@ struct BreadRecipeView: View {
     }
     
     private var header: some View {
-      VStack(spacing: 14) {
-        Image(systemName: "fork.knife")
+      VStack(spacing: 8) {//14
+        Image(systemName: "leaf.arrow.trianglehead.clockwise")//fork.knife
           .font(.system(size: heroIconSize, weight: .semibold))
           .foregroundStyle(.white)
           .frame(width: heroBadgeSize, height: heroBadgeSize)
@@ -112,7 +112,7 @@ struct BreadRecipeView: View {
           .accessibilityHidden(true)
 
         Text(title)
-          .font(.largeTitle.bold())
+          .font(.title.bold())
           .multilineTextAlignment(.center)
           .foregroundStyle(.white)
 
@@ -240,11 +240,7 @@ struct BreadRecipeView: View {
     private var stepsSection: some View {
       VStack(alignment: .leading, spacing: 16) {
         sectionTitle("Elaboración", systemImage: "list.number")
-//          Text("Numero de pasos que hay \(steps.count)")
         ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-//            Text("Paso \(index + 1)").font(.title)
-//            Text("Titulo \(step.title)").font(.title2)
-//            Text("Descripcion \(step.descripcion)").font(.title3)
             StepSnippetCard(
             number: index + 1,
             titulo: step.title,
@@ -280,12 +276,12 @@ private struct StepSnippetCard: View {
         badge
         VStack(alignment: .leading, spacing: 6) {
           Text("Paso \(number)")
-                .font(.caption.weight(.bold))//,,,,.title..
+                .font(.title2.bold())
             .textCase(.uppercase)
             .tracking(1.2)
             .foregroundStyle(theme.bottom)
           Text(titulo)
-                .font(.title.weight(.semibold))
+                .font(.title3.weight(.semibold))
             .foregroundStyle(.primary)
           Text(descripcion)
             .font(.caption2)
