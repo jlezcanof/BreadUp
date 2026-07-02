@@ -123,9 +123,6 @@ struct GenerateBreadRecipeView: View {
     .sheet(isPresented: $showDatePicker) {
       datePickerSheet
     }
-//    .onAppear {
-//        vm.initVM(modelContext: modelContext)
-//    }
   }
 
   // MARK: - Cabecera resumen

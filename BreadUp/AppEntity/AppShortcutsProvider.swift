@@ -11,13 +11,10 @@ struct BreadRecipeShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: GetRecipeBreadIntent(),
                     phrases:  [
-                        "idioma por defecto de la aplicación \(.applicationName)",
-                               "Obtiene una receta con display name \(.applicationName)",
-                               "Anotado con \(.applicationName)"//,
-//                                "Busca una receta "
-                              ],
+                               "Obtiene una receta en \(.applicationName)",
+                               "Busca una receta a partir del nombre en \(.applicationName)"
+                    ],
                     shortTitle: "Obtener receta",
-                    // LocalizedStringResource(stringLiteral: "pan para pan pan pan")
-                    systemImageName: "cooktop.fill")
+                    systemImageName: "leaf.arrow.trianglehead.clockwise")
     }
 }

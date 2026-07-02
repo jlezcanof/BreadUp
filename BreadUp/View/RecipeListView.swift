@@ -98,6 +98,9 @@ struct RecipeListView: View {
       }
       .onDelete(perform: deleteRecipes)
     }
+    .task(id: recipes.map(\.id)) {
+        try? await RecipeBreadSpotlightIndexer.index(recipes: recipes)
+    }
   }
 
   // MARK: - Búsqueda (barra inferior)

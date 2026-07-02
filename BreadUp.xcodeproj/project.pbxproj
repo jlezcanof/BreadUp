@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9EFE3DE62F8E527F00392988 /* basura.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE3DE52F8E527B00392988 /* basura.swift */; };
+		9E6332F42FF67CA5003D43B7 /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 9E6332F32FF67CA5003D43B7 /* AppShortcuts.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9E27310D2F7446EA0008A3B9 /* BreadUp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreadUp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9EFE3DE52F8E527B00392988 /* basura.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = basura.swift; sourceTree = "<group>"; };
+		9E6332F32FF67CA5003D43B7 /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -50,7 +50,7 @@
 		9E2731042F7446EA0008A3B9 = {
 			isa = PBXGroup;
 			children = (
-				9EFE3DE52F8E527B00392988 /* basura.swift */,
+				9E6332F32FF67CA5003D43B7 /* AppShortcuts.xcstrings */,
 				9E27310F2F7446EA0008A3B9 /* BreadUp */,
 				9E27310E2F7446EA0008A3B9 /* Products */,
 			);
@@ -105,11 +105,12 @@
 				};
 			};
 			buildConfigurationList = 9E2731082F7446EA0008A3B9 /* Build configuration list for PBXProject "BreadUp" */;
-			developmentRegion = en;
+			developmentRegion = es;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = 9E2731042F7446EA0008A3B9;
 			minimizedProjectReferenceProxies = 1;
@@ -128,6 +129,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E6332F42FF67CA5003D43B7 /* AppShortcuts.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +140,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9EFE3DE62F8E527F00392988 /* basura.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +208,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
@@ -268,6 +270,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;

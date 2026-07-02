@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "es",
+  "strings" : {
+    "Obtiene una receta en ${applicationName}" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Get a recipe in${applicationName}",
+              "Search a recipe from to the name in ${applicationName}",
+              "Search a recipe from the name in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Obtiene una receta en ${applicationName}",
+              "Busca una receta a partir del nombre en ${applicationName}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.2"
+}
