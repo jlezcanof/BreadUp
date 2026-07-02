@@ -7,7 +7,6 @@
 import AppIntents
 import CoreSpotlight
 import Foundation
-//import UniformTypeIdentifiers
 
 @MainActor
 enum RecipeBreadSpotlightIndexer {
@@ -28,17 +27,23 @@ enum RecipeBreadSpotlightIndexer {
     private static func searchableItem(for recipe: BreadUpIngredients) -> CSSearchableItem {
         let attributes = CSSearchableItemAttributeSet(contentType: .plainText)
         
-        attributes.title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)
-        attributes.displayName = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespaces)//"Display name"
-        attributes.contentDescription = recipe.calculateBread?.steps.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
-//        attributes.contentDescription = recipe.calculateBread.debugDescription.trimmingCharacters(in: .whitespacesAndNewlines)
-//        attributes.textContent = "textcontent"
+        let title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)
+        attributes.title = title
+        attributes.displayName = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespaces)
+        let firstStepDescription = recipe.calculateBread?.steps.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        //Este es el más importantes
+        let typeFlour = recipe.flourType.rawValue
+        
+        attributes.contentDescription = firstStepDescription
+        attributes.textContent        = typeFlour
+        let debugDescription = recipe.calculateBread.debugDescription
+        print("debug description is \(debugDescription)")
+        
+        //Este es el más importante
         attributes.contentCreationDate = recipe.created ?? .now
         attributes.associateAppEntity(RecipeBreadEntity(id: recipe.id.uuidString,
-                                                        title: "recipe.calculateBread?.recipe!",
-                                                        subtitle: "recipe.calculateBread?.recipe!",
+                                                        title: title ?? "",
+                                                        subtitle: typeFlour,
                                                         createdAt: recipe.created ?? .now))
 
         
@@ -48,4 +53,3 @@ enum RecipeBreadSpotlightIndexer {
     }
 }
 
-// Usamos enum para poder invocarse desde cuando lado SIN necesidad de crear una instancia (y es ó esto ó un patrón singleton)
