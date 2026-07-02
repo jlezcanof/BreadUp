@@ -80,28 +80,8 @@ struct BreadRecipeView: View {
     @ScaledMetric(relativeTo: .body) private var rowBadgeSize: CGFloat = 32
 
     var body: some View {
-//        ScrollView {
-//          VStack(spacing: 24) {
-//            header
-//              .onGeometryChange(for: Bool.self) { proxy in
-//                // El hero deja de verse cuando su borde inferior
-//                // sube por encima del top del scroll.
-//                proxy.frame(in: .scrollView).maxY < 10
-//              } action: { isHidden in
-//                withAnimation(.easeInOut(duration: 0.2)) {
-//                  showNavTitle = isHidden
-//                }
-//              }
-////            ingredientsCard
-////            if !steps.isEmpty {
-////              stepsSection
-////            }
-//          }
-//          .padding(.horizontal)
-//          .padding(.bottom, 32)
-//        }
         //ScrollView {
-        VStack {
+        VStack {//spacing: 24
             header
                 .onGeometryChange(for: Bool.self) { proxy in
                     // El hero deja de verse cuando su borde inferior
@@ -113,9 +93,9 @@ struct BreadRecipeView: View {
                     }
                 }
             ingredientsCard
-//                        if !steps.isEmpty {
-//                          stepsSection
-//                        }
+            if !steps.isEmpty {
+                stepsSection
+            }
         }
         .padding(.horizontal)
         .padding(.bottom, 32)
@@ -250,6 +230,29 @@ struct BreadRecipeView: View {
         recipe.calculateBread?.recipe?
         .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
       return stored.isEmpty ? "Receta de pan" : stored
+    }
+    
+    private var steps: [BreadUpStepRecipe] {
+      (recipe.calculateBread?.steps ?? []).sorted { $0.order < $1.order }
+    }
+    
+    // MARK: - Pasos
+    private var stepsSection: some View {
+      VStack(alignment: .leading, spacing: 16) {
+        sectionTitle("Elaboración", systemImage: "list.number")
+          Text("Numero de pasos que hay \(steps.count)")
+          // ini prueba
+        ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+            Text("Paso \(index + 1)").font(.title)
+            Text("Titulo \(step.title)").font(.title2)
+//            Text("Descripcion \(step.descripcion)").font(.title3)
+//          StepCard(
+//            number: index + 1,
+//            titulo: step.title,
+//            descripcion: step.descripcion)
+        }
+          // end prueba
+      }
     }
     
     // MARK: - Helpers
