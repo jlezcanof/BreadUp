@@ -285,10 +285,10 @@ private struct StepSnippetCard: View {
             .tracking(1.2)
             .foregroundStyle(theme.bottom)
           Text(titulo)
-            .font(.headline)
+                .font(.title.weight(.semibold))
             .foregroundStyle(.primary)
           Text(descripcion)
-            .font(.caption)
+            .font(.caption2)
             .foregroundStyle(.secondary)
 //            .fixedSize(horizontal: false, vertical: true)
         }
