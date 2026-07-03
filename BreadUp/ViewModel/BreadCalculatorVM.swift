@@ -231,8 +231,19 @@ final class BreadCalculatorVM {
   }
 
   private func calculateRecipe() async {
+    guard availableLanguageModel() else {
+        self.alert = "No está disponible el modelo del lenguaje"
+        Self.log.notice("Modelo de lenguaje no disponible")
+        return
+    }
     try? await self.generateRecipeBread()  // se traga cualquier throw, prevenirlo
   }
+    
+    private func cleanContextWindow() {
+        session = LanguageModelSession(model: model, instructions: instructions)
+        session.prewarm()
+        //      session.logFeedbackAttachment(sentiment: .)
+    }
 
   func navigateToGenerateView() async {
     // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
@@ -247,6 +258,7 @@ final class BreadCalculatorVM {
     guard !hydrationNotPermitted else { return }   // se queda en RecipeDetailView con el alert
       
     path.append(.generate)
+    cleanContextWindow()
     await calculateRecipe()
   }
 
@@ -254,11 +266,9 @@ final class BreadCalculatorVM {
     path.removeAll()
   }
 
-  /// Reintenta la generación sin volver a navegar (ya estamos en la vista de generación).
+  // Reintenta la generación sin volver a navegar (ya estamos en la vista de generación).
   func retryGeneration() async {
-    session = LanguageModelSession(model: model, instructions: instructions)
-    session.prewarm()
-//      session.logFeedbackAttachment(sentiment: .)
+    cleanContextWindow()
     await calculateRecipe()
   }
     
@@ -279,12 +289,6 @@ final class BreadCalculatorVM {
   }
 
   private func generateRecipeBread() async throws {
-        guard availableLanguageModel() else {
-            self.alert = "No está disponible el modelo del lenguaje"
-            Self.log.notice("Modelo de lenguaje no disponible")
-            return
-        }
-
         isLoading = true
         hasGenerationError = false
         receivedTotalInformationAboutRecipe = false
@@ -294,10 +298,6 @@ final class BreadCalculatorVM {
         defer { isLoading = false }
       
       let namesRecipes = allNamesRecipes()
-//        Self.log.info("Nombre de recetas ")
-//        namesRecipes.forEach { name in
-//            Self.log.info("\(name)")
-//        }
 
         do {
             let prompt =
@@ -316,9 +316,9 @@ final class BreadCalculatorVM {
               Y lo que es más importante, tiene que ser un nombre DISTINTO a estas recetas ya existentes: \(namesRecipes.joined(separator: ", "))
               """
             
-          Self.log.info("prompt is:")
-          Self.log.info("\(prompt)")
-       
+//          Self.log.info("prompt is:")
+//          Self.log.info("\(prompt)")
+//       
           let stream = session.streamResponse(
               to: prompt,
               generating: BreadRecipe.self,

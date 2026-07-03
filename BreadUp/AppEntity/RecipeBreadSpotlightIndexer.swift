@@ -27,23 +27,30 @@ enum RecipeBreadSpotlightIndexer {
     private static func searchableItem(for recipe: BreadUpIngredients) -> CSSearchableItem {
         let attributes = CSSearchableItemAttributeSet(contentType: .plainText)
         
-        let title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)//.whitespaces
         attributes.title = title
-        attributes.displayName = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespaces)
-        let firstStepDescription = recipe.calculateBread?.steps.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
+        attributes.displayName = title//recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespaces)
+        //let firstStepDescription  = recipe.calculateBread?.steps.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
+        let secondStepDescription = recipe.calculateBread?.steps[1].descripcion.trimmingCharacters(in: .whitespaces)
         
         let typeFlour = recipe.flourType.rawValue
         
-        attributes.contentDescription = firstStepDescription
-        attributes.textContent        = typeFlour
-        let debugDescription = recipe.calculateBread.debugDescription
-        print("debug description is \(debugDescription)")
+        attributes.contentDescription = typeFlour//firstStepDescription....secondStepDescription
+        attributes.textContent        = typeFlour // secondStepDescription
+        
+//        let debugDescription = recipe.calculateBread.debugDescription
+//        print("debug description is \(debugDescription)")
+        
+        print("second step description \(secondStepDescription!)")//prueba
+        print("display name \(title!)")//prueba
+
+        // TODO habría que sacar todos los steps y convertirlos a un único texto
         
         //Este es el más importante
         attributes.contentCreationDate = recipe.created ?? .now
         attributes.associateAppEntity(RecipeBreadEntity(id: recipe.id.uuidString,
-                                                        title: title ?? "",
-                                                        subtitle: typeFlour,
+                                                        title: title ?? "titulin",
+                                                        contentSteps: "Harina de \(typeFlour)",
                                                         createdAt: recipe.created ?? .now))
 
         

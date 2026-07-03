@@ -18,12 +18,12 @@ struct RecipeBreadEntity: AppEntity, IndexedEntity {
         
     let id: String
     let title: String
-    let subtitle: String
+    let contentSteps: String
     let createdAt: Date
     
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: LocalizedStringResource(stringLiteral: title),
-                              subtitle: LocalizedStringResource(stringLiteral: subtitle))
+                              subtitle: LocalizedStringResource(stringLiteral: contentSteps))
     }
 }
 

@@ -13,7 +13,8 @@ struct RecipeListView: View {
   @Environment(BreadCalculatorVM.self) private var vm
   // Más recientes primero. `created` es opcional: SwiftData coloca los nil al
   // final con orden inverso (las recetas guardadas siempre llevan fecha).
-  @Query(sort: \BreadUpIngredients.created, order: .reverse)
+    
+  @Query(sort: \BreadUpIngredients.created, order: .reverse)//TODO ordernar tambien con el nombre de forma ascendente
   private var recipes: [BreadUpIngredients]
 
   // Búsqueda por texto (título de la receta).
