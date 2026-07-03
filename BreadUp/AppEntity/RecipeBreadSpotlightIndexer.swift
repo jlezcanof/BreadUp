@@ -14,6 +14,11 @@ enum RecipeBreadSpotlightIndexer {
     private static let domainIdentifier = "breadup"
     private static let index = CSSearchableIndex(name: "BreadUp")
     
+    static func delete(recipe: BreadUpIngredients) async throws {
+        let searchableItem = searchableItem(for: recipe)
+        try await index.deleteSearchableItems(withIdentifiers: [searchableItem.uniqueIdentifier])
+    }
+    
     static func index (recipe: BreadUpIngredients) async throws {
         try await index.indexSearchableItems([searchableItem(for: recipe)])
     }

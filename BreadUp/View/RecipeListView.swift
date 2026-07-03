@@ -277,7 +277,11 @@ struct RecipeListView: View {
   private func deleteRecipes(offsets: IndexSet) {
     withAnimation {
       for index in offsets {
-        modelContext.delete(filteredRecipes[index])
+        let recipeOffset = filteredRecipes[index]
+        modelContext.delete(recipeOffset)
+        Task {
+              try await RecipeBreadSpotlightIndexer.delete(recipe: recipeOffset)
+        }
       }
     }
   }
