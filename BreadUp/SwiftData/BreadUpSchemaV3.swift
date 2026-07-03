@@ -83,8 +83,17 @@ enum BreadUpSchemaV3: VersionedSchema {
     }
       
       var toEntity: RecipeBreadEntity {
-          RecipeBreadEntity(id: self.id.uuidString, title: self.calculateBread?.recipe ?? "title" ,
-                            contentSteps: "contentSteps", createdAt: created ?? .now)
+          
+          var contentSteps = "Pasos de la receta"
+          
+          self.calculateBread?.steps.sorted {$0.order < $1.order}.forEach { step in
+              contentSteps += "\n\n- ** Paso \(step.order)"
+              contentSteps += "\n  - Título: \(step.title)"
+              contentSteps += "\n  - Descripcion: \(step.descripcion)"
+          }
+          
+          return RecipeBreadEntity(id: self.id.uuidString, title: self.calculateBread?.recipe ?? "title" ,
+                            contentSteps: contentSteps, createdAt: created ?? .now)
       }
   }
 

@@ -29,28 +29,26 @@ enum RecipeBreadSpotlightIndexer {
         
         let title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)//.whitespaces
         attributes.title = title
-        attributes.displayName = title//recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespaces)
-        //let firstStepDescription  = recipe.calculateBread?.steps.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
-        let secondStepDescription = recipe.calculateBread?.steps[1].descripcion.trimmingCharacters(in: .whitespaces)
+        attributes.displayName = title
         
-        let typeFlour = recipe.flourType.rawValue
+        let firstStepDescription = recipe.calculateBread?.steps.filter {$0.order == 0}.first?.descripcion.trimmingCharacters(in: .whitespacesAndNewlines)
+                        
+        attributes.contentDescription = firstStepDescription
+        attributes.textContent        = firstStepDescription
         
-        attributes.contentDescription = typeFlour//firstStepDescription....secondStepDescription
-        attributes.textContent        = typeFlour // secondStepDescription
+        var contentSteps = "Pasos de la receta"
         
-//        let debugDescription = recipe.calculateBread.debugDescription
-//        print("debug description is \(debugDescription)")
-        
-        print("second step description \(secondStepDescription!)")//prueba
-        print("display name \(title!)")//prueba
-
-        // TODO habría que sacar todos los steps y convertirlos a un único texto
+        recipe.calculateBread?.steps.sorted {$0.order < $1.order}.forEach { step in
+            contentSteps += "\n\n- ** Paso \(step.order)"
+            contentSteps += "\n  - Título: \(step.title)"
+            contentSteps += "\n  - Descripcion: \(step.descripcion)"
+        }
         
         //Este es el más importante
         attributes.contentCreationDate = recipe.created ?? .now
         attributes.associateAppEntity(RecipeBreadEntity(id: recipe.id.uuidString,
                                                         title: title ?? "titulin",
-                                                        contentSteps: "Harina de \(typeFlour)",
+                                                        contentSteps: contentSteps,
                                                         createdAt: recipe.created ?? .now))
 
         
