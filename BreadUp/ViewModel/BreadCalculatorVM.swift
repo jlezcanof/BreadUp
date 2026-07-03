@@ -200,7 +200,7 @@ final class BreadCalculatorVM {
         }
     }
 
-  func save() {
+  func save(){
     guard let modelContext else { return }
     let ingredients = BreadUpIngredients(
       id: UUID(),
@@ -228,6 +228,14 @@ final class BreadCalculatorVM {
     }
       
     resetIngredients()
+      
+    Task {
+        await saveIndex(recipe: ingredients)
+    }
+  }
+  
+  private func saveIndex(recipe: BreadUpIngredients) async {
+    try? await RecipeBreadSpotlightIndexer.index(recipe: recipe)
   }
 
   private func calculateRecipe() async {
@@ -315,10 +323,7 @@ final class BreadCalculatorVM {
               El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario.
               Y lo que es más importante, tiene que ser un nombre DISTINTO a estas recetas ya existentes: \(namesRecipes.joined(separator: ", "))
               """
-            
-//          Self.log.info("prompt is:")
-//          Self.log.info("\(prompt)")
-//       
+                  
           let stream = session.streamResponse(
               to: prompt,
               generating: BreadRecipe.self,

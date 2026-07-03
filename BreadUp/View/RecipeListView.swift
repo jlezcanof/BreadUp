@@ -14,6 +14,9 @@ struct RecipeListView: View {
   // Más recientes primero. `created` es opcional: SwiftData coloca los nil al
   // final con orden inverso (las recetas guardadas siempre llevan fecha).
     
+//    @Query(sort: [SortDescriptor(\BreadUpIngredients.calculateBread.recipe, order: .forward)])
+//    private var recipess: [BreadUpIngredients]
+    
   @Query(sort: \BreadUpIngredients.created, order: .reverse)//TODO ordernar tambien con el nombre de forma ascendente
   private var recipes: [BreadUpIngredients]
 
@@ -98,9 +101,6 @@ struct RecipeListView: View {
         }
       }
       .onDelete(perform: deleteRecipes)
-    }
-    .task(id: recipes.map(\.id)) {
-        try? await RecipeBreadSpotlightIndexer.index(recipes: recipes)
     }
   }
 
