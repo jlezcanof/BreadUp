@@ -9,53 +9,53 @@ import Foundation
 import SwiftData
 
 enum BreadUpSchemaV1: VersionedSchema {
-    
-    static var versionIdentifier: Schema.Version {
-        Schema.Version(1, 0, 0)
+
+  static var versionIdentifier: Schema.Version {
+    Schema.Version(1, 0, 0)
+  }
+
+  static var models: [any PersistentModel.Type] {
+    [Ingredients.self, CalculateBread.self]
+  }
+
+  @Model
+  final class Ingredients {
+    @Attribute(.unique) var id: UUID
+    var water: Int
+    var flourType: FlourType
+    var flourQuantity: Int
+    var yeast: Int
+
+    @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
+    var calculateBread: CalculateBread?
+
+    init(
+      id: UUID,
+      water: Int,
+      flourType: FlourType,
+      flourQuantity: Int,
+      yeast: Int
+    ) {
+      self.id = id
+      self.water = water
+      self.flourType = flourType
+      self.flourQuantity = flourQuantity
+      self.yeast = yeast
     }
+  }
 
-    static var models: [any PersistentModel.Type] {
-        [Ingredients.self, CalculateBread.self]
+  @Model
+  final class CalculateBread {
+    @Attribute(.unique) var id: UUID
+    var time: Int
+    var temperature: Int
+
+    var ingredients: Ingredients?
+
+    init(id: UUID, time: Int, temperature: Int) {
+      self.id = id
+      self.time = time
+      self.temperature = temperature
     }
-    
-    @Model
-    final class Ingredients {
-        @Attribute(.unique) var id: UUID
-        var water: Int
-        var flourType: FlourType
-        var flourQuantity: Int
-        var yeast: Int
-
-        @Relationship(deleteRule: .cascade, inverse: \CalculateBread.ingredients)
-        var calculateBread: CalculateBread?
-
-        init(
-            id: UUID,
-            water: Int,
-            flourType: FlourType,
-            flourQuantity: Int,
-            yeast: Int
-        ) {
-            self.id = id
-            self.water = water
-            self.flourType = flourType
-            self.flourQuantity = flourQuantity
-            self.yeast = yeast
-        }
-    }
-
-    @Model
-    final class CalculateBread {
-        @Attribute(.unique) var id: UUID
-        var time: Int
-        var temperature: Int
-
-        var ingredients: Ingredients?
-
-        init(id: UUID, time: Int, temperature: Int) {
-            self.id = id
-            self.time = time
-            self.temperature = temperature
-        }
-    }
+  }
 }
