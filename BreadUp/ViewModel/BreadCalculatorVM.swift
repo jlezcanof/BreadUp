@@ -142,8 +142,8 @@ final class BreadCalculatorVM {
 
         if !isHidrated {
             Self.log.notice("La hidratación no es la mas aconsejable para esta combinación")
-            self.alertHydrationNotPermmited = "El cálculo de la hidratación no es la más adecuada para \(flourType.displayName), agua \(water) y cantidad \(flourQuantity)"
-             hydrationNotPermitted = true
+            self.alertHydrationNotPermmited = "El cálculo de la hidratación no es la más adecuada para \(flourType.displayName)"
+            self.hydrationNotPermitted = true
             return
         }
         hydrationNotPermitted = false

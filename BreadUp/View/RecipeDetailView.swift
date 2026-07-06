@@ -11,15 +11,14 @@ import SwiftUI
 
 struct RecipeDetailView: View {
 
-  @Environment(BreadCalculatorVM.self) private var vm
+    @Environment(BreadCalculatorVM.self) private var vm
 
-  @State private var resultID = "resultado"
-    
-  private var canGenerate: Bool {
-      //print("canGenerate \(!vm.hydrationNotPermitted)")
-      return !vm.hydrationNotPermitted//isModelAvailable &&
-  }
-    
+    @State private var resultID = "resultado"
+
+    private var canGenerate: Bool {
+        return !vm.hydrationNotPermitted  //isModelAvailable &&
+    }
+
     var body: some View {
         @Bindable var vm = vm
         return ScrollViewReader { proxy in
@@ -98,19 +97,19 @@ struct RecipeDetailView: View {
                             .frame(maxWidth: .infinity)
                             .font(.headline)
                     }
-//                    .buttonStyle( !canGenerate ? .glass : .glassProminent)// .glassProminent : .glass
+                    //                    .buttonStyle( !canGenerate ? .glass : .glassProminent)// .glassProminent : .glass
                     //          // !isModelAvailable || && !...true....!vm.hydrationNotPermitted
                     .disabled(!canGenerate)
                     .grayscale(canGenerate ? 0 : 1)
                     .opacity(canGenerate ? 1 : 0.6)
                     .animation(.easeInOut(duration: 0.2), value: canGenerate)
                 }
-//                footer: {
-//                    if let unavailableNote {
-//                        Text(unavailableNote)
-//                            .font(.footnote)
-//                    }
-//                }
+                //                footer: {
+                //                    if let unavailableNote {
+                //                        Text(unavailableNote)
+                //                            .font(.footnote)
+                //                    }
+                //                }
             }
             .navigationTitle("Nueva receta")
         }
@@ -137,66 +136,51 @@ struct RecipeDetailView: View {
             Button("De acuerdo", role: .cancel) {}
         } message: {
             Text(
-                "Por favor, ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada para la masa"
+                "Ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada para la masa"
             )
         }
     }
 
-    /// El modelo está disponible para generar.
+    // El modelo está disponible para generar.
     private var isModelAvailable: Bool {
         if case .available = vm.availableModel() { return true }
         return false
     }
 
-  /// Nota explicativa (footer) cuando la generación no está disponible.
-//  private var unavailableNote: String? {
-//    guard case .unavailable(let reason) = vm.availableModel() else { return nil }
-//    switch reason {
-//    case .appleIntelligenceNotEnabled:
-//      return "Activa Apple Intelligence en los Ajustes del sistema para generar recetas."
-//    case .modelNotReady:
-//      return "El modelo se está preparando. Vuelve a intentarlo en unos minutos."
-//    case .deviceNotEligible:
-//      return "Este dispositivo no es compatible con Apple Inteligence."
-//    @unknown default:
-//      return "La generación de recetas no está disponible ahora mismo."
-//    }
-//  }
+    private var water: some View {
+        Text("\(vm.water) ml")
+            .font(.headline)
+    }
 
-  private var water: some View {
-    Text("\(vm.water) ml")
-      .font(.headline)
-  }
+    private var yeast: some View {
+        Text("\(vm.yeast) g")
+            .font(.headline)
+    }
 
-  private var yeast: some View {
-    Text("\(vm.yeast) g")
-      .font(.headline)
-  }
+    private var sliderYeast: some View {
+        Slider(
+            value: Binding(
+                get: { Double(vm.yeast) },
+                set: { vm.yeast = Int($0) }
+            ),
+            in: 5...50,
+            step: 5,
+            onEditingChanged: { editing in
+                //                            isEditing = editing
+                //                                if editing {
+                //                                    print("Empieza a mover el slider")
+                //                                } else {
+                //                                    print("Termina de mover el slider")
+                //                                    // Aquí haces algo pesado: guardar, enviar, etc.
+                //                                }
+            }
+        )
+        .accessibilityLabel("Cantidad de levadura")
+        .accessibilityValue("\(vm.yeast) gramos")
+    }
 
-  private var sliderYeast: some View {
-    Slider(
-      value: Binding(
-        get: { Double(vm.yeast) },
-        set: { vm.yeast = Int($0) }
-      ),
-      in: 5...50,
-      step: 5,
-      onEditingChanged: { editing in
-        //                            isEditing = editing
-        //                                if editing {
-        //                                    print("Empieza a mover el slider")
-        //                                } else {
-        //                                    print("Termina de mover el slider")
-        //                                    // Aquí haces algo pesado: guardar, enviar, etc.
-        //                                }
-      }
-    )
-    .accessibilityLabel("Cantidad de levadura")
-    .accessibilityValue("\(vm.yeast) gramos")
-  }
-
-  //  private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
-  //      .inlineOnlyPreservingWhitespace
+    //  private let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnly)
+    //      .inlineOnlyPreservingWhitespace
 }
 
 #Preview {
