@@ -243,7 +243,7 @@ struct BreadUpTests {
 
     // MARK: - Persistencia
 
-    @Test("save persiste ingredientes, título de receta y pasos ordenados", .disabled())
+    @Test("save persiste ingredientes, título de receta y pasos ordenados")
     func savePersistsIngredientsRecipeAndSteps() throws {
         let container = try makeInMemoryContainer()
         let context = container.mainContext
@@ -289,10 +289,11 @@ struct BreadUpTests {
         ])
     }
 
-    @Test("save restablece los ingredientes a sus valores por defecto", .disabled())
+    @Test("save restablece los ingredientes a sus valores por defecto")
     func saveResetsIngredientsToDefaults() throws {
         let container = try makeInMemoryContainer()
         let vm = makeConfiguredVM(context: container.mainContext)
+        
         vm.flourType = .rye
         vm.flourQuantity = 400
         vm.water = 320
