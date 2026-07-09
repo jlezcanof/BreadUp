@@ -289,5 +289,5 @@ private struct IngredientChip: View {
 
 #Preview {
   GenerateBreadRecipeView()
-    .environment(BreadCalculatorVM())
+    .environment(BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()))
 }

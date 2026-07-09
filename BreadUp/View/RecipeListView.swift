@@ -280,7 +280,7 @@ struct RecipeListView: View {
         let recipeOffset = filteredRecipes[index]
         modelContext.delete(recipeOffset)
         Task {
-              try await RecipeBreadSpotlightIndexer.delete(recipe: recipeOffset)
+            try await vm.delete(recipe: recipeOffset)
         }
       }
     }
@@ -289,5 +289,5 @@ struct RecipeListView: View {
 
 #Preview {
   RecipeListView()
-    .environment(BreadCalculatorVM())
+    .environment(BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()))
 }

@@ -80,7 +80,7 @@ final class BreadCalculatorVM {
 
     private let recipeIndexer: any RecipeIndexing
 
-    init(recipeIndexer: RecipeIndexing) {
+    init(recipeIndexer: any RecipeIndexing = SpotlightRecipeIndexer()) {
         self.recipeIndexer = recipeIndexer
         model = SystemLanguageModel.default
         session = LanguageModelSession()
@@ -257,12 +257,7 @@ final class BreadCalculatorVM {
     }
 
     private func saveIndex(recipe: BreadUpIngredients) async {
-        // RecipeBreadSpotlightIndexer
-        try? await self.recipeIndexer.index(recipe: recipe)
-    }
-    func delete(recipe: BreadUpIngredients) async throws {
-        try? await RecipeBreadSpotlightIndexer.delete(recipe: recipe)
-//        self.recipeIndexer.
+        try? await recipeIndexer.index(recipe: recipe)
     }
 
     private func calculateRecipe() async {

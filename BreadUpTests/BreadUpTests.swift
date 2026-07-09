@@ -30,6 +30,24 @@ struct BakingProfileCase: Sendable {
     let expectedCoreTemperature: Int
 }
 
+// MARK: - Dobles de test
+
+/// Doble no-op de la costura `RecipeIndexing`. Neutraliza el efecto de sistema
+/// fire-and-forget que `save()` dispara: no toca `CSSearchableIndex` (efecto de
+/// sistema, prohibido en tests) y, al ignorar `recipe`, no accede a la instancia
+/// `@Model` que el `ModelContext` en memoria destruye al resetearse (la causa
+/// del crash que arrastraba a toda la suite).
+///
+@MainActor
+private struct NoopRecipeIndexer: RecipeIndexing {
+    func index(recipe: BreadUpIngredients) async throws {
+        print("NoopRecipeIndexer.index")
+    }
+    func delete(recipe: BreadUpIngredients) async throws {
+        print("Nooprecipeindexer.delete")
+    }
+}
+
 @Suite("Bread Up Tests")
 @MainActor
 struct BreadUpTests {
@@ -44,7 +62,7 @@ struct BreadUpTests {
         water: Int,
         yeast: Int = 5
     ) -> BreadCalculatorVM {
-        let vm = BreadCalculatorVM()
+        let vm = BreadCalculatorVM(recipeIndexer: NoopRecipeIndexer())
         vm.flourType = flour
         vm.flourQuantity = flourQuantity
         vm.water = water
@@ -64,8 +82,10 @@ struct BreadUpTests {
     }
 
     /// VM con el `ModelContext` inyectado vía `initVM`, listo para persistir.
+    /// Inyecta el doble no-op de indexado para que `save()` no dispare el efecto
+    /// de sistema fire-and-forget sobre el modelo en memoria.
     private func makeConfiguredVM(context: ModelContext) -> BreadCalculatorVM {
-        let vm = BreadCalculatorVM()
+        let vm = BreadCalculatorVM(recipeIndexer: NoopRecipeIndexer())
         vm.initVM(modelContext: context)
         return vm
     }
@@ -336,7 +356,7 @@ struct BreadUpTests {
 
     @Test("backToRecipeList vacía la pila de navegación")
     func backToRecipeListClearsNavigationPath() {
-        let vm = BreadCalculatorVM()
+        let vm = BreadCalculatorVM(recipeIndexer: NoopRecipeIndexer()) 
         vm.path = [.detail, .generate]
 
         vm.backToRecipeList()

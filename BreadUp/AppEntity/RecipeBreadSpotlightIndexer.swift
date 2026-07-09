@@ -63,3 +63,31 @@ enum RecipeBreadSpotlightIndexer {
     }
 }
 
+// MARK: - Costura de indexado (inyectable)
+
+/// Abstracción del indexado de recetas. Existe como costura de diseño para
+/// poder inyectar en `BreadCalculatorVM` un doble de test que no toque
+/// `CSSearchableIndex` (efecto de sistema) ni acceda a la instancia `@Model`
+/// (que un `ModelContext` en memoria destruye al resetearse).
+///
+
+
+@MainActor
+protocol RecipeIndexing {
+    func index(recipe: BreadUpIngredients) async throws
+    func delete(recipe: BreadUpIngredients) async throws
+}
+
+/// Implementación real por defecto: delega en `RecipeBreadSpotlightIndexer`.
+@MainActor
+struct SpotlightRecipeIndexer: RecipeIndexing {
+    
+    func index(recipe: BreadUpIngredients) async throws {
+        try await RecipeBreadSpotlightIndexer.index(recipe: recipe)
+    }
+    
+    func delete(recipe: BreadUpIngredients) async throws {
+        try await RecipeBreadSpotlightIndexer.delete(recipe: recipe)
+    }
+}
+

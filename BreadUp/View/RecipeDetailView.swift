@@ -136,7 +136,7 @@ struct RecipeDetailView: View {
             Button("De acuerdo", role: .cancel) {}
         } message: {
             Text(
-                "Ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada para la masa"
+                "Ajuste sus valores de agua y harina para tener la hidratación más adecuada para la masa"
             )
         }
     }
