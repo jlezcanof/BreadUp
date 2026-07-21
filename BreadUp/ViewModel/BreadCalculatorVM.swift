@@ -19,8 +19,8 @@ final class BreadCalculatorVM {
 
     var time: Int = 0
     var temperature: Int = 0
-    /// Temperatura objetivo en el centro de la miga (criterio real de cocción,
-    /// según ThermoWorks/Wordloaf). Más fiable que el tiempo de horneado.
+    // Temperatura objetivo en el centro de la miga (criterio real de cocción,
+    // según ThermoWorks/Wordloaf). Más fiable que el tiempo de horneado.
     var internalTemperature: Int = 0
 
     private let model: SystemLanguageModel
@@ -33,8 +33,8 @@ final class BreadCalculatorVM {
     var isLoading = false
     var hasGenerationError = false
 
-    /// La receta que se intenta generar ya existe (mismos ingredientes y fecha).
-    /// La pantalla de ingredientes observa este flag para avisar sin navegar.
+    // La receta que se intenta generar ya existe (mismos ingredientes y fecha).
+    // La pantalla de ingredientes observa este flag para avisar sin navegar.
     var hasDuplicateError = false
     var hydrationNotPermitted = false  // Estado de validez - controla el botón
     var showHidrationAlert = false  //presentación del alert - independiente
@@ -77,7 +77,6 @@ final class BreadCalculatorVM {
     //      4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
     //         y propón el ajuste mínimo necesario.
     //      5. El título de la receta debe ser SIEMPRE único, no se puede NUNCA repetir.
-
     
     private let recipeIndexer: any RecipeIndexing
 
@@ -258,12 +257,10 @@ final class BreadCalculatorVM {
     }
 
     private func saveIndex(recipe: BreadUpIngredients) async {
-        // RecipeBreadSpotlightIndexer
         try? await self.recipeIndexer.index(recipe: recipe)
     }
     func delete(recipe: BreadUpIngredients) async throws {
         try? await RecipeBreadSpotlightIndexer.delete(recipe: recipe)
-//        self.recipeIndexer.
     }
 
     private func calculateRecipe() async {
@@ -335,16 +332,17 @@ final class BreadCalculatorVM {
 
         let namesRecipes = allNamesRecipes()
         
-        var titleSection: String
-        if namesRecipes.isEmpty {
-            titleSection = "El título debe ser un nombre original, poético y evocador en idioma español."
-        } else {
+        var titleSection = """
+        INSTRUCCIONES PARA EL TÍTULO (obligatorias):
+        - Inventa un nombre original y evocador en español, de 4-5 palabras como máximo.
+        - NO nombres la receta por el tipo de harina ni por los ingredientes: no uses la palabra "\(flourType.rawValue)" ni "harina", y evita fórmulas como "Pan de \(flourType.rawValue)".
+        - Evoca una imagen, una sensación o un lugar (aroma, hogar, campo, tradición…).
+        """
+        if !namesRecipes.isEmpty {
             let list = namesRecipes.map { "  - \($0)" }.joined(separator: "\n")
-            titleSection = """
-            CRÍTICO — El título generado DEBE SER DIFERENTE en concepto, palabras y estilo a \
-            todos los títulos de esta lista (son recetas ya existentes):
+            titleSection += "\n\n" + """
+            Además, el título DEBE SER DISTINTO en concepto y palabras a estos, que ya existen (no los repitas ni reutilices sus palabras):
             \(list)
-            DO NOT repetir títulos que estén en la lista.
             """
         }
 
@@ -361,20 +359,14 @@ final class BreadCalculatorVM {
                     - Tiempo aproximado  en el horno: \(time) minutos (es ORIENTATIVO, varía según el horno)
                     - Punto de cocción: el pan estará listo cuando el centro de la miga alcanze \(internalTemperature) °C y el color de la corteza, no sólo por el reloj.
                 """
-            
-//            
+                        
 //            El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario y \
 //            MUY IMPORTANTE: DO NOT repetir titulo que ya esté en esta lista: \(namesRecipes.joined(separator: ", "))
-            titleSection.append(prompt)
-            print("prompt is \(titleSection)")
-            // Y lo que es más importante, tiene que ser un nombre DISTINTO a estas recetas ya existentes: \(namesRecipes.joined(separator: ", "))
-
-            // DO NOT inventar títulos que no estén en la lista
+            let promptFinal = prompt + "\n\n" + titleSection
+            print("prompt is \(promptFinal)")
             
-//            print("Listado de recetas existentes: \(namesRecipes.joined(separator: ", "))")
-
             let stream = session.streamResponse(
-                to: titleSection,//prompt
+                to: promptFinal,
                 generating: BreadRecipe.self,
                 options: options
             )
@@ -459,9 +451,6 @@ final class BreadCalculatorVM {
     /// esos no se comparan de forma fiable dentro de un `#Predicate`.
     private func recipeAlreadyExists() -> Bool {
         guard let modelContext else { return false }
-
-        //        print("tipo de harina \(flourType)  \(flourType.rawValue) \(flourType.displayName)")
-
         let flourTypeName = flourType.name
 
         // Swift DAta NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes

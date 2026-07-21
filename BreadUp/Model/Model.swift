@@ -10,7 +10,7 @@ import FoundationModels
 @Generable
 struct BreadRecipe: Equatable {
     
-    @Guide(description: "Un título sugerente para la receta de pan")
+    @Guide(description: "Título breve (4-5 palabras máx.), original y evocador en español. No menciones el tipo de harina ni los ingredientes: prefiere una imagen, sensación o lugar (aroma, hogar, campo, tradición).")
     let title: String
     
     @Guide(description: "Listado de todos los pasos que tiene que realizar para la receta de pan", .minimumCount(6), .maximumCount(9))
@@ -71,10 +71,3 @@ extension RecipeStep {
     static let tenStep = RecipeStep(titulo: "Incorporar harina", descripcion: "Agrega la harina de trigo a la mezcla de levadura y agua. Amasa suavemente con las manos o un tenedor hasta formar una masa homogénea. La masa debe ser suave y elástica, sin pegajosa.")
     
 }
-
-//extension StepRecipe: Generable {
-//    init(_ content: GeneratedContent) throws {
-//        self.nameStep = try content.value(forProperty: "nameStep")
-//        self.descriptionStep = try content.value(forProperty: "descriptionStep")
-//    }
-//}
