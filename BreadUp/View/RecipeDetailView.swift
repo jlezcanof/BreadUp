@@ -126,7 +126,7 @@ struct RecipeDetailView: View {
             Button("De acuerdo", role: .cancel) {}
         } message: {
             Text(
-                "Ya tienes guardada una receta con estos ingredientes y fecha."
+                "Ya tienes guardada una receta con estos ingredientes."//y fecha
             )
         }
         .alert(

@@ -281,11 +281,11 @@ final class BreadCalculatorVM {
     func navigateToGenerateView() async {
         // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
         // entrar en la pantalla de generación (evita mostrarla vacía).
-        if recipeAlreadyExists() {
-            Self.log.notice("Generación cancelada: la receta ya existe")
-            hasDuplicateError = true
-            return
-        }
+        //if recipeAlreadyExists() {
+        //    Self.log.notice("Generación cancelada: la receta ya existe")
+        //    hasDuplicateError = true
+        //    return
+        //}
 
         self.calculateHydratation()
         guard !hydrationNotPermitted else { return }  // se queda en RecipeDetailView con el alert
@@ -296,6 +296,15 @@ final class BreadCalculatorVM {
     }
 
     func backToRecipeList() {
+        // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
+        // entrar en la pantalla de generación (evita mostrarla vacía).
+        if recipeAlreadyExists() {
+            // Self.log.notice("Generación cancelada: la receta ya existe")
+            Self.log.notice("No podemos guardar: la receta ya existe")
+            hasDuplicateError = true
+            return
+        }
+        
         path.removeAll()
     }
 
@@ -453,13 +462,14 @@ final class BreadCalculatorVM {
         guard let modelContext else { return false }
         let flourTypeName = flourType.name
 
-        // Swift DAta NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
+        // Swift Data NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
         let descriptor = FetchDescriptor<BreadUpIngredients>(
             predicate: #Predicate {
                 $0.flourQuantity == flourQuantity
                     && $0.yeast == yeast
                     && $0.water == water
                     && $0.flourTypeString == flourTypeName
+//                && $0.calculateBread?.recipe == 
                 // TODO búsqueda por fecha y título
             }
         )
@@ -467,20 +477,6 @@ final class BreadCalculatorVM {
         let candidates = try? modelContext.fetch(descriptor)
 
         return (candidates?.count != 0) ? true : false
-
-        //        if (candidates?.count != 0) {
-        //            return true
-        //        }
-        //        return false
-
-        //        let calendar = Calendar.current
-        //        let targetDay = calendar.startOfDay(for: selectedDate)
-        //
-        //        return candidates.contains { candidate in
-        //            guard let created = candidate.created else { return false }
-        //            return candidate.flourType == flourType
-        //                && calendar.startOfDay(for: created) == targetDay
-        //        }
     }
 
     private func containsSafetyAssetFailure(_ error: Error) -> Bool {
