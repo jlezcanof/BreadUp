@@ -9,7 +9,7 @@ import SwiftData
 import os
 
 @Observable @MainActor
-final class BreadCalculatorVM {
+final class BreadCalculatorVM2 {
 
     var water: Int = 125
     var flourType: FlourType = .wheat
@@ -78,10 +78,9 @@ final class BreadCalculatorVM {
     //      4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
     //         y propón el ajuste mínimo necesario.
 
-    private let recipeIndexer: any RecipeIndexing
+//    private let recipeIndexer: any RecipeIndexing
 
-    init(recipeIndexer: any RecipeIndexing = SpotlightRecipeIndexer()) {
-        self.recipeIndexer = recipeIndexer
+    init() {
         model = SystemLanguageModel.default
         session = LanguageModelSession()
     }
@@ -257,7 +256,7 @@ final class BreadCalculatorVM {
     }
 
     private func saveIndex(recipe: BreadUpIngredients) async {
-        try? await recipeIndexer.index(recipe: recipe)
+        try? await RecipeBreadSpotlightIndexer.index(recipe: recipe)
     }
 
     private func calculateRecipe() async {

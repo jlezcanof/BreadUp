@@ -71,13 +71,14 @@ final class BreadCalculatorVM {
                     3. Cada paso tiene un título corto (3 a 5 palabras) y una descripción
                        de 2 frases como máximo, con una acción concreta, tiempos y temperaturas.
                     4. Si te preguntan con algo ajeno a la panadería, responde amablemente que
-                       solo ayudas con recetas de pan.
-                    5. El título de la receta debe ser SIEMPRE único, no se puede NUNCA repetir.
+                       solo ayudas con temas relacionados con la eleboración de pan.
         """
-    //
+    
     //      4. Si las proporciones no permiten hacer un pan viable, dilo al inicio
     //         y propón el ajuste mínimo necesario.
+    //      5. El título de la receta debe ser SIEMPRE único, no se puede NUNCA repetir.
 
+    
     private let recipeIndexer: any RecipeIndexing
 
     init(recipeIndexer: RecipeIndexing) {
@@ -336,17 +337,16 @@ final class BreadCalculatorVM {
         
         var titleSection: String
         if namesRecipes.isEmpty {
-            titleSection = "El título debe ser un nombre poético, original y evocador en español."
+            titleSection = "El título debe ser un nombre original, poético y evocador en idioma español."
         } else {
             let list = namesRecipes.map { "  - \($0)" }.joined(separator: "\n")
             titleSection = """
             CRÍTICO — El título generado DEBE SER DIFERENTE en concepto, palabras y estilo a \
             todos los títulos de esta lista (son recetas ya existentes):
             \(list)
-            Inventa un nombre completamente nuevo sin reutilizar ninguna de esas palabras.
+            DO NOT repetir títulos que estén en la lista.
             """
         }
-//        print("title section \(titleSection)")
 
         do {
             let prompt =
