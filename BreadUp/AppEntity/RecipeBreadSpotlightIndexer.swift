@@ -32,7 +32,7 @@ enum RecipeBreadSpotlightIndexer {
     private static func searchableItem(for recipe: BreadUpIngredients) -> CSSearchableItem {
         let attributes = CSSearchableItemAttributeSet(contentType: .plainText)
         
-        let title = recipe.calculateBread?.recipe?.trimmingCharacters(in: .whitespacesAndNewlines)//.whitespaces
+        let title = recipe.calculateBread?.recipe.trimmingCharacters(in: .whitespacesAndNewlines)//.whitespaces
         attributes.title = title
         attributes.displayName = title
         
