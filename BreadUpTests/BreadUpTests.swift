@@ -363,13 +363,4 @@ struct BreadUpTests {
         #expect(vm.hasDuplicateError == false)
     }
 
-//    @Test("backToRecipeList vacía la pila de navegación")
-//    func backToRecipeListClearsNavigationPath() {
-//        let vm = BreadCalculatorVM(recipeIndexer: NoopRecipeIndexer()) 
-//        vm.path = [.detail, .generate]
-//
-//        vm.backToRecipeList()
-//
-//        #expect(vm.path.isEmpty)
-//    }
 }

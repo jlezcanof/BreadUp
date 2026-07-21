@@ -477,6 +477,9 @@ final class BreadCalculatorVM {
                 // $0.created == selectedDate
                 //&&
                 //$0.created?.formatted(.dateTime).elementsEqual(selectedDate.formatted(.dateTime))
+                //&&
+                recipeTitle.localizedStandardContains(recipeTitle)
+                &&
                 $0.calculateBread?.recipe == recipeTitle // "Pan del Campo Sereno"
                 //&&
                 //$0.created?.formatted(.dateTime) == Date().formatted(.dateTime)
