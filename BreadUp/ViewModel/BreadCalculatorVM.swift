@@ -219,7 +219,7 @@ final class BreadCalculatorVM {
         }
     }
 
-    func save() {
+    private func save() {
         guard let modelContext else { return }
         let ingredients = BreadUpIngredients(
             id: UUID(),
@@ -277,25 +277,18 @@ final class BreadCalculatorVM {
         session.prewarm()
         //      session.logFeedbackAttachment(sentiment: .)
     }
-
-    func navigateToGenerateView() async {
+    
+    func checkAlreadyExists() {
         // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
         // entrar en la pantalla de generación (evita mostrarla vacía).
-        //if recipeAlreadyExists() {
-        //    Self.log.notice("Generación cancelada: la receta ya existe")
-        //    hasDuplicateError = true
-        //    return
-        //}
-
-        self.calculateHydratation()
-        guard !hydrationNotPermitted else { return }  // se queda en RecipeDetailView con el alert
-
-        path.append(.generate)
-        cleanContextWindow()
-        await calculateRecipe()
+        if recipeAlreadyExists() {
+            Self.log.notice("Generación cancelada: la receta ya existe")
+            hasDuplicateError = true
+            return
+        }
     }
-
-    func backToRecipeList() {
+    
+    func buttonSave() {
         // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
         // entrar en la pantalla de generación (evita mostrarla vacía).
         if recipeAlreadyExists() {
@@ -304,7 +297,20 @@ final class BreadCalculatorVM {
             hasDuplicateError = true
             return
         }
-        
+        save()
+        backToRecipeList()
+    }
+
+    func navigateToGenerateView() async {
+        self.calculateHydratation()
+        guard !hydrationNotPermitted else { return }  // se queda en RecipeDetailView con el alert
+
+        path.append(.generate)
+        cleanContextWindow()
+        await calculateRecipe()
+    }
+
+    private func backToRecipeList() {
         path.removeAll()
     }
 
@@ -460,17 +466,27 @@ final class BreadCalculatorVM {
     /// esos no se comparan de forma fiable dentro de un `#Predicate`.
     private func recipeAlreadyExists() -> Bool {
         guard let modelContext else { return false }
-        let flourTypeName = flourType.name
+        
+        //let flourTypeName = flourType.name
 
+        print("selectedDate: \(selectedDate.formatted(.dateTime))")
+        print("recipeTitle: \(recipeTitle)")
+        
         // Swift Data NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
         let descriptor = FetchDescriptor<BreadUpIngredients>(
             predicate: #Predicate {
-                $0.flourQuantity == flourQuantity
-                    && $0.yeast == yeast
-                    && $0.water == water
-                    && $0.flourTypeString == flourTypeName
-//                && $0.calculateBread?.recipe == 
-                // TODO búsqueda por fecha y título
+                // $0.created == selectedDate
+                //&&
+                //$0.created?.formatted(.dateTime).elementsEqual(selectedDate.formatted(.dateTime))
+                //$0.created?.formatted(.dateTime) == selectedDate.formatted(.dateTime)
+                
+                // &&
+                $0.calculateBread?.recipe == recipeTitle
+                
+                //$0.flourQuantity == flourQuantity
+                //    && $0.yeast == yeast
+                //    && $0.water == water
+                //    && $0.flourTypeString == flourTypeName
             }
         )
 

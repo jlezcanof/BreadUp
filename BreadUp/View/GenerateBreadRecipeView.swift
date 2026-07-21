@@ -120,8 +120,19 @@ struct GenerateBreadRecipeView: View {
     .alert("Guardar receta", isPresented: $showSaveDialog) {
       Button("Cancelar", role: .cancel) {}
       Button("Guardar") {
-        vm.save()
-        vm.backToRecipeList()
+          vm.buttonSave()
+          
+////          // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
+////          // entrar en la pantalla de generación (evita mostrarla vacía).
+////          if recipeAlreadyExists() {
+////              // Self.log.notice("Generación cancelada: la receta ya existe")
+////              Self.log.notice("No podemos guardar: la receta ya existe")
+////              hasDuplicateError = true
+////              return
+////          }
+//      //  vm.checkAlreadyExists()
+//        vm.save()
+//        vm.backToRecipeList()
       }
     } message: {
       Text("¿Quieres guardar esta receta en tu recetario?")
