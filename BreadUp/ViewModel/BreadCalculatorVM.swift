@@ -292,7 +292,6 @@ final class BreadCalculatorVM {
         // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
         // entrar en la pantalla de generación (evita mostrarla vacía).
         if recipeAlreadyExists() {
-            // Self.log.notice("Generación cancelada: la receta ya existe")
             Self.log.notice("No podemos guardar: la receta ya existe")
             hasDuplicateError = true
             return
@@ -310,7 +309,7 @@ final class BreadCalculatorVM {
         await calculateRecipe()
     }
 
-    func backToRecipeList() {//private
+    private func backToRecipeList() {
         path.removeAll()
     }
 
@@ -467,10 +466,10 @@ final class BreadCalculatorVM {
     private func recipeAlreadyExists() -> Bool {
         guard let modelContext else { return false }
         
-        //let flourTypeName = flourType.name
-
         print("selectedDate: \(selectedDate.formatted(.dateTime))")
-        print("recipeTitle: \(recipeTitle)")
+        
+        //let dateTime = selectedDate.formatted(.dateTime)
+        //print("datetime \(dateTime)")
         
         // Swift Data NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
         let descriptor = FetchDescriptor<BreadUpIngredients>(
@@ -478,15 +477,9 @@ final class BreadCalculatorVM {
                 // $0.created == selectedDate
                 //&&
                 //$0.created?.formatted(.dateTime).elementsEqual(selectedDate.formatted(.dateTime))
-                //$0.created?.formatted(.dateTime) == selectedDate.formatted(.dateTime)
-                
-                // &&
                 $0.calculateBread?.recipe == recipeTitle // "Pan del Campo Sereno"
-                
-                //$0.flourQuantity == flourQuantity
-                //    && $0.yeast == yeast
-                //    && $0.water == water
-                //    && $0.flourTypeString == flourTypeName
+                //&&
+                //$0.created?.formatted(.dateTime) == Date().formatted(.dateTime)
             }
         )
 
