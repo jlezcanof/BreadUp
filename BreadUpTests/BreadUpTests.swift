@@ -262,8 +262,9 @@ struct BreadUpTests {
             RecipeStep(titulo: "Hornear", descripcion: "Hornea el pan."),
         ]
 
-        vm.save()
-
+        //vm.save()
+        vm.buttonSave()
+        
         let stored = try context.fetch(FetchDescriptor<BreadUpIngredients>())
         #expect(stored.count == 1)
 
@@ -299,7 +300,8 @@ struct BreadUpTests {
         vm.water = 320
         vm.yeast = 8
 
-        vm.save()
+        //vm.save()
+        vm.buttonSave()
 
         #expect(vm.flourType == .wheat)
         #expect(vm.flourQuantity == 125)
@@ -309,20 +311,25 @@ struct BreadUpTests {
 
     // MARK: - Navegación (sólo ramas de retorno temprano, sin FoundationModels)
 
-    @Test("navigateToGenerateView: receta duplicada avisa y no navega")
-    func navigateToGenerateViewDuplicateSetsErrorAndDoesNotNavigate() async throws {
+    @Test("GenerateBreadRecipeView: receta duplicada avisa y no navega")
+    func generateBreadRecipeViewDuplicateSetsErrorAndDoesNotNavigate() async throws {
         let container = try makeInMemoryContainer()
         let context = container.mainContext
-        context.insert(
-            BreadUpIngredients(
-                id: UUID(),
-                water: 350,
-                flourTypeString: "wheat",
-                flourQuantity: 500,
-                yeast: 10,
-                createdAt: nil
-            )
+        
+        let recipeTitle = "Pan del siglo XX"
+        let firstBread = BreadUpIngredients(
+            id: UUID(),
+            water: 350,
+            flourTypeString: "wheat",
+            flourQuantity: 500,
+            yeast: 10,
+            createdAt: nil
         )
+        
+        let calculateBread = BreadUpCalculate(recipe: recipeTitle)
+        firstBread.calculateBread = calculateBread
+        
+        context.insert(firstBread)
         try context.save()
 
         let vm = makeConfiguredVM(context: context)
@@ -331,8 +338,9 @@ struct BreadUpTests {
         vm.flourQuantity = 500
         vm.water = 350
         vm.yeast = 10
+        vm.recipeTitle = recipeTitle
 
-        await vm.navigateToGenerateView()
+        vm.buttonSave()
 
         #expect(vm.hasDuplicateError == true)
         #expect(vm.path.isEmpty)

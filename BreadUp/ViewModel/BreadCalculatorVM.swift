@@ -310,7 +310,7 @@ final class BreadCalculatorVM {
         await calculateRecipe()
     }
 
-    private func backToRecipeList() {
+    func backToRecipeList() {//private
         path.removeAll()
     }
 
@@ -481,7 +481,7 @@ final class BreadCalculatorVM {
                 //$0.created?.formatted(.dateTime) == selectedDate.formatted(.dateTime)
                 
                 // &&
-                $0.calculateBread?.recipe == recipeTitle
+                $0.calculateBread?.recipe == recipeTitle // "Pan del Campo Sereno"
                 
                 //$0.flourQuantity == flourQuantity
                 //    && $0.yeast == yeast
