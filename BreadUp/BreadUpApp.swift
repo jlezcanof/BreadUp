@@ -23,7 +23,7 @@ enum AppModelStore {
 @main
 struct BreadUpApp: App {
     
-    @State private var vm = BreadCalculatorVM()
+    @State private var vm = BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()) // <#T##any RecipeIndexing#>
     let container = AppModelStore.shared
     
     var body: some Scene {

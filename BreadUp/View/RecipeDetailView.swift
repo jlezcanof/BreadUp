@@ -121,14 +121,6 @@ struct RecipeDetailView: View {
         .onChange(of: vm.water) { vm.verifyHidration() }
         .onChange(of: vm.flourType) { vm.verifyHidration() }
         .onChange(of: vm.flourQuantity) { vm.verifyHidration() }
-        //    .onChange(of: vm.yeast) {vm.verifyHidration()}//
-        .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
-            Button("De acuerdo", role: .cancel) {}
-        } message: {
-            Text(
-                "Ya tienes guardada una receta con estos ingredientes y fecha."
-            )
-        }
         .alert(
             vm.alertHydrationNotPermmited,
             isPresented: $vm.showHidrationAlert
@@ -136,7 +128,7 @@ struct RecipeDetailView: View {
             Button("De acuerdo", role: .cancel) {}
         } message: {
             Text(
-                "Ajuste los valores de agua y cantidad de harina para tener una hidratación más adecuada para la masa"
+                "Ajuste sus valores de agua y harina para tener la hidratación más adecuada para la masa"
             )
         }
     }

@@ -19,6 +19,12 @@ struct GenerateBreadRecipeView: View {
   /// resultado para anunciar que la receta está lista.
   @AccessibilityFocusState private var recipeTitleFocused: Bool
 
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+  /// Controla la aparición animada (fade + scale sutil) de la cabecera resumen.
+  @State private var headerAppeared = false
+
   private static let bottomID = "recipeBottomAnchor"
 
   var body: some View {
@@ -111,11 +117,17 @@ struct GenerateBreadRecipeView: View {
     } message: {
       Text(vm.alert)
     }
+    .alert("Esa receta ya existe", isPresented: $vm.hasDuplicateError) {
+        Button("De acuerdo", role: .cancel) {}
+    } message: {
+        Text(
+            "Ya tienes guardada una receta para esa fecha y ese título."
+        )
+    }
     .alert("Guardar receta", isPresented: $showSaveDialog) {
       Button("Cancelar", role: .cancel) {}
       Button("Guardar") {
-        vm.save()
-        vm.backToRecipeList()
+          vm.buttonSave()
       }
     } message: {
       Text("¿Quieres guardar esta receta en tu recetario?")
@@ -127,61 +139,105 @@ struct GenerateBreadRecipeView: View {
 
   // MARK: - Cabecera resumen
 
-  /// Tarjeta de cabecera: título de la receta + chips con los ingredientes
-  /// elegidos, usando los colores de marca. Conecta el resultado con lo pedido.
-    private func summaryHeader(title: String) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(title)
-                .font(.title2.bold())
-                .foregroundStyle(.primary)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityFocused($recipeTitleFocused)
-            VStack(alignment: .leading, spacing: 10) {
-                // Fila 1: tipo de harina centrado en todo el ancho.
-                HStack(spacing: 0) {
-                    Spacer()
-                    IngredientChip(
-                        icon: "tag.fill",
-                        tint: Color("BreadFlour"),
-                        value: vm.flourType.displayName,
-                        label: "Tipo de harina, \(vm.flourType.displayName)"
-                    )
-                    Spacer()
-                }
-                // Fila 2: los 3 chips de cantidad distribuidos de lado a lado.
-                HStack(spacing: 0) {
-                    IngredientChip(
-                        icon: "leaf.fill",
-                        tint: Color("BreadFlour"),
-                        value: "\(vm.flourQuantity) g",
-                        label: "Harina, \(vm.flourQuantity) gramos"
-                    )
-                    Spacer(minLength: 10)
-                    IngredientChip(
-                        icon: "drop.fill",
-                        tint: Color("BreadWater"),
-                        value: "\(vm.water) ml",
-                        label: "Agua, \(vm.water) mililitros"
-                    )
-                    Spacer(minLength: 10)
-                    IngredientChip(
-                        icon: "bubbles.and.sparkles.fill",
-                        tint: Color("BreadYeast"),
-                        value: "\(vm.yeast) g",
-                        label: "Levadura, \(vm.yeast) gramos"
-                    )
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
-        }
+  /// Tarjeta de cabecera Liquid Glass: eyebrow del tipo de harina, título de
+  /// la receta generada y tres "stat tiles" con las cantidades elegidas
+  /// (color-coded por ingrediente). Conecta el resultado con lo pedido.
+  private func summaryHeader(title: String) -> some View {
+    GlassEffectContainer(spacing: 20) {
+      headerCard(title: title)
     }
+  }
 
-    // MARK: - Barra de acciones
+  /// Contenido de la tarjeta + el fondo (glass o, si Reducir transparencia
+  /// está activo, un fondo opaco equivalente) + la animación de aparición.
+  private func headerCard(title: String) -> some View {
+    let card =
+      VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 4) {
+          // Eyebrow: tipo de harina elegido, en el color de marca.
+          HStack(spacing: 6) {
+            Image(systemName: "tag.fill")
+            Text(vm.flourType.displayName)
+          }
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(Color("BreadFlour"))
+          .accessibilityElement(children: .combine)
+          .accessibilityLabel("Tipo de harina, \(vm.flourType.displayName)")
+
+          Text(title)
+            .font(.title2.bold())
+            .foregroundStyle(.primary)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityFocused($recipeTitleFocused)
+        }
+
+        HStack(spacing: 12) {
+          IngredientStatTile(
+            icon: "leaf.fill",
+            tint: Color("BreadFlour"),
+            value: "\(vm.flourQuantity) g",
+            name: "Harina",
+            accessibilityLabel: "Harina, \(vm.flourQuantity) gramos"
+          )
+          IngredientStatTile(
+            icon: "drop.fill",
+            tint: Color("BreadWater"),
+            value: "\(vm.water) ml",
+            name: "Agua",
+            accessibilityLabel: "Agua, \(vm.water) mililitros"
+          )
+          IngredientStatTile(
+            icon: "bubbles.and.sparkles.fill",
+            tint: Color("BreadYeast"),
+            value: "\(vm.yeast) g",
+            name: "Levadura",
+            accessibilityLabel: "Levadura, \(vm.yeast) gramos"
+          )
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(20)
+      .background { decorativeMark }
+
+    return Group {
+      if reduceTransparency {
+        // Reducir transparencia activo: fondo opaco equivalente, sin glass.
+        card
+          .background {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+              .fill(Color(.secondarySystemGroupedBackground))
+          }
+      } else {
+        card
+          .glassEffect(
+            .regular.tint(Color("HeroTop").opacity(0.12)),
+            in: .rect(cornerRadius: 28, style: .continuous)
+          )
+      }
+    }
+    .opacity(headerAppeared ? 1 : 0)
+    .scaleEffect(headerAppeared ? 1 : 0.97, anchor: .top)
+    .onAppear {
+      withAnimation(reduceMotion ? nil : .smooth(duration: 0.4)) {
+        headerAppeared = true
+      }
+    }
+  }
+
+  /// Marca de agua puramente decorativa (`fork.knife`) en la esquina
+  /// superior-trailing de la tarjeta, recortada a su misma forma.
+  private var decorativeMark: some View {
+    Image(systemName: "fork.knife")
+      .font(.system(size: 120))
+      .foregroundStyle(Color("HeroBottom").opacity(0.06))
+      .rotationEffect(.degrees(20))
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+      .offset(x: 24, y: -24)
+      .clipShape(.rect(cornerRadius: 28, style: .continuous))
+      .accessibilityHidden(true)
+  }
+
+  // MARK: - Barra de acciones
 
   /// Fila de acciones que aparece al completarse la receta: elegir fecha de
   /// elaboración y guardar. Los botones usan los estilos Liquid Glass del
@@ -260,34 +316,43 @@ struct GenerateBreadRecipeView: View {
 
 }
 
-// MARK: - IngredientChip
+// MARK: - IngredientStatTile
 
-/// Cápsula compacta que muestra un icono + valor para un ingrediente.
-/// Reutilizable en cualquier cabecera de receta.
-private struct IngredientChip: View {
+/// Tile compacto tipo "stat" que muestra icono + valor destacado + etiqueta
+/// para un ingrediente, con color-coding por tinte de marca. Reutilizable en
+/// cualquier cabecera de receta.
+private struct IngredientStatTile: View {
 
   let icon: String
   let tint: Color
   let value: String
-  let label: String
+  let name: String
+  let accessibilityLabel: String
 
   var body: some View {
-    HStack(spacing: 6) {
+    VStack(spacing: 6) {
       Image(systemName: icon)
-        .font(.caption.weight(.semibold))
+        .font(.headline)
         .foregroundStyle(tint)
       Text(value)
-        .font(.subheadline.weight(.medium))
+        .font(.title3.weight(.semibold))
+        .foregroundStyle(.primary)
+      Text(name)
+        .font(.caption)
+        .foregroundStyle(.secondary)
     }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 7)
-    .background { Capsule().fill(tint.opacity(0.12)) }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 12)
+    .background {
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .fill(tint.opacity(0.10))
+    }
     .accessibilityElement(children: .combine)
-    .accessibilityLabel(label)
+    .accessibilityLabel(accessibilityLabel)
   }
 }
 
 #Preview {
   GenerateBreadRecipeView()
-    .environment(BreadCalculatorVM())
+    .environment(BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()))
 }
