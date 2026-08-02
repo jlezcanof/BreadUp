@@ -19,17 +19,29 @@
 		9EFE3DEF2F8FD84800392988 /* Exceptions for "BreadUp" folder in "BreadUp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				basuraquealmaceno.txt,
 				Info.plist,
 			);
 			target = 9E27310C2F7446EA0008A3B9 /* BreadUp */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		9E59F968301F9FD400963C50 /* Exceptions for "BreadUp" folder in "Compile Sources" phase from "BreadUp" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 9E2731092F7446EA0008A3B9 /* Sources */;
+			membershipExceptions = (
+				basuraquealmaceno.txt,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9E27310F2F7446EA0008A3B9 /* BreadUp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				9EFE3DEF2F8FD84800392988 /* Exceptions for "BreadUp" folder in "BreadUp" target */,
+				9E59F968301F9FD400963C50 /* Exceptions for "BreadUp" folder in "Compile Sources" phase from "BreadUp" target */,
 			);
 			path = BreadUp;
 			sourceTree = "<group>";

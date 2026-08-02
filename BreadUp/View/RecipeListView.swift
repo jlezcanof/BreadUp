@@ -181,6 +181,7 @@ struct RecipeListView: View {
               systemImage: recipe.isFavorite ? "star.slash" : "star.fill"
             )
           }
+          .labelStyle(.iconOnly)
           .tint(.yellow)
         }
       }
