@@ -43,5 +43,5 @@ struct FavoriteRecipesView: View {
   NavigationStack {
     FavoriteRecipesView()
   }
-  .environment(BreadCalculatorVM())
+  .environment(BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()))
 }

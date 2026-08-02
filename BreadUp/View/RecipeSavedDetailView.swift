@@ -22,7 +22,7 @@ struct RecipeSavedDetailView: View {
   /// Título guardado (en `calculateBread.recipe`); si faltara, un texto por defecto.
   private var title: String {
     let stored =
-      recipe.calculateBread?.recipe
+      recipe.calculateBread?.recipe!
       .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     return stored.isEmpty ? "Receta de pan" : stored
   }
