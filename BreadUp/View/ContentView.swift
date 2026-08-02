@@ -60,5 +60,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(BreadCalculatorVM())
+        .environment(BreadCalculatorVM(recipeIndexer: SpotlightRecipeIndexer()))
 }

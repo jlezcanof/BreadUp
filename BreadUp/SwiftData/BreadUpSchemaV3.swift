@@ -102,15 +102,14 @@ enum BreadUpSchemaV3: VersionedSchema {
     @Attribute(.unique) var id: UUID
 
     var ingredients: Ingredients?
-
-    var recipe: String?
+    var recipe: String
 
     // Relación 1-N: una receta calculada tiene N pasos.
     @Relationship(deleteRule: .cascade, inverse: \StepRecipe.calculateBread)
     var steps: [StepRecipe] = []
 
-    init(  //id: UUID,
-      recipe: String?
+    init(//id: UUID,
+      recipe: String
     ) {
       self.id = UUID()
       self.recipe = recipe
