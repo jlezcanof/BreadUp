@@ -9,14 +9,14 @@ import Foundation
 import SwiftData
 import AppIntents
 
-typealias BreadUpIngredients = BreadUpSchemaV3.Ingredients
-typealias BreadUpCalculate   = BreadUpSchemaV3.CalculateBread
-typealias BreadUpStepRecipe  = BreadUpSchemaV3.StepRecipe
+typealias BreadUpIngredients = BreadUpSchemaV4.Ingredients
+typealias BreadUpCalculate   = BreadUpSchemaV4.CalculateBread
+typealias BreadUpStepRecipe  = BreadUpSchemaV4.StepRecipe
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
 
   static var schemas: [any VersionedSchema.Type] {
-    [BreadUpSchemaV1.self, BreadUpSchemaV2.self, BreadUpSchemaV3.self]
+    [BreadUpSchemaV1.self, BreadUpSchemaV2.self, BreadUpSchemaV3.self, BreadUpSchemaV4.self]
   }
 
   static var stages: [MigrationStage] {
@@ -25,6 +25,7 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
       migrationV1toV2,
       // pending migrate to v2
       migrationV2toV3,
+      migrationV3toV4,
     ]
   }
 
@@ -33,6 +34,13 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
   static let migrationV2toV3 = MigrationStage.lightweight(
     fromVersion: BreadUpSchemaV2.self,
     toVersion: BreadUpSchemaV3.self
+  )
+
+  // V3 -> V4: solo añade `isFavorite` (Bool) con valor por defecto false,
+  // sin nuevas entidades ni relaciones: migración ligera.
+  static let migrationV3toV4 = MigrationStage.lightweight(
+    fromVersion: BreadUpSchemaV3.self,
+    toVersion: BreadUpSchemaV4.self
   )
 
   static let migrationV1toV2 = MigrationStage.custom(
@@ -112,8 +120,8 @@ extension FlourType {
   }
 }
 
-extension BreadUpSchemaV3.Ingredients {
-  @MainActor static let example = BreadUpSchemaV3.Ingredients(
+extension BreadUpSchemaV4.Ingredients {
+  @MainActor static let example = BreadUpSchemaV4.Ingredients(
     id: UUID(),
     water: 250,
     flourTypeString: "corn",

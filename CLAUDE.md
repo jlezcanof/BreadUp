@@ -43,9 +43,9 @@ Flujo de capas: **SwiftData (schema/migración) → ViewModel (`@Observable`) �
 
 ### Persistencia (`BreadUp/SwiftData/`)
 - `BreadUpApp.swift`: `AppModelStore.shared` es un `ModelContainer` `@MainActor` único, construido con `BreadUpMigrationPlan`. Se inyecta en la escena con `.modelContainer(...)`.
-- Esquema **versionado**: `BreadUpSchemaV1` → `BreadUpSchemaV2` (`VersionedSchema`). `BreadUpMigrationPlan` define una migración `.custom` (V1→V2 añade el campo `created`).
-- **Usa siempre los typealias** `BreadUpIngredients` (= `BreadUpSchemaV2.Ingredients`) y `BreadUpCalculate` (= `BreadUpSchemaV2.CalculateBread`), definidos en `BreadUpMigrationPlan.swift`. Así el resto del código no se acopla a una versión concreta del schema. Al introducir cambios de modelo, crea una nueva `VersionedSchema` + stage de migración y reapunta los typealias; no edites un schema versionado ya migrado.
-- Modelos: `Ingredients` (water/flourType/flourQuantity/yeast/created) tiene relación `.cascade` con `CalculateBread` (que guarda `recipe: String?`).
+- Esquema **versionado**: `BreadUpSchemaV1` → `BreadUpSchemaV2` → `BreadUpSchemaV3` → `BreadUpSchemaV4` (`VersionedSchema`). `BreadUpMigrationPlan` encadena las migraciones: V1→V2 es `.custom` (añade el campo `created`, con backfill a `.now` en `didMigrate`); V2→V3 y V3→V4 son `.lightweight` (V2→V3 añade la entidad `StepRecipe` y su relación 1-N con `CalculateBread`; V3→V4 añade `isFavorite: Bool` a `Ingredients` con default `false`).
+- **Usa siempre los typealias** `BreadUpIngredients` (= `BreadUpSchemaV4.Ingredients`), `BreadUpCalculate` (= `BreadUpSchemaV4.CalculateBread`) y `BreadUpStepRecipe` (= `BreadUpSchemaV4.StepRecipe`), definidos en `BreadUpMigrationPlan.swift`. Así el resto del código no se acopla a una versión concreta del schema. Al introducir cambios de modelo, crea una nueva `VersionedSchema` + stage de migración y reapunta los typealias; no edites un schema versionado ya migrado.
+- Modelos: `Ingredients` (water/flourType/flourQuantity/yeast/created/isFavorite) tiene relación `.cascade` con `CalculateBread` (que guarda `recipe: String?` y una relación 1-N `.cascade` con `StepRecipe`, sus pasos).
 - `FlourType` (en `BreadUpMigrationPlan.swift`) es el enum de harinas con `displayName` en español; es el tipo usado por la UI. Persiste como `Codable`.
 
 ### Generación con FoundationModels (`BreadUp/FMFBusiness/` + `ViewModel/`)

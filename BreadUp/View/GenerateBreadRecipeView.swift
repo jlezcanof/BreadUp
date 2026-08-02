@@ -7,6 +7,21 @@ import FoundationModels
 import SwiftData
 import SwiftUI
 
+/// Vista que muestra la receta de pan generada en el dispositivo mediante FoundationModels.
+///
+/// Observa el estado de `BreadCalculatorVM` y renderiza el resultado de forma incremental
+/// conforme el modelo emite tokens (streaming): auto-desplaza el scroll al último paso
+/// visible y mueve el foco de VoiceOver al título en cuanto la generación termina.
+///
+/// Al completarse la receta, aparece una barra flotante de acciones que permite:
+/// - Seleccionar la fecha de elaboración mediante un `DatePicker` en una hoja.
+/// - Guardar la receta (ingredientes + pasos) en SwiftData a través del VM.
+///
+/// El botón de reintento en la barra de navegación permite regenerar otra versión
+/// con los mismos ingredientes sin abandonar la vista.
+///
+/// > Note: La generación de recetas requiere un dispositivo con Apple Intelligence habilitado.
+/// > En simuladores o dispositivos no elegibles, el VM no lanzará la generación.
 struct GenerateBreadRecipeView: View {
 
   @Environment(BreadCalculatorVM.self) private var vm    

@@ -8,31 +8,106 @@ import SwiftData
 import SwiftUI
 import FoundationModels
 
+/// Lista principal de recetas de pan guardadas por el usuario.
+///
+/// ## Overview
+///
+/// `RecipeListView` muestra todas las recetas persistidas en SwiftData,
+/// ordenadas de más reciente a más antigua. Integra un buscador desplegable
+/// en la barra inferior y una hoja de filtros para afinar los resultados
+/// por tipo de harina y rango de fechas.
+///
+/// La vista gestiona tres estados vacíos diferenciados:
+///
+/// - **Apple Intelligence no disponible** — el modelo on-device no está activo;
+///   se muestra un aviso y se oculta el botón de nueva receta.
+/// - **Sin recetas** — la base de datos está vacía; se invita al usuario a crear
+///   la primera receta pulsando el botón `+`.
+/// - **Sin resultados** — hay recetas pero ninguna coincide con la búsqueda
+///   o los filtros activos.
+///
+/// ## Dependencias de entorno
+///
+/// La vista requiere dos objetos inyectados en el entorno SwiftUI:
+///
+/// | Entorno | Tipo | Uso |
+/// |---|---|---|
+/// | `\.modelContext` | `ModelContext` | Borrar recetas de SwiftData |
+/// | `BreadCalculatorVM` | `BreadCalculatorVM` | Navegación y disponibilidad del modelo |
+///
+/// ## Integración
+///
+/// Integración mínima dentro de un `NavigationStack` con el contenedor de
+/// SwiftData ya configurado en la escena:
+///
+/// ```swift
+/// NavigationStack(path: $vm.path) {
+///     RecipeListView()
+///         .navigationDestination(for: Route.self) { route in
+///             switch route {
+///             case .detail:
+///                 RecipeDetailView()
+///             case .saved(let recipe):
+///                 RecipeSavedDetailView(recipe: recipe)
+///             }
+///         }
+/// }
+/// .environment(vm)
+/// .modelContainer(AppModelStore.shared)
+/// ```
+///
+/// ### Preview aislada
+///
+/// Para previsualizar la vista de forma aislada, proporciona un
+/// `BreadCalculatorVM` vacío. SwiftData poblará la lista con los datos
+/// del contenedor de preview si los hay:
+///
+/// ```swift
+/// #Preview {
+///     RecipeListView()
+///         .environment(BreadCalculatorVM())
+/// }
+/// ```
 struct RecipeListView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(BreadCalculatorVM.self) private var vm
-  // Más recientes primero. `created` es opcional: SwiftData coloca los nil al
-  // final con orden inverso (las recetas guardadas siempre llevan fecha).
-    
-//    @Query(sort: [SortDescriptor(\BreadUpIngredients.calculateBread.recipe, order: .forward)])
-//    private var recipess: [BreadUpIngredients]
-    
-  @Query(sort: \BreadUpIngredients.created, order: .reverse)//TODO ordernar tambien con el nombre de forma ascendente
+
+  /// Recetas cargadas desde SwiftData, ordenadas de más reciente a más antigua.
+  ///
+  /// Las recetas sin fecha (`created == nil`) quedan al final porque SwiftData
+  /// coloca los `nil` al final en orden `.reverse`. En la práctica todas las
+  /// recetas guardadas incluyen fecha.
+  @Query(sort: \BreadUpIngredients.created, order: .reverse)
   private var recipes: [BreadUpIngredients]
 
-  // Búsqueda por texto (título de la receta).
+  /// Texto introducido en el buscador inferior.
+  ///
+  /// Se compara (sin distinguir mayúsculas ni diacríticos) contra el título
+  /// de la receta y el nombre del tipo de harina.
   @State private var searchText = ""
 
-  // Filtros por atributo.
+  /// Controla la presentación de la hoja de filtros.
   @State private var showFilters = false
+
+  /// Tipo de harina seleccionado como filtro. `nil` significa "todas las harinas".
   @State private var flourFilter: FlourType?
+
+  /// Activa el filtrado por rango de fechas usando `dateFrom` y `dateTo`.
   @State private var useDateRange = false
+
+  /// Límite inferior del rango de fechas cuando `useDateRange` está activo.
+  ///
+  /// Se inicializa a un mes antes de la fecha actual.
   @State private var dateFrom: Date =
     Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
+
+  /// Límite superior del rango de fechas cuando `useDateRange` está activo.
   @State private var dateTo: Date = .now
 
-  // Buscador custom desplegable desde la barra inferior.
+  /// `true` mientras el buscador inferior está expandido.
   @State private var isSearching = false
+
+  /// Gestiona el foco del `TextField` del buscador inferior.
   @FocusState private var searchFocused: Bool
 
   var body: some View {
@@ -40,7 +115,7 @@ struct RecipeListView: View {
       .overlay {
           if !vm.availableModel() {
               ContentUnavailableView(
-                "Apple Intelligence no disponible",//Este dispositivo no es compatible con Apple Inteligence
+                "Apple Intelligence no disponible",
                 systemImage: "apple.intelligence",
                 description: Text(
                   "Esta app necesita Apple Intelligence activo en el dispositivo. Actívalo en Ajustes › Apple Intelligence y Siri."
@@ -76,8 +151,6 @@ struct RecipeListView: View {
               }
           }
       }
-      // Barra inferior: en reposo, filtro + lupa; al buscar, el campo de texto
-      // desplegado abajo. Solo cuando hay recetas que filtrar/buscar.
       .safeAreaBar(edge: .bottom) {
         if !recipes.isEmpty {
           bottomSearchBar
@@ -86,18 +159,29 @@ struct RecipeListView: View {
       .sheet(isPresented: $showFilters) {
         filtersSheet
       }
-      // Da/quita el foco al campo al abrir/cerrar el buscador.
       .onChange(of: isSearching) { _, searching in
         searchFocused = searching
       }
   }
 
   // MARK: - Lista
+
   private var recipeList: some View {
     List {
       ForEach(filteredRecipes) { recipe in
         NavigationLink(value: Route.saved(recipe)) {
           RecipeRow(recipe: recipe)
+        }
+        .swipeActions(edge: .leading) {
+          Button {
+            toggleFavorite(recipe)
+          } label: {
+            Label(
+              recipe.isFavorite ? "Quitar de favoritos" : "Marcar como favorita",
+              systemImage: recipe.isFavorite ? "star.slash" : "star.fill"
+            )
+          }
+          .tint(.yellow)
         }
       }
       .onDelete(perform: deleteRecipes)
@@ -106,8 +190,12 @@ struct RecipeListView: View {
 
   // MARK: - Búsqueda (barra inferior)
 
-  /// En reposo, muestra el filtro (izquierda) y la lupa (derecha). Al activar
-  /// la búsqueda, despliega el campo de texto en esa misma zona inferior.
+  /// Barra inferior adaptativa: muestra los controles de filtro y búsqueda en
+  /// reposo, y despliega el campo de texto al activar la búsqueda.
+  ///
+  /// Solo se renderiza cuando hay al menos una receta guardada. Al abrir el
+  /// buscador, el foco del teclado se transfiere automáticamente al
+  /// `TextField` vía el `onChange` en `body`.
   @ViewBuilder
   private var bottomSearchBar: some View {
     if isSearching {
@@ -143,8 +231,11 @@ struct RecipeListView: View {
     .accessibilityValue(hasActiveFilters ? "Activos" : "Ninguno")
   }
 
-  /// Campo de búsqueda desplegado en la barra inferior, con lupa, limpiar y
-  /// botón para cancelar (cierra y vacía la búsqueda).
+  /// Campo de búsqueda expandido en la barra inferior.
+  ///
+  /// Incluye un icono de lupa decorativo, el `TextField` con foco automático
+  /// y un botón `xmark` que cierra el buscador y limpia el texto introducido.
+  /// El icono del botón cambia a `xmark.circle.fill` mientras hay texto.
   private var searchFieldBar: some View {
     HStack(spacing: 10) {
       HStack(spacing: 8) {
@@ -178,12 +269,25 @@ struct RecipeListView: View {
 
   // MARK: - Filtrado
 
-  /// Hay filtros de atributo activos (la búsqueda de texto no cuenta como tal).
+  /// `true` cuando hay al menos un filtro de atributo activo.
+  ///
+  /// La búsqueda de texto **no** se considera filtro de atributo: no cambia
+  /// el icono del botón de filtros ni habilita el botón de limpiar en la hoja.
   private var hasActiveFilters: Bool {
     flourFilter != nil || useDateRange
   }
 
-  /// Recetas tras aplicar búsqueda de título + filtros de harina y fecha.
+  /// Subconjunto de `recipes` tras aplicar la búsqueda por texto y los filtros
+  /// de tipo de harina y rango de fechas.
+  ///
+  /// La coincidencia de texto es insensible a mayúsculas y diacríticos y se
+  /// evalúa tanto sobre el título de la receta (`calculateBread.recipe`) como
+  /// sobre el nombre del tipo de harina (`flourType.displayName`).
+  ///
+  /// Los tres predicados se combinan con `&&`:
+  /// 1. `matchesText` — texto vacío pasa todo.
+  /// 2. `matchesFlour` — `flourFilter == nil` pasa todo.
+  /// 3. `matchesDate` — solo activo si `useDateRange == true`.
   private var filteredRecipes: [BreadUpIngredients] {
     recipes.filter { recipe in
       let matchesText =
@@ -198,7 +302,14 @@ struct RecipeListView: View {
     }
   }
 
-  /// `true` si `date` cae dentro del rango [inicio de `dateFrom`, fin de `dateTo`].
+  /// Comprueba si una fecha cae dentro del rango `[dateFrom, dateTo]`, ambos
+  /// extremos inclusivos a nivel de día completo.
+  ///
+  /// El rango se calcula como `[startOfDay(dateFrom), startOfDay(dateTo) + 1 día)`,
+  /// de modo que todo el día `dateTo` queda incluido.
+  ///
+  /// - Parameter date: Fecha a comprobar. Devuelve `false` si es `nil`.
+  /// - Returns: `true` si `date` se encuentra dentro del rango activo.
   private func dateInRange(_ date: Date?) -> Bool {
     guard let date else { return false }
     let calendar = Calendar.current
@@ -236,8 +347,6 @@ struct RecipeListView: View {
       .navigationTitle("Filtros")
       .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // "Limpiar" vive en la barra del sheet (no en el Form), así no queda
-                // pegado a la home indicator y está siempre accesible sin hacer scroll.
                 ToolbarItem(placement: .topBarLeading) {
                     Button(role: .cancel) {
                         showFilters = false
@@ -251,22 +360,18 @@ struct RecipeListView: View {
                     .disabled(!hasActiveFilters)
                     .accessibilityLabel("Limpiar filtros")
                 }
-//                ToolbarItem(placement: .confirmationAction) {
-//                    Button(role: .confirm) {
-//                        
-//                        //showFilters = false
-//                    } label: {
-//                        Image(systemName: "checkmark")
-//                    }
-//                    .accessibilityLabel("Listo")
-//                    .disabled(true)
-//                }
             }
         }
     .presentationDetents([.medium])
   }
 
   // MARK: - Acciones
+
+  /// Restablece todos los filtros de atributo a su estado inicial.
+  ///
+  /// Pone `flourFilter` a `nil` y `useDateRange` a `false`. El texto de
+  /// búsqueda **no** se limpia aquí; se gestiona de forma independiente
+  /// en `searchFieldBar`.
   private func clearFilters() {
     withAnimation {
       flourFilter = nil
@@ -274,6 +379,15 @@ struct RecipeListView: View {
     }
   }
 
+  /// Elimina las recetas en los índices indicados de `filteredRecipes`.
+  ///
+  /// El borrado opera sobre `filteredRecipes` (no sobre `recipes` completo)
+  /// para que el índice del gesto swipe-to-delete coincida con la fila
+  /// visible. Tras eliminar del `ModelContext`, desindexiza la receta de
+  /// Spotlight de forma asíncrona.
+  ///
+  /// - Parameter offsets: Índices de `filteredRecipes` a eliminar, tal como
+  ///   los proporciona el modificador `.onDelete`.
   private func deleteRecipes(offsets: IndexSet) {
     withAnimation {
       for index in offsets {
@@ -283,6 +397,15 @@ struct RecipeListView: View {
               try await RecipeBreadSpotlightIndexer.delete(recipe: recipeOffset)
         }
       }
+    }
+  }
+
+  /// Alterna el estado de favorita de `recipe` y persiste el cambio de forma
+  /// inmediata (sin depender del autosave del `ModelContext`).
+  private func toggleFavorite(_ recipe: BreadUpIngredients) {
+    recipe.isFavorite.toggle()
+    if modelContext.hasChanges {
+      try? modelContext.save()
     }
   }
 }
