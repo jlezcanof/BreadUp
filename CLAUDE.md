@@ -10,23 +10,20 @@ Es un proyecto exploratorio/de aprendizaje: hay abundante código comentado, fic
 
 ## Comandos
 
-No hay aún ninguna target de tests. Build y arranque vía `xcodebuild` (o preferiblemente el MCP `xcode`, ver más abajo):
-
-```bash
-# Compilar para simulador iOS
-xcodebuild -project BreadUp.xcodeproj -scheme BreadUp \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
-
-# Limpiar
-xcodebuild -project BreadUp.xcodeproj -scheme BreadUp clean
-```
+Build, arranque y tests van **exclusivamente** vía el MCP `xcode` (ver más abajo). No hay comandos de shell recomendados para este proyecto.
 
 - Esquema único: `BreadUp`. Bundle id `com.josemanuel.lezcano.BreadUp`.
 - **FoundationModels solo funciona en dispositivos con Apple Intelligence habilitado.** En simuladores/dispositivos no elegibles, `SystemLanguageModel.default.availability` será `.unavailable(...)` y la generación de recetas no se ejecuta (la UI lo refleja en `RecipeDetailView`).
 
-### MCP `xcode` (preferente)
+### MCP `xcode` (obligatorio, sin excepciones)
 
-Para cualquier fichero que pertenezca al `.xcodeproj` (todo `BreadUp/**/*.swift`), usa las herramientas del MCP `xcode` (`XcodeRead`/`XcodeWrite`/`XcodeGrep`/`BuildProject`/`RunAllTests`/`RenderPreview`…) en lugar de `xcodebuild` en Bash o de Read/Write/Grep. Ficheros fuera del proyecto (este `CLAUDE.md`, `.claude/`, scripts) van por las herramientas estándar.
+El `.xcodeproj` **no se toca nunca internamente a través del shell** (`xcodebuild`, edición manual del `.pbxproj`, o `Read`/`Write`/`Edit`/`Grep` estándar sobre `BreadUp/**/*.swift` u otros ficheros del target). Usa siempre las herramientas del MCP `xcode` (`XcodeRead`/`XcodeWrite`/`XcodeGrep`/`BuildProject`/`RunAllTests`/`RunSomeTests`/`RenderPreview`/`XcodeRM`…). Si por cualquier motivo excepcional fuera necesario recurrir al shell, **pide autorización expresa y justifica el motivo antes de hacerlo** — nunca por iniciativa propia, ni siquiera como fallback si el MCP está desconectado (en ese caso, informa y espera a que se reconecte). Ficheros fuera del proyecto (este `CLAUDE.md`, `.claude/`, `Docs/`, scripts) van por las herramientas estándar.
+
+## Testing
+
+- **Tests unitarios: solo Swift Testing** (`import Testing`, `@Test`, `#expect`) — target `BreadUpTests`. No uses XCTest para tests unitarios.
+- **XCTest se reserva exclusivamente para UI Tests** — es la única herramienta disponible para ese propósito a mayo de 2026 (Swift Testing no cubre todavía UI testing).
+- Ejecuta siempre los tests vía el MCP `xcode` (`RunAllTests`/`RunSomeTests`/`GetTestList`), nunca `xcodebuild test` en shell.
 
 ## Configuración de compilación crítica
 
@@ -36,6 +33,7 @@ El target impone reglas estrictas que hay que respetar en todo código nuevo:
 - **`SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated`** → el aislamiento por defecto NO es `@MainActor`. Anota `@MainActor` explícitamente donde toque UI/`ModelContext` en el hilo principal.
 - **`SWIFT_TREAT_WARNINGS_AS_ERRORS = YES`** → cualquier warning rompe el build. No dejes imports/variables sin usar.
 - Deployment target iOS 26. `SUPPORTED_PLATFORMS = iphoneos iphonesimulator macosx`.
+- **Icono de la app: formato `.icon` (Icon Composer, norma de Xcode 26)**. Ya está configurado — no uses el formato clásico `.appiconset`/PNGs sueltos dentro de `Assets.xcassets` para el icono.
 
 ## Arquitectura
 
@@ -57,7 +55,7 @@ Flujo de capas: **SwiftData (schema/migración) → ViewModel (`@Observable`) �
 
 ### Vistas (`BreadUp/View/`)
 - `ContentView` → `NavigationStack` → `RecipeListView` (lista con `@Query` de `BreadUpIngredients`, borrado por swipe) → `RecipeDetailView` (formulario con sliders, botón "Generar receta" condicionado a `model.availability`, guardado) y `RecipeSavedDetailView` (detalle de receta guardada). `StepView`/`StepCard`/`StepsBreadView` renderizan pasos.
-- Todas las cadenas de UI están **en español, hardcodeadas** (no hay catálogo de localización `Localizable.xcstrings` todavía).
+- El proyecto tiene configuradas las Localizations **Spanish** (recién añadida) y **English** (ya existía previamente). Las cadenas de UI en el código siguen escritas en español.
 
 ### Integración con el sistema (`BreadUp/AppEntity/`) — WIP
 - `RecipeBreadEntity` (`AppEntity` + `IndexedEntity`), `RecipeBreadIntents` (`CreateRecipeBreadIntent` + `BreadRecipeShortcuts`) y `RecipeBreadSpotlightIndexer` (CoreSpotlight). Mayormente esqueleto: las queries devuelven `[]` y el indexado usa placeholders. Punto de partida para Siri/Shortcuts/Spotlight, no funcional aún.
