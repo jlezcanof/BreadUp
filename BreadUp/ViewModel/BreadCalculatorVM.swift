@@ -36,6 +36,13 @@ final class BreadCalculatorVM {
     // La receta que se intenta generar ya existe (mismos ingredientes y fecha).
     // La pantalla de ingredientes observa este flag para avisar sin navegar.
     var hasDuplicateError = false
+
+    // Señal de éxito para que `CreateRecipeFlowView` (la raíz de la
+    // jerarquía del sheet de creación) sepa que debe cerrarse por completo.
+    // No basta con observar `path.isEmpty`: también se vacía al cerrar el
+    // alert de error de generación (pop de `.generate` a la raíz), caso en
+    // el que NO queremos cerrar el sheet.
+    var didSaveRecipe = false
     var hydrationNotPermitted = false  // Estado de validez - controla el botón
     var showHidrationAlert = false  //presentación del alert - independiente
     var alertHydrationNotPermmited = ""
@@ -288,16 +295,19 @@ final class BreadCalculatorVM {
         }
     }
     
-    func buttonSave() {
+    @discardableResult
+    func buttonSave() -> Bool {
         // Si ya existe una receta con estos ingredientes y fecha, avisamos sin
         // entrar en la pantalla de generación (evita mostrarla vacía).
         if recipeAlreadyExists() {
             Self.log.notice("No podemos guardar: la receta ya existe")
             hasDuplicateError = true
-            return
+            return false
         }
         save()
         backToRecipeList()
+        didSaveRecipe = true
+        return true
     }
 
     func navigateToGenerateView() async {
@@ -466,28 +476,36 @@ final class BreadCalculatorVM {
     private func recipeAlreadyExists() -> Bool {
         guard let modelContext else { return false }
         
-        print("selectedDate: \(selectedDate.formatted(.dateTime))")
+        let descriptor = obtainFetchDescriptor()
+        let candidates = (try? modelContext.fetch(descriptor)) ?? []
+
+        return (candidates.count != 0) ? true : false
+    }
+    
+    private func obtainFetchDescriptor() -> FetchDescriptor<BreadUpCalculate> {
         
-        //let dateTime = selectedDate.formatted(.dateTime)
-        //print("datetime \(dateTime)")
+        // SwiftData no puede traducir a SQL una comparación de subcadena
+        // sobre una relación opcional encadenada (p. ej.
+        // `calculateBread?.recipe?.localizedStandardContains(...)`): genera
+        // un `TERNARY(...)` que el motor SQL no soporta y crashea en tiempo
+        // de ejecución ("unimplemented SQL generation ... bad RHS"). Igual
+        // que en `allNamesRecipes()`, se hace el fetch sin predicado y la
+        // comparación de texto en memoria.
         
-        // Swift Data NO ES capaz de entrar a las propiedades una instancia, hay que sacar los valores antes
-        let descriptor = FetchDescriptor<BreadUpIngredients>(
+        let descriptor = FetchDescriptor<BreadUpCalculate>(
             predicate: #Predicate {
+                ($0.recipe?.localizedStandardContains(recipeTitle) == true
+                ||
+                $0.recipe == recipeTitle )
+                &&
+                (1 == 1)
+                // TODO incluir aqui para buscar tambien coincidencia de fechas
                 // $0.created == selectedDate
                 //&&
                 //$0.created?.formatted(.dateTime).elementsEqual(selectedDate.formatted(.dateTime))
-                //&&
-                //$0.created?.formatted(.dateTime) == Date().formatted(.dateTime)
-                $0.calculateBread?.recipe?.localizedStandardContains(recipeTitle) == true
-                ||
-                $0.calculateBread?.recipe == recipeTitle
             }
         )
-
-        let candidates = try? modelContext.fetch(descriptor)
-
-        return (candidates?.count != 0) ? true : false
+        return descriptor
     }
 
     private func containsSafetyAssetFailure(_ error: Error) -> Bool {

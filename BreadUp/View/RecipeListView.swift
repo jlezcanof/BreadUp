@@ -41,20 +41,22 @@ import FoundationModels
 /// SwiftData ya configurado en la escena:
 ///
 /// ```swift
-/// NavigationStack(path: $vm.path) {
+/// NavigationStack(path: $recipesPath) {
 ///     RecipeListView()
 ///         .navigationDestination(for: Route.self) { route in
 ///             switch route {
-///             case .detail:
-///                 RecipeDetailView()
-///             case .saved(let recipe):
-///                 RecipeSavedDetailView(recipe: recipe)
+///             case .generate: GenerateBreadRecipeView() // inalcanzable aquí
+///             case .saved(let recipe): RecipeSavedDetailView(recipe: recipe)
 ///             }
 ///         }
 /// }
 /// .environment(vm)
 /// .modelContainer(AppModelStore.shared)
 /// ```
+///
+/// El botón "+" no empuja ninguna ruta: presenta `CreateRecipeFlowView()`
+/// como sheet modal (ver `.sheet(isPresented: $showingCreateRecipe)`), para
+/// ocultar la tab bar durante la tarea de crear/generar una receta.
 ///
 /// ### Preview aislada
 ///
@@ -88,6 +90,9 @@ struct RecipeListView: View {
 
   /// Controla la presentación de la hoja de filtros.
   @State private var showFilters = false
+
+  /// Controla la presentación del flujo modal de "crear + generar receta".
+  @State private var showingCreateRecipe = false
 
   /// Tipo de harina seleccionado como filtro. `nil` significa "todas las harinas".
   @State private var flourFilter: FlourType?
@@ -142,7 +147,11 @@ struct RecipeListView: View {
           if vm.availableModel() {
               ToolbarItem(placement: .primaryAction) {
                 Button {
-                  vm.path.append(.detail)
+                  // Reset defensivo: `vm.path` es estado compartido y
+                  // persistente en el VM (no se recrea al mostrar el sheet).
+                  vm.path = []
+                  vm.didSaveRecipe = false
+                  showingCreateRecipe = true
                 } label: {
                   Image(systemName: "plus")
                 }
@@ -158,6 +167,15 @@ struct RecipeListView: View {
       }
       .sheet(isPresented: $showFilters) {
         filtersSheet
+      }
+      .sheet(isPresented: $showingCreateRecipe) {
+        // Flujo modal (HIG "Modality"): oculta la tab bar mientras dura la
+        // tarea multi-paso de configurar y generar una receta.
+        // `.interactiveDismissDisabled()` evita el swipe-to-dismiss
+        // accidental con el formulario a medio rellenar; el cierre pasa por
+        // el botón "Cancelar" explícito de `RecipeDetailView`.
+        CreateRecipeFlowView()
+          .interactiveDismissDisabled()
       }
       .onChange(of: isSearching) { _, searching in
         searchFocused = searching

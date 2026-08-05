@@ -12,6 +12,7 @@ import SwiftUI
 struct RecipeDetailView: View {
 
     @Environment(BreadCalculatorVM.self) private var vm
+    @Environment(\.dismiss) private var dismiss
 
     @State private var resultID = "resultado"
 
@@ -112,6 +113,13 @@ struct RecipeDetailView: View {
                 //                }
             }
             .navigationTitle("Nueva receta")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancelar", role: .cancel) {
+                        dismiss()
+                    }
+                }
+            }
         }
         .loadingOverlay(vm.isLoading, message: "Generando receta…")
         .onAppear {

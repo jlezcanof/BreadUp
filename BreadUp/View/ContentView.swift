@@ -8,26 +8,28 @@
 import SwiftUI
 import SwiftData
 
-/// Rutas de navegación de la app. Cada pestaña del `TabView` mantiene su
-/// propia pila: la de "Mis recetas" usa `BreadCalculatorVM.path` (compartido
-/// con el flujo de creación de recetas), la de "Favoritos" usa un `path`
-/// local a `ContentView`.
+/// Rutas de navegación de la app.
+///
+/// - `.generate` solo se alcanza dentro del `NavigationStack` interno del
+///   sheet de creación de recetas (`CreateRecipeFlowView`), apilado sobre
+///   `BreadCalculatorVM.path`.
+/// - `.saved` se usa en las pilas de `push` de ambas pestañas del `TabView`:
+///   "Mis recetas" (`recipesPath`) y "Favoritos" (`favoritesPath`), ambas
+///   locales a `ContentView`.
 enum Route: Hashable {
-    case detail                     // Configurar/crear una nueva receta
     case generate                   // Generar la receta con FoundationModels
     case saved(BreadUpIngredients)  // Detalle de una receta ya guardada
 }
 
 struct ContentView: View {
 
-    @Environment(BreadCalculatorVM.self) private var vm
+    @State private var recipesPath: [Route] = []
     @State private var favoritesPath: [Route] = []
 
     var body: some View {
-        @Bindable var vm = vm
         TabView {
             Tab("Mis recetas", systemImage: "list.bullet") {
-                NavigationStack(path: $vm.path) {
+                NavigationStack(path: $recipesPath) {
                     RecipeListView()
                         .navigationDestination(for: Route.self) { route in
                             routeDestination(route)
@@ -48,9 +50,11 @@ struct ContentView: View {
     @ViewBuilder
     private func routeDestination(_ route: Route) -> some View {
         switch route {
-            case .detail:
-                RecipeDetailView()
             case .generate:
+                // No debería alcanzarse desde aquí: ni `recipesPath` ni
+                // `favoritesPath` reciben nunca `.generate` (solo `vm.path`,
+                // consumido por `CreateRecipeFlowView`). Se mantiene por
+                // exhaustividad de `Route`, compartido con ese otro flujo.
                 GenerateBreadRecipeView()
             case .saved(let recipe):
                 RecipeSavedDetailView(recipe: recipe)
