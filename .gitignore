@@ -1,0 +1,2 @@
+# Permisos y overrides locales de Claude Code (específicos de cada máquina/usuario)
+.claude/settings.local.json
