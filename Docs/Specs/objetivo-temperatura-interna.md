@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Hoy `BreadRecipe`/`StepRecipe` (`Generable.swift`) generan pasos que incluyen un tiempo de horno, pero ninguna referencia a temperatura interna. Según las fuentes recogidas (`Docs/Specs/SOURCES-INFO.md` — King Arthur, ThermoWorks, wordloaf), el tiempo de horno es solo orientativo: depende de la forma y el tamaño de la pieza, algo que la app no pregunta hoy. El único indicador fiable de que el pan está hecho es la temperatura interna: masas magras (baguette, hogaza, masa madre) ~96–99 °C (205–210 °F). BreadUp genera exclusivamente este tipo de masa. Sin esta nota, el usuario puede confiar ciegamente en el tiempo generado y sacar un pan crudo o sobre-horneado.
+Hoy `BreadRecipe`/`StepRecipe` (`Generable.swift`) generan pasos que incluyen un tiempo de horno, pero ninguna referencia a temperatura interna. Según las fuentes recogidas (`Docs/SOURCES-INFO.md` — King Arthur, ThermoWorks, wordloaf), el tiempo de horno es solo orientativo: depende de la forma y el tamaño de la pieza, algo que la app no pregunta hoy. El único indicador fiable de que el pan está hecho es la temperatura interna: masas magras (baguette, hogaza, masa madre) ~96–99 °C (205–210 °F). BreadUp genera exclusivamente este tipo de masa. Sin esta nota, el usuario puede confiar ciegamente en el tiempo generado y sacar un pan crudo o sobre-horneado.
 
 ## Propuesta
 

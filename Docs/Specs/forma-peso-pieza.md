@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Según todas las fuentes recogidas (`Docs/Specs/SOURCES-INFO.md`), el factor que realmente determina la temperatura y el tiempo de horno es la forma y el tamaño/peso de la pieza (masa magra en hogaza/baguette/molde a 230–250 °C; el tiempo depende del peso) — no la cantidad de harina/agua/levadura que hoy configura el usuario. `RecipeDetailView` nunca pregunta esto, por lo que el modelo genera instrucciones de horno "a ciegas" respecto al factor más determinante según la ciencia panadera.
+Según todas las fuentes recogidas (`Docs/SOURCES-INFO.md`), el factor que realmente determina la temperatura y el tiempo de horno es la forma y el tamaño/peso de la pieza (masa magra en hogaza/baguette/molde a 230–250 °C; el tiempo depende del peso) — no la cantidad de harina/agua/levadura que hoy configura el usuario. `RecipeDetailView` nunca pregunta esto, por lo que el modelo genera instrucciones de horno "a ciegas" respecto al factor más determinante según la ciencia panadera.
 
 ## Propuesta
 

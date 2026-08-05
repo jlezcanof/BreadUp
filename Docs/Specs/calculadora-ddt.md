@@ -4,7 +4,7 @@
 
 ## Contexto
 
-La fórmula de Temperatura de Masa Deseada (DDT) —`Agua = (DDT × 3) − Tª ambiente − Tª harina − fricción`— es, según las fuentes recogidas (`Docs/Specs/SOURCES-INFO.md` — King Arthur pro reference), la única fórmula real de la panadería profesional que combina agua + harina + ambiente. Determina la **temperatura del agua** a usar, no la cantidad. Hoy `RecipeDetailView` solo permite ajustar la cantidad de agua (ml) vía slider, sin ninguna referencia a su temperatura, dejando fuera el único cálculo con base científica real que la app podría ofrecer sin necesidad de FoundationModels.
+La fórmula de Temperatura de Masa Deseada (DDT) —`Agua = (DDT × 3) − Tª ambiente − Tª harina − fricción`— es, según las fuentes recogidas (`Docs/SOURCES-INFO.md` — King Arthur pro reference), la única fórmula real de la panadería profesional que combina agua + harina + ambiente. Determina la **temperatura del agua** a usar, no la cantidad. Hoy `RecipeDetailView` solo permite ajustar la cantidad de agua (ml) vía slider, sin ninguna referencia a su temperatura, dejando fuera el único cálculo con base científica real que la app podría ofrecer sin necesidad de FoundationModels.
 
 ## Propuesta
 
