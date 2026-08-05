@@ -136,13 +136,19 @@ struct GenerateBreadRecipeView: View {
         Button("De acuerdo", role: .cancel) {}
     } message: {
         Text(
-            "Ya tienes guardada una receta para esa fecha y ese título."
+            "Ya tienes guardada una receta con ese nombre."//para esa fecha y ese título
         )
     }
     .alert("Guardar receta", isPresented: $showSaveDialog) {
       Button("Cancelar", role: .cancel) {}
       Button("Guardar") {
-          vm.buttonSave()
+          // Este `dismiss()` solo hace pop dentro del NavigationStack del
+          // sheet (inofensivo, `path` ya está vacío tras guardar). Quien
+          // cierra el sheet completo es `CreateRecipeFlowView`, observando
+          // `vm.didSaveRecipe`.
+          if vm.buttonSave() {
+              dismiss()
+          }
       }
     } message: {
       Text("¿Quieres guardar esta receta en tu recetario?")
