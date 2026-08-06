@@ -6,7 +6,7 @@ Estado de implementación de las specs recogidas en `Docs/Specs/`. Actualizar es
 
 | Spec | Prioridad | Estado |
 |---|---|---|
-| [objetivo-temperatura-interna](Specs/objetivo-temperatura-interna.md) | Leve | Pendiente |
-| [calculadora-ddt](Specs/calculadora-ddt.md) | Normal | Pendiente |
-| [diario-horneado](Specs/diario-horneado.md) | Normal | Pendiente |
-| [forma-peso-pieza](Specs/forma-peso-pieza.md) | Normal | Pendiente |
+| [01_Phase_objetivo-temperatura-interna](Specs/01_Phase_objetivo-temperatura-interna.md) | Leve | Pendiente |
+| [02_Phase_calculadora-ddt](Specs/02_Phase_calculadora-ddt.md) | Normal | Pendiente |
+| [03_Phase_diario-horneado](Specs/03_Phase_diario-horneado.md) | Normal | Pendiente |
+| [04_Phase_forma-peso-pieza](Specs/04_Phase_forma-peso-pieza.md) | Normal | Pendiente |
