@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "0068CB96-6FF7-4B28-AD7C-915E274D7CE9",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:BreadUp.xcodeproj",
+      "identifier" : "9E27310C2F7446EA0008A3B9",
+      "name" : "BreadUp"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:BreadUp.xcodeproj",
+        "identifier" : "9E63346A2FFB9E05003D43B7",
+        "name" : "BreadUpTests"
+      }
+    }
+  ],
+  "version" : 1
+}
