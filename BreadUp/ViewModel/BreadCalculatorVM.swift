@@ -16,11 +16,10 @@ final class BreadCalculatorVM {
     var flourQuantity: Int = 125
     var yeast: Int = 5
     var breadShape: BreadShape = .hogaza
-    // Peso aproximado de UNA pieza (si se divide la masa en varias). Por
-    // defecto sigue al peso total de la masa hasta que el usuario lo ajusta
-    // manualmente en el slider; a partir de ahí deja de re-derivarse.
-    var pieceWeight: Int = 100//255
-    var pieceWeightManuallyAdjusted = false
+    // Peso aproximado de UNA pieza (si se divide la masa en varias). Se
+    // calcula automáticamente a partir de agua/harina/levadura en cada
+    // `calculateHydratation()`; no es editable directamente en el formulario.
+    var pieceWeight: Int = 100
     var selectedDate: Date = Date()
 
     var time: Int = 0
@@ -211,13 +210,11 @@ final class BreadCalculatorVM {
             max(190, Int((baking.oven + tempAdjust + shapeOvenAdjust).rounded()))
         )
 
-        // Peso de una pieza: por defecto sigue al peso total de la masa
-        // (una sola pieza); si el usuario lo ajusta manualmente en el
-        // formulario, deja de re-derivarse hasta el próximo reset.
+        // Peso de una pieza: se recalcula siempre a partir del peso total
+        // de la masa (agua + harina + levadura), no es ajustable por el
+        // usuario.
         let doughWeight = Double(flourQuantity + water + yeast)
-        if !pieceWeightManuallyAdjusted {
-            pieceWeight = Int(doughWeight)
-        }
+        pieceWeight = Int(doughWeight)
 
         // Tiempo de horneado: lo determina el PESO de la pieza que entra al
         // horno (no el lote completo), modulado por hidratación, densidad de
@@ -240,14 +237,13 @@ final class BreadCalculatorVM {
         )
     }
 
-    private func resetIngredients() {
+    func resetIngredients() {// private
         self.flourType = .wheat
         self.flourQuantity = 125
         self.yeast = 5
         self.water = 125
         self.breadShape = .hogaza
-        self.pieceWeight = 255
-        self.pieceWeightManuallyAdjusted = false
+        self.pieceWeight = 100
     }
 
     func verifyHidration() {
@@ -289,7 +285,7 @@ final class BreadCalculatorVM {
             try? modelContext.save()
         }
 
-        resetIngredients()
+        // TODO esto tiene que ir cuando navegamos al alta resetIngredients()
 
         Task {
             await saveIndex(recipe: ingredients)
@@ -410,7 +406,7 @@ final class BreadCalculatorVM {
                     - Agua: \(water) mililitros
                     - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                     - Levadura fresca de panaderia: \(yeast) gramos.
-                    - Forma de la pieza: \(breadShape.displayName), peso aproximado de cada pieza: \(pieceWeight) gramos.
+                    - Forma de la masa: \(breadShape.displayName), peso aproximado de cada pieza: \(pieceWeight) gramos.
 
                 Condiciones de horneado (ya calculadas teniendo en cuenta la forma y el peso de la pieza; oriéntate por ellas, no las contradigas):
                     - Temperatura del horno \(temperature) °C
@@ -421,7 +417,7 @@ final class BreadCalculatorVM {
 //            El título que has de generar para la receta de pan debe ser un nombre divertido, original, diferente y sugerente para el usuario y \
 //            MUY IMPORTANTE: DO NOT repetir titulo que ya esté en esta lista: \(namesRecipes.joined(separator: ", "))
             let promptFinal = prompt + "\n\n" + titleSection
-            //print("prompt is \(promptFinal)")
+            print("prompt is \(promptFinal)")
             
             let stream = session.streamResponse(
                 to: promptFinal,

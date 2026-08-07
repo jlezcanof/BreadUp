@@ -88,37 +88,19 @@ struct RecipeDetailView: View {
                         .accessibilityHidden(true)
                     }
                 }
-                Section("Forma de la pieza") {
+                Section {
                     Picker("Forma", selection: $vm.breadShape) {
                         ForEach(BreadShape.allCases) { shape in
                             Text(shape.displayName).tag(shape)
                         }
                     }
-                    VStack(alignment: .leading) {
-                        Text("\(vm.pieceWeight) g")
-                            .font(.headline)
-                        Slider(
-                            value: Binding(
-                                get: { Double(vm.pieceWeight) },
-                                set: {
-                                    vm.pieceWeight = Int($0)
-                                    vm.pieceWeightManuallyAdjusted = true
-                                }
-                            ),
-                            in: 100...1000,
-                            step: 25
-                        )
+                    LabeledContent("Peso de la pieza", value: "\(vm.pieceWeight) g")
                         .accessibilityLabel("Peso de la pieza")
                         .accessibilityValue("\(vm.pieceWeight) gramos")
-                        HStack {
-                            Text("100 g")
-                            Spacer()
-                            Text("1000 g")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .accessibilityHidden(true)
-                    }
+                } header: {
+                    Text("Forma de la masa")
+                } footer: {
+                    Text("El peso se calcula automáticamente a partir del agua, la harina y la levadura.")
                 }
                 Section {
                     Button {

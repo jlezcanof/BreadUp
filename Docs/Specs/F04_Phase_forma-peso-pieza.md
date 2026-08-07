@@ -2,6 +2,8 @@
 
 **Prioridad:** Normal
 
+**Estado:** Implementado y cerrado (2026-08-07). Ver "Estado final" al fondo de este documento.
+
 ## Contexto
 
 Según todas las fuentes recogidas (`Docs/SOURCES-INFO.md`), el factor que realmente determina la temperatura y el tiempo de horno es la forma y el tamaño/peso de la pieza (masa magra en hogaza/baguette/molde a 230–250 °C; el tiempo depende del peso) — no la cantidad de harina/agua/levadura que hoy configura el usuario. `RecipeDetailView` nunca pregunta esto, por lo que el modelo genera instrucciones de horno "a ciegas" respecto al factor más determinante según la ciencia panadera.
@@ -9,7 +11,7 @@ Según todas las fuentes recogidas (`Docs/SOURCES-INFO.md`), el factor que realm
 ## Propuesta
 
 - Nuevo enum `BreadShape` (hogaza, baguette, molde), análogo a `FlourType`, con `displayName` en español, definido junto a `FlourType` en `BreadUpMigrationPlan.swift`.
-- Nueva `Section` "Forma de la pieza" en `RecipeDetailView`: `Picker` de `BreadShape` + peso aproximado de la pieza final (derivable de harina+agua+levadura, o ajustable manualmente vía slider).
+- Nueva `Section` "Forma de la pieza" en `RecipeDetailView`: `Picker` de `BreadShape` + peso aproximado de la pieza final, calculado automáticamente a partir de harina+agua+levadura (no editable directamente — ver "Estado final").
 - `BreadCalculatorVM` incorpora `breadShape`/`pieceWeight` en las instrucciones/prompt de generación (`GetBreadRecipeTool`/`BreadArguments`).
 - `Generable.swift` usa `@Guide` para que el modelo ajuste temperatura/tiempo de horno generados según la forma (230–250 °C para masa magra) y el peso de la pieza.
 - Se persiste `shape: BreadShape` en `BreadUpIngredients` vía nueva `BreadUpSchemaV5` (o V6 si coincide en el tiempo con el diario de horneado), con migración `.lightweight` análoga a como V4 añadió `isFavorite`.
@@ -99,14 +101,12 @@ Replicar el patrón exacto de la Section "Harina" (Picker con `ForEach(Enum.allC
 - Patrón `BakingProfileCase`/`HydrationBoundaryCase` (structs `Sendable` + `@Test(arguments:)`) es el que replicar para un `BreadShapeCase` nuevo.
 - No hay target de UI Tests — coherente con la regla de `CLAUDE.md` (Swift Testing únicamente).
 
-## Decisiones de diseño pendientes (resolver antes de implementar)
+## Decisiones de diseño (resueltas)
 
 1. **¿`calculateHydratation()` incorpora forma/peso al cálculo determinístico, o se añaden solo como texto libre al prompt?**
-   - Opción A (recomendada): ampliar `calculateHydratation()` — coherente con el patrón actual y con la instrucción "no contradigas" ya en el prompt; determinista y testeable con oráculos. Más trabajo, toca tests existentes.
-   - Opción B: soltar la instrucción "no las contradigas" y dejar que el LLM decida libremente — menos trabajo, pero dos generaciones con la misma forma podrían dar tiempos distintos (no determinista/no verificable por test).
-2. **¿Se persiste `pieceWeight` en SwiftData (V5), o queda transitorio (como `temperature`/`time`/`internalTemperature` hoy, que no se persisten)?**
-   - Opción A (recomendada, alineada con esta spec, que solo menciona persistir `shape`): no persistir `pieceWeight`.
-   - Opción B: persistir también `pieceWeight: Int` en `Ingredients` V5 como dato histórico.
+   - **Elegida: Opción A** — se amplió `calculateHydratation()` (ajuste de `temperature` ±10°C por forma dentro de 190–250°C, `time` en función del peso real de la pieza, molde ×1.1 por retención). Coherente con la instrucción "no contradigas" ya en el prompt; determinista y testeable con oráculos calculados a mano.
+2. **¿Se persiste `pieceWeight` en SwiftData (V5), o queda transitorio?**
+   - **Elegida: Opción B** — se persiste también `pieceWeight: Int` en `Ingredients` V5, junto a `shape`.
 
 ## Fuera de alcance
 
@@ -114,4 +114,11 @@ Replicar el patrón exacto de la Section "Harina" (Picker con `ForEach(Enum.allC
 
 ## Verificación
 
-Generar una receta para hogaza vs. molde con los mismos ingredientes y comprobar que la temperatura/tiempo de horno sugeridos por el modelo difieren de forma razonable entre ambas formas.
+Generar una receta para hogaza vs. molde con los mismos ingredientes y comprobar que la temperatura/tiempo de horno sugeridos por el modelo difieren de forma razonable entre ambas formas. Verificado: 38/38 tests en verde en la implementación inicial (oráculos de forma calculados a mano, ver `BreadUpTests.swift`).
+
+## Estado final (2026-08-07)
+
+Implementación completa según el diseño de este documento, más un refinamiento de UX post-implementación:
+
+- **Refinamiento de UX — `pieceWeight` deja de ser editable.** La primera versión incluía un `Slider` para ajustar `pieceWeight` manualmente (con un flag `pieceWeightManuallyAdjusted` en el VM para no resincronizarlo tras el ajuste). El usuario señaló que, al ser un valor 100% derivado de agua+harina+levadura, un `Slider` no encajaba — consultado el HIG de Apple: [Sliders](https://developer.apple.com/design/human-interface-guidelines/sliders) son para valores que el usuario ajusta directamente ("a control... that people can adjust"), mientras que [Labels](https://developer.apple.com/design/human-interface-guidelines/labels) son "texto estático que se lee pero no se edita" — el patrón correcto para un valor calculado. Se sustituyó el `Slider` por `LabeledContent("Peso de la pieza", value: "\(vm.pieceWeight) g")` de solo lectura, con un footer explicando que se calcula automáticamente. Se eliminó `pieceWeightManuallyAdjusted` del VM y toda la lógica de override manual asociada (ya no aplica: `calculateHydratation()` siempre recalcula `pieceWeight = flourQuantity + water + yeast`), y se eliminó el test que verificaba ese comportamiento manual (`manuallyAdjustedPieceWeightIsNotOverwritten`).
+- Verificación final: 37/37 tests en verde, build sin warnings.

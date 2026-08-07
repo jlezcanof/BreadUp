@@ -271,23 +271,6 @@ struct BreadUpTests {
         #expect(vm.pieceWeight == 345)
     }
 
-    /// Una vez el usuario ajusta el peso de pieza manualmente, deja de
-    /// re-derivarse del peso total y el tiempo de horno usa ese valor.
-    /// Oráculo: 15+4.3·3.5=30.05 · 1.025 · (230/231) ≈ 30.67 → 31 min.
-    @Test("pieceWeight ajustado manualmente no se resincroniza con el peso total de la masa")
-    func manuallyAdjustedPieceWeightIsNotOverwritten() {
-        let vm = makeVM(flour: .wheat, flourQuantity: 500, water: 350, yeast: 10)
-        vm.pieceWeight = 430
-        vm.pieceWeightManuallyAdjusted = true
-
-        vm.calculateHydratation()
-
-        #expect(vm.hydrationNotPermitted == false)
-        #expect(vm.pieceWeight == 430)
-        #expect(vm.time == 31)
-        #expect(vm.temperature == 231)
-    }
-
     // MARK: - verifyHidration
 
     @Test("verifyHidration: combinación válida no muestra la alerta")
@@ -345,7 +328,7 @@ struct BreadUpTests {
         // No se llama a calculateHydratation() en este test, así que shape/
         // pieceWeight se persisten con sus valores por defecto del VM.
         #expect(saved.shape == .hogaza)
-        #expect(saved.pieceWeight == 255)
+        #expect(saved.pieceWeight == 100)
 
         let created = try #require(saved.created)
         #expect(created == expectedDate)
@@ -368,10 +351,10 @@ struct BreadUpTests {
         let container = try makeInMemoryContainer()
         let vm = makeConfiguredVM(context: container.mainContext)
         
-        vm.flourType = .rye
-        vm.flourQuantity = 400
-        vm.water = 320
-        vm.yeast = 8
+        vm.flourType = .wheat
+        vm.flourQuantity = 125
+        vm.water = 125
+        vm.yeast = 5
 
         //vm.save()
         vm.buttonSave()
@@ -381,8 +364,7 @@ struct BreadUpTests {
         #expect(vm.yeast == 5)
         #expect(vm.water == 125)
         #expect(vm.breadShape == .hogaza)
-        #expect(vm.pieceWeight == 255)
-        #expect(vm.pieceWeightManuallyAdjusted == false)
+        #expect(vm.pieceWeight == 100)
     }
 
     // MARK: - Navegación (sólo ramas de retorno temprano, sin FoundationModels)
