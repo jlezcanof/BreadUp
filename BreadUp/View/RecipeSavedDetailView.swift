@@ -121,26 +121,33 @@ struct RecipeSavedDetailView: View {
       sectionTitle("Ingredientes", systemImage: "list.bullet")
 
       VStack(spacing: 0) {
-        ingredientRow(
+        IngredientRow(
           icon: "leaf.fill",
-          tint: Color("BreadFlour"),
+          tint: Color(.breadFlour),//"BreadFlour"
           title: "Harina",
           detail: recipe.flourType.displayName,//recipe.flourType.rawValue
           value: "\(recipe.flourQuantity) g")
         Divider().padding(.leading, 60)
-        ingredientRow(
+        IngredientRow(
           icon: "bubbles.and.sparkles.fill",
-          tint: Color("BreadYeast"),
+          tint: Color(.breadYeast),//"BreadYeast"
           title: "Levadura",
           detail: nil,
           value: "\(recipe.yeast) g")
         Divider().padding(.leading, 60)
-        ingredientRow(
+        IngredientRow(
           icon: "drop.fill",
-          tint: Color("BreadWater"),
+          tint: Color(.breadWater),//"BreadWater"
           title: "Agua",
           detail: nil,
           value: "\(recipe.water) ml")
+        Divider().padding(.leading, 60)
+        IngredientRow(
+            icon: "basket",
+            tint: Color(.breadFlour),
+            title: "Forma",// Forma de la pieza
+            detail: nil,
+            value: recipe.shapeString)
       }
       .padding(.vertical, 4)
       .background {
@@ -153,7 +160,7 @@ struct RecipeSavedDetailView: View {
     }
   }
 
-  private func ingredientRow(
+  private func IngredientRow(
     icon: String,
     tint: Color,
     title: String,

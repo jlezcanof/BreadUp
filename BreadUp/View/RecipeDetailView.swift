@@ -88,6 +88,38 @@ struct RecipeDetailView: View {
                         .accessibilityHidden(true)
                     }
                 }
+                Section("Forma de la pieza") {
+                    Picker("Forma", selection: $vm.breadShape) {
+                        ForEach(BreadShape.allCases) { shape in
+                            Text(shape.displayName).tag(shape)
+                        }
+                    }
+                    VStack(alignment: .leading) {
+                        Text("\(vm.pieceWeight) g")
+                            .font(.headline)
+                        Slider(
+                            value: Binding(
+                                get: { Double(vm.pieceWeight) },
+                                set: {
+                                    vm.pieceWeight = Int($0)
+                                    vm.pieceWeightManuallyAdjusted = true
+                                }
+                            ),
+                            in: 100...1000,
+                            step: 25
+                        )
+                        .accessibilityLabel("Peso de la pieza")
+                        .accessibilityValue("\(vm.pieceWeight) gramos")
+                        HStack {
+                            Text("100 g")
+                            Spacer()
+                            Text("1000 g")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    }
+                }
                 Section {
                     Button {
                         Task {

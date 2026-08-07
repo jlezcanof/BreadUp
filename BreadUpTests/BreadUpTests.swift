@@ -30,6 +30,15 @@ struct BakingProfileCase: Sendable {
     let expectedCoreTemperature: Int
 }
 
+/// Forma de la pieza y los valores de temperatura/tiempo esperados, para los
+/// mismos ingredientes base (wheat 500 g / 350 ml / 10 g levadura → peso de
+/// pieza auto-derivado de 860 g).
+struct BreadShapeCase: Sendable {
+    let shape: BreadShape
+    let expectedTemperature: Int
+    let expectedTime: Int
+}
+
 // MARK: - Dobles de test
 
 /// Doble no-op de la costura `RecipeIndexing`. Neutraliza el efecto de sistema
@@ -219,6 +228,66 @@ struct BreadUpTests {
         #expect(vm.internalTemperature == testCase.expectedCoreTemperature)
     }
 
+    // MARK: - Forma y peso de la pieza
+
+    /// Mismos ingredientes que el oráculo de trigo al 70% (231 °C / 46 min
+    /// con hogaza). baguette sube +10 °C y baja el tiempo (mismo peso, más
+    /// calor); molde baja -10 °C y sube el tiempo (menos calor + retención
+    /// del molde, ×1.1). Oráculo calculado a mano:
+    ///   baguette: 45.1·1.025·(230/241) ≈ 44.12 → 44 min
+    ///   molde:    45.1·1.025·(230/221)·1.1 ≈ 52.92 → 53 min
+    @Test(
+        "La forma de la pieza ajusta temperatura y tiempo de horno",
+        arguments: [
+            BreadShapeCase(shape: .hogaza, expectedTemperature: 231, expectedTime: 46),
+            BreadShapeCase(shape: .baguette, expectedTemperature: 241, expectedTime: 44),
+            BreadShapeCase(shape: .molde, expectedTemperature: 221, expectedTime: 53),
+        ]
+    )
+    func breadShapeAdjustsOvenTemperatureAndTime(_ testCase: BreadShapeCase) {
+        let vm = makeVM(flour: .wheat, flourQuantity: 500, water: 350, yeast: 10)
+        vm.breadShape = testCase.shape
+
+        vm.calculateHydratation()
+
+        #expect(vm.hydrationNotPermitted == false)
+        #expect(vm.temperature == testCase.expectedTemperature)
+        #expect(vm.time == testCase.expectedTime)
+    }
+
+    /// Sin tocar el slider de peso, `pieceWeight` sigue al peso total de la
+    /// masa (una sola pieza) en cada recálculo.
+    @Test("Sin ajuste manual, pieceWeight sigue al peso total de la masa")
+    func pieceWeightFollowsDoughWeightWithoutManualAdjustment() {
+        let vm = makeVM(flour: .wheat, flourQuantity: 500, water: 350, yeast: 10)
+
+        vm.calculateHydratation()
+        #expect(vm.pieceWeight == 860)
+
+        vm.flourQuantity = 200
+        vm.water = 140
+        vm.yeast = 5
+        vm.calculateHydratation()
+        #expect(vm.pieceWeight == 345)
+    }
+
+    /// Una vez el usuario ajusta el peso de pieza manualmente, deja de
+    /// re-derivarse del peso total y el tiempo de horno usa ese valor.
+    /// Oráculo: 15+4.3·3.5=30.05 · 1.025 · (230/231) ≈ 30.67 → 31 min.
+    @Test("pieceWeight ajustado manualmente no se resincroniza con el peso total de la masa")
+    func manuallyAdjustedPieceWeightIsNotOverwritten() {
+        let vm = makeVM(flour: .wheat, flourQuantity: 500, water: 350, yeast: 10)
+        vm.pieceWeight = 430
+        vm.pieceWeightManuallyAdjusted = true
+
+        vm.calculateHydratation()
+
+        #expect(vm.hydrationNotPermitted == false)
+        #expect(vm.pieceWeight == 430)
+        #expect(vm.time == 31)
+        #expect(vm.temperature == 231)
+    }
+
     // MARK: - verifyHidration
 
     @Test("verifyHidration: combinación válida no muestra la alerta")
@@ -273,6 +342,10 @@ struct BreadUpTests {
         #expect(saved.flourQuantity == 400)
         #expect(saved.yeast == 8)
         #expect(saved.flourType == .rye)
+        // No se llama a calculateHydratation() en este test, así que shape/
+        // pieceWeight se persisten con sus valores por defecto del VM.
+        #expect(saved.shape == .hogaza)
+        #expect(saved.pieceWeight == 255)
 
         let created = try #require(saved.created)
         #expect(created == expectedDate)
@@ -307,6 +380,9 @@ struct BreadUpTests {
         #expect(vm.flourQuantity == 125)
         #expect(vm.yeast == 5)
         #expect(vm.water == 125)
+        #expect(vm.breadShape == .hogaza)
+        #expect(vm.pieceWeight == 255)
+        #expect(vm.pieceWeightManuallyAdjusted == false)
     }
 
     // MARK: - Navegación (sólo ramas de retorno temprano, sin FoundationModels)

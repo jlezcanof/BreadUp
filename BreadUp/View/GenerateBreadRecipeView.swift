@@ -191,7 +191,6 @@ struct GenerateBreadRecipeView: View {
             .accessibilityAddTraits(.isHeader)
             .accessibilityFocused($recipeTitleFocused)
         }
-
         HStack(spacing: 12) {
           IngredientStatTile(
             icon: "leaf.fill",
@@ -213,6 +212,13 @@ struct GenerateBreadRecipeView: View {
             value: "\(vm.yeast) g",
             name: "Levadura",
             accessibilityLabel: "Levadura, \(vm.yeast) gramos"
+          )
+          IngredientStatTile(
+            icon: "basket",
+            tint: Color("HeroTop"),
+            value: vm.breadShape.displayName,
+            name: "Forma",
+            accessibilityLabel: "Forma de la pieza, \(vm.breadShape.displayName)"
           )
         }
       }
@@ -358,6 +364,7 @@ private struct IngredientStatTile: View {
       Text(value)
         .font(.title3.weight(.semibold))
         .foregroundStyle(.primary)
+        .fixedSize(horizontal: true, vertical: false)//new
       Text(name)
         .font(.caption)
         .foregroundStyle(.secondary)

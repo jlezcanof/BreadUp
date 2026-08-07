@@ -9,14 +9,14 @@ import Foundation
 import SwiftData
 import AppIntents
 
-typealias BreadUpIngredients = BreadUpSchemaV4.Ingredients
-typealias BreadUpCalculate   = BreadUpSchemaV4.CalculateBread
-typealias BreadUpStepRecipe  = BreadUpSchemaV4.StepRecipe
+typealias BreadUpIngredients = BreadUpSchemaV5.Ingredients
+typealias BreadUpCalculate   = BreadUpSchemaV5.CalculateBread
+typealias BreadUpStepRecipe  = BreadUpSchemaV5.StepRecipe
 
 enum BreadUpMigrationPlan: SchemaMigrationPlan {
 
   static var schemas: [any VersionedSchema.Type] {
-    [BreadUpSchemaV1.self, BreadUpSchemaV2.self, BreadUpSchemaV3.self, BreadUpSchemaV4.self]
+    [BreadUpSchemaV1.self, BreadUpSchemaV2.self, BreadUpSchemaV3.self, BreadUpSchemaV4.self, BreadUpSchemaV5.self]
   }
 
   static var stages: [MigrationStage] {
@@ -26,6 +26,7 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
       // pending migrate to v2
       migrationV2toV3,
       migrationV3toV4,
+      migrationV4toV5,
     ]
   }
 
@@ -41,6 +42,14 @@ enum BreadUpMigrationPlan: SchemaMigrationPlan {
   static let migrationV3toV4 = MigrationStage.lightweight(
     fromVersion: BreadUpSchemaV3.self,
     toVersion: BreadUpSchemaV4.self
+  )
+
+  // V4 -> V5: añade `shapeString` (forma de la pieza) y `pieceWeight`
+  // (peso aproximado) con valores por defecto, sin nuevas entidades ni
+  // relaciones: migración ligera.
+  static let migrationV4toV5 = MigrationStage.lightweight(
+    fromVersion: BreadUpSchemaV4.self,
+    toVersion: BreadUpSchemaV5.self
   )
 
   static let migrationV1toV2 = MigrationStage.custom(
@@ -120,8 +129,32 @@ extension FlourType {
   }
 }
 
-extension BreadUpSchemaV4.Ingredients {
-  @MainActor static let example = BreadUpSchemaV4.Ingredients(
+enum BreadShape: String, CaseIterable, Identifiable, Codable {
+  case hogaza = "Hogaza"
+  case baguette = "Baguette"
+  case molde = "Molde"
+
+  var id: Self { self }
+
+  var displayName: String {
+    switch self {
+    case .hogaza: return "Hogaza"
+    case .baguette: return "Baguette"
+    case .molde: return "Molde"
+    }
+  }
+
+  var name: String {
+    switch self {
+    case .hogaza: return "hogaza"
+    case .baguette: return "baguette"
+    case .molde: return "molde"
+    }
+  }
+}
+
+extension BreadUpSchemaV5.Ingredients {
+  @MainActor static let example = BreadUpSchemaV5.Ingredients(
     id: UUID(),
     water: 250,
     flourTypeString: "corn",
