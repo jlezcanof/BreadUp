@@ -2,6 +2,8 @@
 
 Estado de implementación de las specs recogidas en `Docs/Specs/`. Actualizar esta tabla al completar (o descartar) cada una.
 
+**Proyecto en Linear**: https://linear.app/lezcanin-team/project/breadup-844322bc9da8 (issues por fase: LEZ-12 a LEZ-15)
+
 **Leyenda:** Pendiente · En progreso · Implementado · Descartado
 
 | Spec | Prioridad | Estado |
