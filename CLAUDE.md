@@ -92,7 +92,7 @@ El target impone reglas estrictas que hay que respetar en todo código nuevo:
 ## SwiftUI
 
 - Controles nativos únicamente. Nunca construyas un componente personalizado que reemplace uno nativo (`.searchable`, `Picker`, `Form`+`Section`+`LabeledContent`, `TabView`+`Tab`+`TabSection`, `.toolbar`). Un look personalizado sobre un control nativo = un `*Style`; nunca un struct paralelo.
-- Cero lógica de negocio en las Views. Validación, transformación, persistencia y orquestación viven en el ViewModel de la pantalla; helpers de presentación en `extension <Model>`. La View pasa `modelContext` a los métodos del ViewModel; el ViewModel nunca lee el Environment de SwiftUI directamente. *(Ya es el patrón documentado de BreadUp — ver Arquitectura más abajo.)*
+- Cero lógica de negocio en las Views. Validación, transformación, persistencia y orquestación viven en el ViewModel de la pantalla; helpers de presentación en `extension <Model>`. La View pasa `modelContext` a los métodos del ViewModel; el ViewModel nunca lee el Environment de SwiftUI directamente. *(Ya es el patrón documentado de BreadUp — skill `breadup-arquitectura`.)*
 - Un tipo por fichero, nombrado igual que el tipo. Nada de `private struct AlgunaView: View` dentro de otro fichero. Mantén el `body` plano — no lo fragmentes en propiedades `private var x: some View`; extrae ficheros `View` reales. Extrae cualquier átomo de UI usado en más de un sitio.
 - Navegación: `NavigationStack` + `NavigationLink(value:)` + `navigationDestination`. Nunca `NavigationView`, nunca un Router/Sidebar a medida.
 - Tipografía: solo estilos de texto semánticos (`.body`, `.headline`, `.title2.bold()`…). Si escribes `.system(size:)` está mal. Los colores viven en el Asset Catalog con variantes light/dark (y alto contraste) — nunca literales hex/RGB en código.
@@ -104,7 +104,7 @@ El target impone reglas estrictas que hay que respetar en todo código nuevo:
 - SwiftData es la fuente de verdad local; las clases `@Model` son el modelo de dominio.
 - Los `ModelContainer` se configuran en el punto de entrada de la app; contenedor en memoria para previews y tests; se comparte vía App Group cuando widgets/extensiones necesitan el store.
 - Las migraciones son versionadas y nunca destructivas sin aprobación explícita.
-- **Uso real en BreadUp** (ver Arquitectura más abajo): `AppModelStore.shared` es un `ModelContainer` `@MainActor` único, construido con `BreadUpMigrationPlan`, inyectado en la escena. Esquema versionado V1→V5 (`VersionedSchema` + `MigrationStage`), con typealias `BreadUpIngredients`/`BreadUpCalculate`/`BreadUpStepRecipe` repuntados a la versión vigente. Al introducir cambios de modelo, crea una nueva `VersionedSchema` + stage de migración y reapunta los typealias; no edites un schema versionado ya migrado.
+- **Uso real en BreadUp** (skill `breadup-arquitectura`): `AppModelStore.shared` es un `ModelContainer` `@MainActor` único, construido con `BreadUpMigrationPlan`, inyectado en la escena. Esquema versionado V1→V5 (`VersionedSchema` + `MigrationStage`), con typealias `BreadUpIngredients`/`BreadUpCalculate`/`BreadUpStepRecipe` repuntados a la versión vigente. Al introducir cambios de modelo, crea una nueva `VersionedSchema` + stage de migración y reapunta los typealias; no edites un schema versionado ya migrado.
 
 **Decisión tomada 2026-08-25**: la constitución genérica prescribe "un único punto de escritura a través de un `@ModelActor` fuera del main actor; las Views leen con `@Query` y mutan solo vía métodos de ViewModel/actor". BreadUp usa deliberadamente el `ModelContainer` `@MainActor` único actual, **sin migrar a `@ModelActor`**: hoy no hay Widget ni watch app compartiendo el store vía App Group, ni escritura pesada en background (la generación de recetas no persiste nada hasta que el usuario pulsa "Guardar", una operación puntual) — los dos escenarios que justifican esa capa. Añadirla ahora sería trabajo sobre código que ya funciona (37/37 tests en verde) sin necesidad real. **Revisar esta decisión si en el futuro se añade** un target Widget/watch que necesite el store compartido, o una importación/sincronización pesada en background.
 
@@ -142,32 +142,7 @@ Usa siempre la API más moderna disponible; las obsoletas están prohibidas (ver
 
 ## Arquitectura
 
-Flujo de capas: **SwiftData (schema/migración) → ViewModel (`@Observable`) → Views (SwiftUI)**, con FoundationModels como servicio de generación inyectado en el ViewModel.
-
-### Persistencia (`BreadUp/SwiftData/`)
-- `BreadUpApp.swift`: `AppModelStore.shared` es un `ModelContainer` `@MainActor` único, construido con `BreadUpMigrationPlan`. Se inyecta en la escena con `.modelContainer(...)`.
-- Esquema **versionado**: `BreadUpSchemaV1` → `BreadUpSchemaV2` → `BreadUpSchemaV3` → `BreadUpSchemaV4` → `BreadUpSchemaV5` (`VersionedSchema`). `BreadUpMigrationPlan` encadena las migraciones: V1→V2 es `.custom` (añade el campo `created`, con backfill a `.now` en `didMigrate`); V2→V3, V3→V4 y V4→V5 son `.lightweight` (V2→V3 añade la entidad `StepRecipe` y su relación 1-N con `CalculateBread`; V3→V4 añade `isFavorite: Bool` a `Ingredients` con default `false`; V4→V5 añade `shapeString: String`/`pieceWeight: Int` a `Ingredients`, forma y peso de la pieza).
-- **Usa siempre los typealias** `BreadUpIngredients` (= `BreadUpSchemaV5.Ingredients`), `BreadUpCalculate` (= `BreadUpSchemaV5.CalculateBread`) y `BreadUpStepRecipe` (= `BreadUpSchemaV5.StepRecipe`), definidos en `BreadUpMigrationPlan.swift`. Así el resto del código no se acopla a una versión concreta del schema. Al introducir cambios de modelo, crea una nueva `VersionedSchema` + stage de migración y reapunta los typealias; no edites un schema versionado ya migrado.
-- **Gotcha de simulador**: si tras compilar con una versión de schema nueva el simulador lanza `NSCocoaErrorDomain Code=134504 "Cannot use staged migration with an unknown model version"`, normalmente no es un bug del plan de migración — es un store obsoleto en el simulador, de una instalación anterior, cuya versión no coincide con ninguna `VersionedSchema` declarada. La solución no es tocar código: desinstalar la app del simulador (`xcrun simctl uninstall booted com.josemanuel.lezcano.BreadUp` o borrado manual del icono) y volver a compilar/ejecutar para que cree el store limpio en la versión actual.
-- Modelos: `Ingredients` (water/flourType/flourQuantity/yeast/created/isFavorite/shape/pieceWeight) tiene relación `.cascade` con `CalculateBread` (que guarda `recipe: String?` y una relación 1-N `.cascade` con `StepRecipe`, sus pasos).
-- `FlourType` y `BreadShape` (ambos en `BreadUpMigrationPlan.swift`) son los enums de harina y forma de la pieza, con `displayName` en español; son los tipos usados por la UI. Persisten como `Codable`.
-
-### Generación con FoundationModels (`BreadUp/Model/` + `ViewModel/`)
-- **Ruta real, distinta de lo que sugieren los nombres de los tipos**: el código vive en `BreadUp/Model/Model.swift` y `BreadUp/Model/Tools.swift` (no existe `FMFBusiness/`). Las cabeceras de ambos ficheros aún dicen `Generable.swift`/`Tooling.swift` — nombres antiguos, sin actualizar tras un renombrado; los tipos que definen se siguen llamando así en el texto de abajo por claridad, pero al buscar el fichero usa el nombre real.
-- `BreadCalculatorVM` (`@Observable @MainActor`): mantiene el estado del formulario, posee una `LanguageModelSession` con instrucciones de "maestro panadero", y expone la generación de recetas vía `generateRecipeBread()` — guided generation con streaming (`session.streamResponse(to:generating: BreadRecipe.self, options:)`). `prewarm()` se llama antes de generar.
-- `Model.swift`: `BreadRecipe` (`@Generable`) tiene un campo `pasos: [RecipeStep]` con `.minimumCount(6), .maximumCount(9)` (rango, **no** un conteo fijo). `RecipeStep` (`titulo`/`descripcion`) es un struct **distinto** del `BreadUpStepRecipe` de SwiftData — no confundirlos, comparten nombre corto pero no están relacionados. No existe ningún ejemplo tipo `exampleRecipeBread` inyectado en el prompt; solo quedan constantes sueltas sin usar (`RecipeStep.example`, `.firstStep`…`.tenStep`).
-- `Tools.swift`: define `GetBreadRecipeTool` (`Tool`, FoundationModels tool-calling) con `BreadArguments` `@Generable`, pero **está desconectado de la sesión activa** — en `BreadCalculatorVM.initVM()` la inicialización con `tools: [GetBreadRecipeTool()]` está comentada. La generación real es guided generation directa, sin tool-calling.
-- `save()` del VM construye `BreadUpIngredients` + `BreadUpCalculate` y los inserta en el `ModelContext`.
-
-### Vistas (`BreadUp/View/`)
-- `ContentView` → `NavigationStack` → `RecipeListView` (lista con `@Query` de `BreadUpIngredients`, borrado por swipe) → `RecipeDetailView` (formulario con sliders, botón "Generar receta" condicionado a `model.availability`, guardado) y `RecipeSavedDetailView` (detalle de receta guardada). `StepView`/`StepCard`/`StepsBreadView` renderizan pasos.
-- El proyecto tiene configuradas las Localizations **Spanish** (recién añadida) y **English** (ya existía previamente). Las cadenas de UI en el código siguen escritas en español.
-
-### Integración con el sistema (`BreadUp/AppEntity/`) — WIP
-- `RecipeBreadEntity` (`AppEntity` + `IndexedEntity`), `RecipeBreadIntents` (`CreateRecipeBreadIntent` + `BreadRecipeShortcuts`) y `RecipeBreadSpotlightIndexer` (CoreSpotlight). Mayormente esqueleto: las queries devuelven `[]` y el indexado usa placeholders. Punto de partida para Siri/Shortcuts/Spotlight, no funcional aún.
-
-### Playground (`BreadUp/Playground/`)
-Experimentos sueltos con FoundationModels (`#Playground`), fuera del flujo de la app.
+Flujo de capas: **SwiftData (schema/migración) → ViewModel (`@Observable`) → Views (SwiftUI)**, con FoundationModels como servicio de generación inyectado en el ViewModel. Detalle completo (persistencia/schema, generación FoundationModels, vistas, integración con el sistema, Playground) migrado al skill `breadup-arquitectura` (2026-08-25, para no cargarlo en cada sesión) — consultarlo al tocar esas áreas.
 
 ## Enrutamiento — qué skill leer antes de trabajar en cada área
 
