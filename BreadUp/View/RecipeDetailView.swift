@@ -89,6 +89,20 @@ struct RecipeDetailView: View {
                     }
                 }
                 Section {
+                    Picker("Forma", selection: $vm.breadShape) {
+                        ForEach(BreadShape.allCases) { shape in
+                            Text(shape.displayName).tag(shape)
+                        }
+                    }
+                    LabeledContent("Peso de la pieza", value: "\(vm.pieceWeight) g")
+                        .accessibilityLabel("Peso de la pieza")
+                        .accessibilityValue("\(vm.pieceWeight) gramos")
+                } header: {
+                    Text("Forma de la masa")
+                } footer: {
+                    Text("El peso se calcula automáticamente a partir del agua, la harina y la levadura.")
+                }
+                Section {
                     Button {
                         Task {
                             await vm.navigateToGenerateView()

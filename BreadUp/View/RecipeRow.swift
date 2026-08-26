@@ -16,61 +16,72 @@ struct RecipeRow: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 6) {
-      HStack(alignment: .firstTextBaseline, spacing: 6) {
-        Text(titleRecipe)
-          .font(.headline)
-          .lineLimit(2)
-          .allowsTightening(true)
-          .accessibilityLabel("Título de la receta")
-          .accessibilityValue(titleRecipe)
-          .accessibilitySortPriority(1)
-
-        if recipe.isFavorite {
-          Image(systemName: "star.fill")
-            .foregroundStyle(.yellow)
-            .accessibilityLabel("Receta favorita")
-            .accessibilitySortPriority(2)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(titleRecipe)
+                    .font(.headline)
+                    .lineLimit(2)
+                    .allowsTightening(true)
+                    .accessibilityLabel("Título de la receta")
+                    .accessibilityValue(titleRecipe)
+                    .accessibilitySortPriority(1)
+                Spacer()
+                Label(recipe.shapeString, systemImage: "basket")
+                    .fixedSize(horizontal: false, vertical: true)
+                    .foregroundStyle(Color("BreadFlour"))
+                    .accessibilityLabel("Tipo de forma, \(recipe.shapeString)")
+                    .accessibilitySortPriority(2)
+                if recipe.isFavorite {
+                    Image(systemName: "star.fill")
+                        .foregroundStyle(.yellow)
+                        .accessibilityLabel("Receta favorita")
+                        .accessibilitySortPriority(3)
+                }
+            }
+            //recipe.flourType.displayName
+            Text("Harina de \(recipe.flourType.rawValue)")
+                .font(.headline)
+                .lineLimit(1, reservesSpace: true)
+                .accessibilityValue("Harina de \(recipe.flourType.rawValue)")
+                .accessibilitySortPriority(4)
+            HStack {
+                Label("\(recipe.water) ml", systemImage: "drop.fill")
+                    .foregroundStyle(Color("BreadWater"))
+                    .accessibilityLabel("Agua, \(recipe.water) mililitros")
+                    .accessibilitySortPriority(5)
+                Spacer()
+                Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
+                    .foregroundStyle(Color("BreadFlour"))
+                    .accessibilityLabel(
+                        "Harina, \(recipe.flourQuantity) gramos"
+                    )
+                    .accessibilitySortPriority(6)
+                Spacer()
+                Label(
+                    "\(recipe.yeast) g",
+                    systemImage: "bubbles.and.sparkles.fill"
+                )
+                .foregroundStyle(Color("BreadYeast"))
+                .accessibilityLabel("Levadura, \(recipe.yeast) gramos")
+                .accessibilitySortPriority(7)
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            if let created = recipe.created {
+                HStack {
+                    Image(systemName: "calendar.circle")
+                        .foregroundStyle(Color(.breadDate))  //"BreadDate"
+                        .accessibilityHidden(true)
+                        .accessibilityValue("Fecha de la receta")
+                    Text(created, format: .dateTime.day().month().year())
+                }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .accessibilityElement(children: .combine)
+                .accessibilitySortPriority(8)
+            }
         }
-      }
-        Text("Harina de \(recipe.flourType.rawValue)")//recipe.flourType.displayName
-          .font(.headline)
-          .lineLimit(1, reservesSpace:true)
-          .accessibilityValue("Harina de \(recipe.flourType.rawValue)")//recipe.flourType.displayName
-          .accessibilitySortPriority(3)
-      HStack {
-        Label("\(recipe.water) ml", systemImage: "drop.fill")
-          .foregroundStyle(Color("BreadWater"))
-          .accessibilityLabel("Agua, \(recipe.water) mililitros")
-          .accessibilitySortPriority(4)
-        Spacer()
-        Label("\(recipe.flourQuantity) g", systemImage: "leaf.fill")
-          .foregroundStyle(Color("BreadFlour"))
-          .accessibilityLabel("Harina, \(recipe.flourQuantity) gramos")
-          .accessibilitySortPriority(5)
-        Spacer()
-        Label("\(recipe.yeast) g", systemImage: "bubbles.and.sparkles.fill")
-          .foregroundStyle(Color("BreadYeast"))
-          .accessibilityLabel("Levadura, \(recipe.yeast) gramos")
-          .accessibilitySortPriority(6)
-      }
-      .font(.subheadline)
-      .foregroundStyle(.secondary)
-      if let created = recipe.created {
-        HStack {
-          Image(systemName: "calendar.circle")
-            .foregroundStyle(Color(.breadDate)) //"BreadDate"
-            .accessibilityHidden(true)
-            .accessibilityValue("Fecha de la receta")
-          Text(created, format: .dateTime.day().month().year())
-        }
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .accessibilityElement(children: .combine)
-        .accessibilitySortPriority(7)
-      }
-    }
-    .padding(.vertical, 4)
+        .padding(.vertical, 4)
     .accessibilityElement(children: .combine)
   }
 }

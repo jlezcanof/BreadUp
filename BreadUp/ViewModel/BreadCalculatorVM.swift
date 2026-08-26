@@ -15,6 +15,11 @@ final class BreadCalculatorVM {
     var flourType: FlourType = .wheat
     var flourQuantity: Int = 125
     var yeast: Int = 5
+    var breadShape: BreadShape = .hogaza
+    // Peso aproximado de UNA pieza (si se divide la masa en varias). Se
+    // calcula automáticamente a partir de agua/harina/levadura en cada
+    // `calculateHydratation()`; no es editable directamente en el formulario.
+    var pieceWeight: Int = 100
     var selectedDate: Date = Date()
 
     var time: Int = 0
@@ -184,23 +189,43 @@ final class BreadCalculatorVM {
             }
 
         // Temperatura del horno: ajuste suave centrado en el punto medio del
-        // rango de hidratación de la harina (más húmeda → un poco más calor).
+        // rango de hidratación de la harina (más húmeda → un poco más calor),
+        // más el ajuste por forma de la pieza dentro de la banda de masa
+        // magra (230–250 °C): hogaza es la banda neutra (no altera el
+        // comportamiento previo a esta fase), baguette sube (más superficie/
+        // volumen, cuece más caliente y rápido), molde baja (las paredes del
+        // molde retrasan la transferencia de calor).
         let midHydration =
             (hidrationMininumRecommended + hidrationMaximumRecommended) / 2
             / 100
         let tempAdjust = (hydrationFraction - midHydration) * 20
+        let shapeOvenAdjust: Double =
+            switch breadShape {
+            case .hogaza: 0
+            case .baguette: 10
+            case .molde: -10
+            }
         temperature = min(
             250,
-            max(190, Int((baking.oven + tempAdjust).rounded()))
+            max(190, Int((baking.oven + tempAdjust + shapeOvenAdjust).rounded()))
         )
 
-        // Tiempo de horneado: lo determina el PESO de la pieza, modulado por
-        // hidratación, densidad de la harina y temperatura del horno.
+        // Peso de una pieza: se recalcula siempre a partir del peso total
+        // de la masa (agua + harina + levadura), no es ajustable por el
+        // usuario.
         let doughWeight = Double(flourQuantity + water + yeast)
-        var bakeTime = 15.0 + (doughWeight / 100) * 3.5
+        pieceWeight = Int(doughWeight)
+
+        // Tiempo de horneado: lo determina el PESO de la pieza que entra al
+        // horno (no el lote completo), modulado por hidratación, densidad de
+        // la harina y temperatura del horno.
+        var bakeTime = 15.0 + (Double(pieceWeight) / 100) * 3.5
         bakeTime *= (1 + (hydrationFraction - 0.65) * 0.5)  // +húmeda → +tiempo
         bakeTime *= baking.density  // integral/centeno densos → +tiempo
         bakeTime *= (230 / Double(temperature))  // +caliente → -tiempo
+        if breadShape == .molde {
+            bakeTime *= 1.1  // el molde retiene más tiempo (aislamiento de las paredes)
+        }
         time = min(75, max(18, Int(bakeTime.rounded())))
 
         // Criterio real de cocción (ThermoWorks/Wordloaf): temperatura en el
@@ -212,11 +237,13 @@ final class BreadCalculatorVM {
         )
     }
 
-    private func resetIngredients() {
+    func resetIngredients() {// private
         self.flourType = .wheat
         self.flourQuantity = 125
         self.yeast = 5
         self.water = 125
+        self.breadShape = .hogaza
+        self.pieceWeight = 100
     }
 
     func verifyHidration() {
@@ -234,7 +261,9 @@ final class BreadCalculatorVM {
             flourTypeString: flourType.name,
             flourQuantity: flourQuantity,
             yeast: yeast,
-            createdAt: selectedDate
+            createdAt: selectedDate,
+            shapeString: breadShape.name,
+            pieceWeight: pieceWeight
         )
 
         let calculateBread = BreadUpCalculate(recipe: recipeTitle)
@@ -256,7 +285,7 @@ final class BreadCalculatorVM {
             try? modelContext.save()
         }
 
-        resetIngredients()
+        // TODO esto tiene que ir cuando navegamos al alta resetIngredients()
 
         Task {
             await saveIndex(recipe: ingredients)
@@ -377,8 +406,9 @@ final class BreadCalculatorVM {
                     - Agua: \(water) mililitros
                     - Harina de \(flourType.rawValue): \(flourQuantity) gramos
                     - Levadura fresca de panaderia: \(yeast) gramos.
+                    - Forma de la masa: \(breadShape.displayName), peso aproximado de cada pieza: \(pieceWeight) gramos.
 
-                Condiciones de horneado (oriéntate por ellas, no las contradigas):
+                Condiciones de horneado (ya calculadas teniendo en cuenta la forma y el peso de la pieza; oriéntate por ellas, no las contradigas):
                     - Temperatura del horno \(temperature) °C
                     - Tiempo aproximado  en el horno: \(time) minutos (es ORIENTATIVO, varía según el horno)
                     - Punto de cocción: el pan estará listo cuando el centro de la miga alcanze \(internalTemperature) °C y el color de la corteza, no sólo por el reloj.

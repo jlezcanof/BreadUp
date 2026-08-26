@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Hoy una receta guardada (`BreadUpIngredients` → `CalculateBread` → `StepRecipe`) es de solo lectura una vez generada: no existe forma de registrar cómo salió el pan al hornearlo. Las fuentes recogidas (`Docs/Specs/SOURCES-INFO.md`) insisten en que la única forma fiable de mejorar es verificar el resultado real (temperatura interna, aspecto de miga/corteza). Sin ese circuito de feedback, BreadUp se queda en generador de instrucciones desechables en vez de cumplir su propósito de "cuaderno de recetas" que aprende de la experiencia del usuario.
+Hoy una receta guardada (`BreadUpIngredients` → `CalculateBread` → `StepRecipe`) es de solo lectura una vez generada: no existe forma de registrar cómo salió el pan al hornearlo. Las fuentes recogidas (`Docs/SOURCES-INFO.md`) insisten en que la única forma fiable de mejorar es verificar el resultado real (temperatura interna, aspecto de miga/corteza). Sin ese circuito de feedback, BreadUp se queda en generador de instrucciones desechables en vez de cumplir su propósito de "cuaderno de recetas" que aprende de la experiencia del usuario.
 
 ## Propuesta
 

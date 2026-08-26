@@ -152,6 +152,7 @@ struct RecipeListView: View {
                   vm.path = []
                   vm.didSaveRecipe = false
                   showingCreateRecipe = true
+                    vm.resetIngredients()
                 } label: {
                   Image(systemName: "plus")
                 }
